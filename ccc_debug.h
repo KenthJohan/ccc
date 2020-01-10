@@ -28,20 +28,20 @@ SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "csc_tcol.h"
+#include "ccc_tcol.h"
 
 //https://stackoverflow.com/questions/8487986/file-macro-shows-full-path
 #ifdef _WIN32
-#define __RELATIVE_FILE__ (strrchr("\\" __FILE__, '\\') + 1)
+#define CCC_RELATIVE_FILE (strrchr("\\" __FILE__, '\\') + 1)
 #else
-#define __RELATIVE_FILE__ (strrchr("/" __FILE__, '/') + 1)
+#define CCC_RELATIVE_FILE (strrchr("/" __FILE__, '/') + 1)
 #endif
 
 //https://gcc.gnu.org/onlinedocs/gcc/Variadic-Macros.html
-#define ASSERT(A)              do{if(!(A)){assert_format(__COUNTER__, __RELATIVE_FILE__, __LINE__, __func__, #A, (0), NULL, NULL                );}}while(0)
-#define ASSERTF(A, F, ...)     do{if(!(A)){assert_format(__COUNTER__, __RELATIVE_FILE__, __LINE__, __func__, #A, (0), NULL,  (F), ## __VA_ARGS__);}}while(0)
-#define ASSERTC(A, C)          do{if(!(A)){assert_format(__COUNTER__, __RELATIVE_FILE__, __LINE__, __func__, #A, (C),   #C, NULL                );}}while(0)
-#define ASSERTCF(A, C, F, ...) do{if(!(A)){assert_format(__COUNTER__, __RELATIVE_FILE__, __LINE__, __func__, #A, (C),   #C,  (F), ## __VA_ARGS__);}}while(0)
+#define ASSERT(A)              do{if(!(A)){assert_format(__COUNTER__, CCC_RELATIVE_FILE, __LINE__, __func__, #A, (0), NULL, NULL                );}}while(0)
+#define ASSERTF(A, F, ...)     do{if(!(A)){assert_format(__COUNTER__, CCC_RELATIVE_FILE, __LINE__, __func__, #A, (0), NULL,  (F), ## __VA_ARGS__);}}while(0)
+#define ASSERTC(A, C)          do{if(!(A)){assert_format(__COUNTER__, CCC_RELATIVE_FILE, __LINE__, __func__, #A, (C),   #C, NULL                );}}while(0)
+#define ASSERTCF(A, C, F, ...) do{if(!(A)){assert_format(__COUNTER__, CCC_RELATIVE_FILE, __LINE__, __func__, #A, (C),   #C,  (F), ## __VA_ARGS__);}}while(0)
 
 
 
@@ -66,7 +66,8 @@ SOFTWARE.
 #define ASSERT_TCOL5 TCOL (TCOL_BOLD, TCOL_RED, TCOL_DEFAULT)
 #define ASSERT_TCOL6 TCOL (TCOL_BOLD, TCOL_RED, TCOL_DEFAULT)
 
-__attribute__ ((__unused__))
+__attribute__ ((unused))
+__attribute__ ((format (printf, 8, 0)))
 static void assert_format_va
 (
 	int id,
@@ -96,7 +97,9 @@ static void assert_format_va
 }
 
 
-__attribute__ ((__unused__))
+__attribute__ ((unused))
+__attribute__ ((noreturn))
+__attribute__ ((format (printf, 8, 0)))
 static void assert_format 
 (
 	int id, 
@@ -119,7 +122,8 @@ static void assert_format
 
 
 
-__attribute__ ((__unused__))
+__attribute__ ((unused))
+__attribute__ ((format (printf, 7, 0)))
 static void trace_format 
 (
 	int id, 
