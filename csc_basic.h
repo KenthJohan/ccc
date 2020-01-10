@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2019 ccc project
+Copyright (c) 2019 CSC Project
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,42 +22,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
 #pragma once
+#include <stddef.h> //offsetof
+#include <stdint.h> //offsetof
 
-//https://misc.flogisoft.com/bash/tip_colors_and_formatting
+#define MAX(a,b) ((a)>(b)?(a):(b))
+#define MIN(a,b) ((a)<(b)?(a):(b))
+//#define INSIDE(x, a, b) ((a) <= (x) && (x) <= (b))
+#define CLAMP(x, x0, x1) (((x) > (x1)) ? (x1) : (((x) < (x0)) ? (x0) : (x)))
+#define SWAP(t, a, b) do{t c = (b); (b) = (a); (a) = (c);} while (0)
+#define SWAPX(a, b)	((a)^=(b),(b)^=(a),(a)^=(b))
 
-//Stringyfier for c preproccessor
-#define TCOL_STR1(x) #x
-#define TCOL_STR(x) TCOL_STR1 (x)
+#define container_of(ptr, type, member) ((type *)(void *)((char *)(ptr) - offsetof(type, member)))
+#define container_of_const(ptr, type, member) ((type *)(void const *)((char const *)(ptr) - offsetof(type, member)))
 
-
-//ANSI text color escape string formatter
-#define TCOL(text, foreground, background) \
-"\x1B[" TCOL_STR (text) ";3" TCOL_STR (foreground) ";4" TCOL_STR (background) "m"
-
-
-//Used for text attributes
-#define TCOL_NORMAL       0
-#define TCOL_BOLD         1
-#define TCOL_UNDERSCORE   4
-#define TCOL_BLINK        5
-#define TCOL_REVERSE      7
-#define TCOL_CONCEAL      8
+#define countof(array) (sizeof(array) / sizeof(array[0]))
 
 
-//Used for foreground and background color
-#define TCOL_BLACK   0
-#define TCOL_RED     1
-#define TCOL_GREEN   2
-#define TCOL_YELLOW  3
-#define TCOL_BLUE    4
-#define TCOL_MAGENTA 5
-#define TCOL_CYAN    6
-#define TCOL_WHITE   7
-#define TCOL_DEFAULT 9
 
 
-//Default text color used in terminals
-//#define TCOL_DEFAULT TCOL (TCOL_NORMAL, TCOL_DEFAULT, TCOL_DEFAULT)
-#define TCOL_RST "\x1B[0m"
+//If a maps to x, then b maps from x
+void csc_inverse_121 (uint32_t a [], uint32_t b [], uint32_t n)
+{
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		b [a [i]] = i;
+	}
+}

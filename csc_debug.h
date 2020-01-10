@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2019 ccc project
+Copyright (c) 2019 CSC Project
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,20 +28,20 @@ SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "ccc_tcol.h"
+#include "csc_tcol.h"
 
 //https://stackoverflow.com/questions/8487986/file-macro-shows-full-path
 #ifdef _WIN32
-#define CCC_RELATIVE_FILE (strrchr("\\" __FILE__, '\\') + 1)
+#define CSC_RELATIVE_FILE (strrchr("\\" __FILE__, '\\') + 1)
 #else
-#define CCC_RELATIVE_FILE (strrchr("/" __FILE__, '/') + 1)
+#define CSC_RELATIVE_FILE (strrchr("/" __FILE__, '/') + 1)
 #endif
 
 //https://gcc.gnu.org/onlinedocs/gcc/Variadic-Macros.html
-#define ASSERT(A)              do{if(!(A)){assert_format(__COUNTER__, CCC_RELATIVE_FILE, __LINE__, __func__, #A, (0), NULL, NULL                );}}while(0)
-#define ASSERTF(A, F, ...)     do{if(!(A)){assert_format(__COUNTER__, CCC_RELATIVE_FILE, __LINE__, __func__, #A, (0), NULL,  (F), ## __VA_ARGS__);}}while(0)
-#define ASSERTC(A, C)          do{if(!(A)){assert_format(__COUNTER__, CCC_RELATIVE_FILE, __LINE__, __func__, #A, (C),   #C, NULL                );}}while(0)
-#define ASSERTCF(A, C, F, ...) do{if(!(A)){assert_format(__COUNTER__, CCC_RELATIVE_FILE, __LINE__, __func__, #A, (C),   #C,  (F), ## __VA_ARGS__);}}while(0)
+#define ASSERT(A)              do{if(!(A)){assert_format(__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, #A, (0), NULL, NULL                );}}while(0)
+#define ASSERTF(A, F, ...)     do{if(!(A)){assert_format(__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, #A, (0), NULL,  (F), ## __VA_ARGS__);}}while(0)
+#define ASSERTC(A, C)          do{if(!(A)){assert_format(__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, #A, (C),   #C, NULL                );}}while(0)
+#define ASSERTCF(A, C, F, ...) do{if(!(A)){assert_format(__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, #A, (C),   #C,  (F), ## __VA_ARGS__);}}while(0)
 
 
 
