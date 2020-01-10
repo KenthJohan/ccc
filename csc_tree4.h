@@ -24,6 +24,8 @@ SOFTWARE.
 
 #pragma once
 
+#include <stdint.h>
+#include <stddef.h>
 
 /*
 https://en.wikipedia.org/wiki/Left-child_right-sibling_binary_tree
@@ -137,3 +139,38 @@ void csc_tree4_addparent2 (struct csc_tree4 * node, struct csc_tree4 * newnode)
 	node->prev = 0;
 }
 
+
+__attribute__ ((unused))
+static inline
+struct csc_tree4 const *
+csc_tree4_traverse
+(struct csc_tree4 const * node, int *depth)
+{
+	if (node == NULL)
+	{
+		return node;
+	}
+	else if (node->child)
+	{
+		(*depth) += 1;
+		return node->child;
+	}
+	else if (node->next)
+	{
+		return node->next;
+	}
+	else if (node->parent && (node->child == NULL) && (node->next == NULL))
+	{
+		do
+		{
+			(*depth) -= 1;
+			node = node->parent;
+		}
+		while (node && (node->next == NULL));
+		if (node && node->next)
+		{
+			return node->next;
+		}
+	}
+	return NULL;
+}
