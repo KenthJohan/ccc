@@ -45,9 +45,9 @@ SOFTWARE.
 
 
 
-#define TRACE(F)            trace_format (__COUNTER__, __RELATIVE_FILE__, __LINE__, __func__, (0), NULL,  (F)                )
-#define TRACEF(F, ...)     trace_format (__COUNTER__, __RELATIVE_FILE__, __LINE__, __func__, (0), NULL,  (F), ## __VA_ARGS__)
-#define TRACECF(C, F, ...) trace_format (__COUNTER__, __RELATIVE_FILE__, __LINE__, __func__, (C),   #C,  (F), ## __VA_ARGS__)
+#define TRACE(F)            trace_format (__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, (0), NULL,  (F)                )
+#define TRACEF(F, ...)     trace_format (__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, (0), NULL,  (F), ## __VA_ARGS__)
+#define TRACECF(C, F, ...) trace_format (__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, (C),   #C,  (F), ## __VA_ARGS__)
 
 #define TRACE_TCOL_INFO0 TCOL (TCOL_NORMAL, TCOL_YELLOW, TCOL_DEFAULT)
 #define TRACE_TCOL_INFO1 TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT)
