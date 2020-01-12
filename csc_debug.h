@@ -37,60 +37,57 @@ SOFTWARE.
 #define CSC_RELATIVE_FILE (strrchr("/" __FILE__, '/') + 1)
 #endif
 
-//https://gcc.gnu.org/onlinedocs/gcc/Variadic-Macros.html
-#define ASSERT(A)              do{if(!(A)){assert_format(__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, #A, (0), NULL, NULL                );}}while(0)
-#define ASSERTF(A, F, ...)     do{if(!(A)){assert_format(__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, #A, (0), NULL,  (F), ## __VA_ARGS__);}}while(0)
-#define ASSERTC(A, C)          do{if(!(A)){assert_format(__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, #A, (C),   #C, NULL                );}}while(0)
-#define ASSERTCF(A, C, F, ...) do{if(!(A)){assert_format(__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, #A, (C),   #C,  (F), ## __VA_ARGS__);}}while(0)
-
-
-
-#define TRACE(F)            trace_format (__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, (0), NULL,  (F)                )
-#define TRACEF(F, ...)     trace_format (__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, (0), NULL,  (F), ## __VA_ARGS__)
-#define TRACECF(C, F, ...) trace_format (__COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__, (C),   #C,  (F), ## __VA_ARGS__)
-
 #define TRACE_TCOL_INFO0 TCOL (TCOL_NORMAL, TCOL_YELLOW, TCOL_DEFAULT)
 #define TRACE_TCOL_INFO1 TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT)
 #define TRACE_TCOL_INFO2 TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT)
 #define TRACE_TCOL_INFO3 TCOL (TCOL_NORMAL, TCOL_RED, TCOL_DEFAULT)
-#define TRACE_TCOL_INFO4 TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT)
+#define TRACE_TCOL_INFO4 TCOL (TCOL_NORMAL, TCOL_BLUE, TCOL_DEFAULT)
 #define TRACE_TCOL_INFO5 TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT)
 #define TRACE_TCOL_INFO6 TCOL (TCOL_NORMAL, TCOL_BLUE, TCOL_DEFAULT)
-
-
 #define ASSERT_TCOL0 TCOL (TCOL_NORMAL, TCOL_RED, TCOL_DEFAULT)
 #define ASSERT_TCOL1 TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT)
-#define ASSERT_TCOL2 TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT)
-#define ASSERT_TCOL3 TCOL (TCOL_BOLD, TCOL_RED, TCOL_DEFAULT)
-#define ASSERT_TCOL4 TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT)
-#define ASSERT_TCOL5 TCOL (TCOL_BOLD, TCOL_RED, TCOL_DEFAULT)
+#define ASSERT_TCOL2 TCOL (TCOL_NORMAL, TCOL_YELLOW, TCOL_DEFAULT)
+#define ASSERT_TCOL3 TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT)
+#define ASSERT_TCOL4 TCOL (TCOL_NORMAL, TCOL_CYAN, TCOL_DEFAULT)
+#define ASSERT_TCOL5 TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT)
 #define ASSERT_TCOL6 TCOL (TCOL_BOLD, TCOL_RED, TCOL_DEFAULT)
+#define ASSERT_TCOLID TCOL (TCOL_NORMAL, TCOL_GREEN, TCOL_DEFAULT)
+
+//https://gcc.gnu.org/onlinedocs/gcc/Variadic-Macros.html
+//http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2153.htm
+#define ASSERT_CARGS __COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__
+
+#define ASSERT(A)               do{if(!(A)){assert_format(ASSERT_CARGS, #A, (NULL)             );}}while(0)
+#define ASSERTF(A, F, ...)      do{if(!(A)){assert_format(ASSERT_CARGS, #A, (F), ## __VA_ARGS__);}}while(0)
+#define ASSERT_PARAM_NOTNULL(A) do{if((A)==NULL){assert_format(ASSERT_CARGS, NULL, "parameter "ASSERT_TCOLID"%s"TCOL_RST" of function "ASSERT_TCOLID"%s"TCOL_RST" is NULL", #A, __func__);}}while(0)
+
+#define TRACE(F)           trace_format (ASSERT_CARGS, (F)                )
+#define TRACEF(F, ...)     trace_format (ASSERT_CARGS, (F), ## __VA_ARGS__)
+
+
+
+
+
 
 __attribute__ ((unused))
-__attribute__ ((format (printf, 8, 0)))
+__attribute__ ((format (printf, 6, 0)))
 static void assert_format_va
 (
-	int id,
-	char const * file,
-	int line,
-	char const * fn,
-	char const * exp,
-	int code,
-	char const * scode,
-	char const * fmt,
-	va_list va
+int id,
+char const * file,
+int line,
+char const * fn,
+char const * exp,
+char const * fmt,
+va_list va
 )
 {
-	fprintf (stderr, ASSERT_TCOL0 "ASSERT " ASSERT_TCOL1 "[%04i]" TCOL_RST " ", id);
+	fprintf (stderr, ASSERT_TCOL0 "ASSERT%04i" TCOL_RST " ", id);
 	fprintf (stderr, ASSERT_TCOL2 "%s" ASSERT_TCOL3 ":" TCOL_RST, file);
 	fprintf (stderr, ASSERT_TCOL4 "%04i" TCOL_RST " in ", line);
-	fprintf (stderr, ASSERT_TCOL5 "%s" TCOL_RST " () ", fn);
-	fprintf (stderr, ASSERT_TCOL6 "[%s]" TCOL_RST " ", exp);
-	if (scode)
-	{
-		fprintf (stderr, TCOL (TCOL_BOLD, TCOL_BLACK, TCOL_YELLOW) "[%i %s]" TCOL_RST " ", code, scode);
-	}
-	fprintf (stderr, "[%04i:" TCOL (TCOL_BOLD, TCOL_RED , TCOL_DEFAULT) "%s" TCOL_RST "]: ", errno, strerror (errno));
+	fprintf (stderr, ASSERT_TCOLID "%s()" TCOL_RST ": ", fn);
+	if (exp){fprintf (stderr, ASSERT_TCOL6 "[%s]" TCOL_RST " ", exp);}
+	if (errno != 0) {fprintf (stderr, "[%04i:" TCOL (TCOL_BOLD, TCOL_RED , TCOL_DEFAULT) "%s" TCOL_RST "]: ", errno, strerror (errno));}
 	vfprintf (stderr, fmt, va);
 	fprintf (stderr, "\n");
 	fflush (stderr);
@@ -99,23 +96,21 @@ static void assert_format_va
 
 __attribute__ ((unused))
 __attribute__ ((noreturn))
-__attribute__ ((format (printf, 8, 0)))
+__attribute__ ((format (printf, 6, 0)))
 static void assert_format 
 (
-	int id, 
-	char const * file, 
-	int line, 
-	char const * fn, 
-	char const * exp, 
-	int code,
-	char const * scode,
-	char const * fmt, 
-	...
+int id,
+char const * file,
+int line,
+char const * fn,
+char const * exp,
+char const * fmt,
+...
 )
 {
 	va_list va;
 	va_start (va, fmt);
-	assert_format_va (id, file, line, fn, exp, code, scode, fmt, va);
+	assert_format_va (id, file, line, fn, exp, fmt, va);
 	va_end (va);
 	exit (1);
 }
@@ -123,17 +118,15 @@ static void assert_format
 
 
 __attribute__ ((unused))
-__attribute__ ((format (printf, 7, 0)))
+__attribute__ ((format (printf, 5, 0)))
 static void trace_format 
 (
-	int id, 
-	char const * file, 
-	int line, 
-	char const * fn, 
-	int code,
-	char const * scode,
-	char const * fmt, 
-	...
+int id,
+char const * file,
+int line,
+char const * fn,
+char const * fmt,
+...
 )
 {
 	va_list list;
@@ -143,10 +136,6 @@ static void trace_format
 	fprintf (stderr, TRACE_TCOL_INFO2 "%s" TRACE_TCOL_INFO3 ":" TCOL_RST, file);
 	fprintf (stderr, TRACE_TCOL_INFO4 "%04i" TCOL_RST " in ", line);
 	fprintf (stderr, TRACE_TCOL_INFO5 "%s" TCOL_RST " ()", fn);
-	if (scode)
-	{
-		fprintf (stderr, TRACE_TCOL_INFO6 " [%i %s]" TCOL_RST " ", code, scode);
-	}
 	fprintf (stderr, ": ");
 	vfprintf (stderr, fmt, list);
 	fprintf (stderr, "\n");

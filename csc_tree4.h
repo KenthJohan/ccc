@@ -26,6 +26,7 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <stddef.h>
+#include "csc_debug.h"
 
 /*
 https://en.wikipedia.org/wiki/Left-child_right-sibling_binary_tree
@@ -42,8 +43,11 @@ struct csc_tree4
 	int child_count;
 };
 
+
 void csc_tree4_addchild (struct csc_tree4 * parent, struct csc_tree4 * child)
 {
+	ASSERT_PARAM_NOTNULL (parent);
+	ASSERT_PARAM_NOTNULL (child);
 	child->prev = 0;
 	child->next = parent->child;
 	child->parent = parent;
@@ -55,8 +59,22 @@ void csc_tree4_addchild (struct csc_tree4 * parent, struct csc_tree4 * child)
 	parent->child_count++;
 }
 
+
+/*
+ * Insert a new entry (sibling1) after the specified head (sibling0).
+ * @sibling0: list head to add it after
+ * @sibling1: new entry to be added
+ *   R           R
+ *  / \   -->   / \
+ * C   s0      C   s0
+ *                  \
+ *                  s1
+ * Node R and C are there only for visuals.
+ */
 void csc_tree4_addsibling (struct csc_tree4 * sibling0, struct csc_tree4 * sibling1)
 {
+	ASSERT_PARAM_NOTNULL (sibling0);
+	ASSERT_PARAM_NOTNULL (sibling1);
 	sibling0->next = sibling1;
 	sibling1->prev = sibling0;
 	sibling1->parent = sibling0->parent;
@@ -66,8 +84,11 @@ void csc_tree4_addsibling (struct csc_tree4 * sibling0, struct csc_tree4 * sibli
 	}
 }
 
+
 void csc_tree4_addparent (struct csc_tree4 * node, struct csc_tree4 * newnode)
 {
+	ASSERT_PARAM_NOTNULL (node);
+	ASSERT_PARAM_NOTNULL (newnode);
 	newnode->child = node;
 	newnode->parent = node->parent;
 	newnode->next = node->next;
@@ -91,8 +112,13 @@ void csc_tree4_addparent (struct csc_tree4 * node, struct csc_tree4 * newnode)
 }
 
 
+/*
+ * Delete a list entry by making the prev/next and parent/child entries
+ * point to each other.
+ */
 void csc_tree4_remove (struct csc_tree4 * node)
 {
+	ASSERT_PARAM_NOTNULL (node);
 	if (node->next)
 	{
 		node->next->prev = node->prev;
@@ -118,6 +144,8 @@ void csc_tree4_remove (struct csc_tree4 * node)
 
 void csc_tree4_addparent2 (struct csc_tree4 * node, struct csc_tree4 * newnode)
 {
+	ASSERT_PARAM_NOTNULL (node);
+	ASSERT_PARAM_NOTNULL (newnode);
 	newnode->child = node;
 	newnode->parent = node->parent;
 	newnode->next = node->next;
