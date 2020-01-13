@@ -60,6 +60,7 @@ SOFTWARE.
 #define ASSERT(A)               do{if(!(A)){assert_format(ASSERT_CARGS, #A, (NULL)             );}}while(0)
 #define ASSERTF(A, F, ...)      do{if(!(A)){assert_format(ASSERT_CARGS, #A, (F), ## __VA_ARGS__);}}while(0)
 #define ASSERT_PARAM_NOTNULL(A) do{if((A)==NULL){assert_format(ASSERT_CARGS, NULL, "parameter "ASSERT_TCOLID"%s"TCOL_RST" of function "ASSERT_TCOLID"%s"TCOL_RST" is NULL", #A, __func__);}}while(0)
+#define ASSERT_ISPOW2(x)        ASSERTF((x & (x-1)) == 0, "The number %i must be a positive integer power of two", (int)(x))
 
 #define TRACE(F)           trace_format (ASSERT_CARGS, (F)                )
 #define TRACEF(F, ...)     trace_format (ASSERT_CARGS, (F), ## __VA_ARGS__)
@@ -83,11 +84,10 @@ va_list va
 )
 {
 	fprintf (stderr, ASSERT_TCOL0 "ASSERT%04i" TCOL_RST " ", id);
-	fprintf (stderr, ASSERT_TCOL2 "%s" ASSERT_TCOL3 ":" TCOL_RST, file);
-	fprintf (stderr, ASSERT_TCOL4 "%04i" TCOL_RST " in ", line);
-	fprintf (stderr, ASSERT_TCOLID "%s()" TCOL_RST ": ", fn);
-	if (exp){fprintf (stderr, ASSERT_TCOL6 "[%s]" TCOL_RST " ", exp);}
+	fprintf (stderr, TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT) "%s:%04i" TCOL_RST " in ", file, line);
+	fprintf (stderr, ASSERT_TCOLID "%s() " TCOL_RST, fn);
 	if (errno != 0) {fprintf (stderr, "[%04i:" TCOL (TCOL_BOLD, TCOL_RED , TCOL_DEFAULT) "%s" TCOL_RST "]: ", errno, strerror (errno));}
+	if (exp){fprintf (stderr, TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT) "%s" TCOL_RST " ", exp);}
 	vfprintf (stderr, fmt, va);
 	fprintf (stderr, "\n");
 	fflush (stderr);
