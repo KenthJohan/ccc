@@ -87,5 +87,19 @@ static inline void csc_dlist_del (struct csc_dlist * entry)
 }
 
 
+__attribute__ ((unused))
+static inline unsigned csc_dlist_count (struct csc_dlist * entry)
+{
+	unsigned count = 0;
+	struct csc_dlist * p;
+	for (p = entry->next; p != entry; p = p->next)
+	{
+		count ++;
+	}
+	return count;
+}
+
+
+
 
 
