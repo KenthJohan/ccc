@@ -39,7 +39,24 @@ SOFTWARE.
 
 #define countof(array) (sizeof(array) / sizeof(array[0]))
 
+/*
 
+typedef uint32_t u32;
+typedef uint16_t u16;
+typedef uint8_t u8;
+
+typedef int32_t i32;
+typedef int16_t i16;
+typedef int8_t i8;
+
+typedef uint32_t c32; //character
+typedef uint16_t c16; //character
+typedef uint8_t c8; //character
+
+typedef uint8_t utf8; //utf character
+typedef uint16_t utf16; //utf character
+typedef uint32_t utf32; //utf character
+*/
 
 
 //If a maps to x, then b maps from x

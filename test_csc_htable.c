@@ -1,6 +1,13 @@
 #include "csc_debug.h"
 #include "csc_htable.h"
+#include "csc_basic.h"
 
+
+
+struct test_entry
+{
+	struct csc_htable_entry table;
+};
 
 
 int main (int argc, char * argv [])
@@ -35,6 +42,10 @@ int main (int argc, char * argv [])
 	printf ("%s %ju\n", e->key, e->ival);
 	e = csc_htable_find (&t, "num4");
 	printf ("%s %ju\n", e->key, e->ival);
+
+
+
+
 
 	return EXIT_SUCCESS;
 }

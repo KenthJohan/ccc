@@ -39,6 +39,7 @@ enum pacton_byteorder
 {
 	PACTON_BYTEORDER_LE,
 	PACTON_BYTEORDER_BE,
+	PACTON_BYTEORDER_NE, //Native endian
 	PACTON_BYTEORDER__N,
 	PACTON_BYTEORDER_UNKNOWN
 };
@@ -55,12 +56,18 @@ enum pacton_primtype
 	PACTON_PRIMTYPE_U64,
 	PACTON_PRIMTYPE_F32,
 	PACTON_PRIMTYPE_F64,
+	PACTON_PRIMTYPE_S8,
+	PACTON_PRIMTYPE_S16,
+	PACTON_PRIMTYPE_S32,
+	PACTON_PRIMTYPE_S64,
+	PACTON_PRIMTYPE_IMAX,
+	PACTON_PRIMTYPE_UMAX,
 	PACTON_PRIMTYPE__N,
 	PACTON_PRIMTYPE_UNKNOWN,
 };
 
 
-#define PACTON_TYPE(endian,size,primtype) ((((endian)&0x1) << 0) | (((size)&0xFF) << 8) | (((primtype)&0xFF) << 16))
+#define PACTON_TYPE(endian,size,primtype) ((((endian)&0x2) << 0) | (((size)&0xFF) << 8) | (((primtype)&0xFF) << 16))
 #define PACTON_TYPE_BYTEORDER(t) (((t) >> 0) & 0x1)
 #define PACTON_TYPE_SIZE(t) (((t) >> 8) & 0xFF)
 #define PACTON_TYPE_PRIMTYPE(t) (((t) >> 16) & 0xFF)
@@ -80,6 +87,12 @@ char const * pacton_primtype_tostr (enum pacton_primtype type)
 	case PACTON_PRIMTYPE_U64: return "U64";
 	case PACTON_PRIMTYPE_F32: return "F32";
 	case PACTON_PRIMTYPE_F64: return "F64";
+	case PACTON_PRIMTYPE_S8: return "S8";
+	case PACTON_PRIMTYPE_S16: return "S16";
+	case PACTON_PRIMTYPE_S32: return "S32";
+	case PACTON_PRIMTYPE_S64: return "S64";
+	case PACTON_PRIMTYPE_IMAX: return "IMAX";
+	case PACTON_PRIMTYPE_UMAX: return "UMAX";
 	default:return NULL;
 	}
 }
@@ -99,6 +112,12 @@ enum pacton_primtype pacton_primtype_fromstr (char const * primtype)
 	else if (strcmp (primtype, pacton_primtype_tostr(PACTON_PRIMTYPE_U64)) == 0){return PACTON_PRIMTYPE_U64;}
 	else if (strcmp (primtype, pacton_primtype_tostr(PACTON_PRIMTYPE_F32)) == 0){return PACTON_PRIMTYPE_F32;}
 	else if (strcmp (primtype, pacton_primtype_tostr(PACTON_PRIMTYPE_F64)) == 0){return PACTON_PRIMTYPE_F64;}
+	else if (strcmp (primtype, pacton_primtype_tostr(PACTON_PRIMTYPE_S8)) == 0){return PACTON_PRIMTYPE_S16;}
+	else if (strcmp (primtype, pacton_primtype_tostr(PACTON_PRIMTYPE_S16)) == 0){return PACTON_PRIMTYPE_S16;}
+	else if (strcmp (primtype, pacton_primtype_tostr(PACTON_PRIMTYPE_S32)) == 0){return PACTON_PRIMTYPE_S32;}
+	else if (strcmp (primtype, pacton_primtype_tostr(PACTON_PRIMTYPE_S64)) == 0){return PACTON_PRIMTYPE_S64;}
+	else if (strcmp (primtype, pacton_primtype_tostr(PACTON_PRIMTYPE_IMAX)) == 0){return PACTON_PRIMTYPE_IMAX;}
+	else if (strcmp (primtype, pacton_primtype_tostr(PACTON_PRIMTYPE_UMAX)) == 0){return PACTON_PRIMTYPE_UMAX;}
 	return PACTON_PRIMTYPE_UNKNOWN;
 }
 
@@ -109,6 +128,7 @@ char const * pacton_byteorder_tostr (enum pacton_byteorder order)
 	{
 	case PACTON_BYTEORDER_BE: return "BE";
 	case PACTON_BYTEORDER_LE: return "LE";
+	case PACTON_BYTEORDER_NE: return "NE";
 	default:return NULL;
 	}
 }
@@ -120,6 +140,7 @@ enum pacton_byteorder pacton_byteorder_fromstr (char const * primtype)
 	if (0){}
 	else if (strcmp (primtype, pacton_byteorder_tostr(PACTON_BYTEORDER_BE)) == 0){return PACTON_BYTEORDER_BE;}
 	else if (strcmp (primtype, pacton_byteorder_tostr(PACTON_BYTEORDER_LE)) == 0){return PACTON_BYTEORDER_LE;}
+	else if (strcmp (primtype, pacton_byteorder_tostr(PACTON_BYTEORDER_NE)) == 0){return PACTON_BYTEORDER_NE;}
 	return PACTON_BYTEORDER_UNKNOWN;
 }
 

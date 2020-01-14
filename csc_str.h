@@ -49,19 +49,24 @@ intmax_t str_to_imax (char ** f, int base)
 {
 	intmax_t a = 0;
 	int c;
+	int neg = 0;
+	c = (**f);
+	if (c == '-') {neg = 1; (*f) ++;}
+	else if (c == '+') {neg = 0; (*f) ++;}
 	while (1)
 	{
 		c = (**f);
 		if (c == '\0') {break;}
-		else if (STR_INB (c, '0', '9', abs (base))) {c -= '0';}
-		else if (abs (base) > 10 && STR_INB (c, 'a', 'z', abs (base))) {c -= ('a' - 10);}
-		else if (abs (base) > 10 && STR_INB (c, 'A', 'Z', abs (base))) {c -= ('A' - 10);}
+		else if (STR_INB (c, '0', '9', abs(base))) {c -= '0';}
+		else if (abs(base) > 10 && STR_INB (c, 'a', 'z', abs(base))) {c -= ('a' - 10);}
+		else if (abs(base) > 10 && STR_INB (c, 'A', 'Z', abs(base))) {c -= ('A' - 10);}
 		else {break;}
 		a *= (intmax_t) base;
 		a += (intmax_t) c;
 		(*f) ++;
 	}
-	return a;
+	if (neg) {return -a;}
+	else {return a;}
 }
 
 
