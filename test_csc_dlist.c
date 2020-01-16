@@ -11,9 +11,9 @@ int main (int argc, char * argv [])
 	struct csc_dlist node [10];
 	csc_dlist_init (node);
 	ASSERT (csc_dlist_count (node) == 0);
-	csc_dlist_add_head (node+1, node);
+	csc_dlist_add_head (node, node+1);
 	ASSERT (csc_dlist_count (node) == 1);
-	csc_dlist_add_head (node+2, node);
+	csc_dlist_add_head (node, node+2);
 	ASSERT (csc_dlist_count (node) == 2);
 	
 	return EXIT_SUCCESS;

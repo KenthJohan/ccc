@@ -56,7 +56,7 @@ static inline void csc_dlist_add_between (struct csc_dlist *prev, struct csc_dli
 
 
 __attribute__ ((unused))
-static inline void csc_dlist_add_head (struct csc_dlist *new, struct csc_dlist *head)
+static inline void csc_dlist_add_head (struct csc_dlist *head, struct csc_dlist *new)
 {
 	ASSERT_PARAM_NOTNULL (head);
 	csc_dlist_add_between (head, new, head->next);
@@ -64,7 +64,7 @@ static inline void csc_dlist_add_head (struct csc_dlist *new, struct csc_dlist *
 
 
 __attribute__ ((unused))
-static inline void csc_dlist_add_tail (struct csc_dlist *new, struct csc_dlist *head)
+static inline void csc_dlist_add_tail (struct csc_dlist *head, struct csc_dlist *new)
 {
 	ASSERT_PARAM_NOTNULL (head);
 	csc_dlist_add_between (head->prev, new, head);
@@ -99,6 +99,14 @@ static inline unsigned csc_dlist_count (struct csc_dlist * entry)
 	return count;
 }
 
+__attribute__ ((unused))
+static inline void csc_dlist_replace (struct csc_dlist *old, struct csc_dlist *new)
+{
+	new->next = old->next;
+	new->next->prev = new;
+	new->prev = old->prev;
+	new->prev->next = new;
+}
 
 
 

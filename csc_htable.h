@@ -37,12 +37,6 @@ struct csc_htable_entry
 {
 	//TODO: Support any key type instead of only cstring:
 	char * key;
-	union
-	{
-		void * pval;
-		intmax_t ival;
-		uintmax_t uval;
-	};
 	//Linux style list head node:
 	struct csc_dlist list;
 };
@@ -53,6 +47,8 @@ struct csc_htable
 	//Number of entries, must be power of 2.
 	unsigned size;
 	struct csc_htable_entry * table;
+	struct csc_dlist list_replace;
+	struct csc_dlist list_del;
 };
 
 
@@ -62,6 +58,8 @@ void csc_htable_init (struct csc_htable * t)
 {
 	ASSERT_PARAM_NOTNULL (t);
 	ASSERT_ISPOW2 (t->size);
+	csc_dlist_init (&t->list_replace);
+	csc_dlist_init (&t->list_del);
 	t->table = calloc (t->size, sizeof (struct csc_htable_entry));
 	for (unsigned i = 0; i < t->size; ++i)
 	{
@@ -91,7 +89,7 @@ unsigned csc_htable_hash (unsigned size, char * key)
 
 __attribute__ ((unused))
 static inline
-struct csc_htable_entry * csc_htable_find (struct csc_htable * t, char * key)
+struct csc_dlist * csc_htable_find_list (struct csc_htable * t, char * key)
 {
 	ASSERT_PARAM_NOTNULL (t);
 	unsigned h = csc_htable_hash (t->size, key);
@@ -104,10 +102,36 @@ struct csc_htable_entry * csc_htable_find (struct csc_htable * t, char * key)
 		ASSERT (e->key);
 		if (strcmp (e->key, key) == 0)
 		{
-			return e;
+			return p;
 		}
 	}
-	return NULL;
+	return p;
+}
+
+
+__attribute__ ((unused))
+static inline
+void csc_htable_set (struct csc_htable * t, struct csc_htable_entry * new)
+{
+	ASSERT_PARAM_NOTNULL (t);
+	unsigned h = csc_htable_hash (t->size, new->key);
+	TRACEF ("%s : %i", new->key, h);
+	struct csc_dlist * list = &t->table [h].list;
+	struct csc_dlist * p;
+	for (p = list->next; p != list; p = p->next)
+	{
+		struct csc_htable_entry * e = container_of (p, struct csc_htable_entry, list);
+		ASSERT (e->key);
+		if (strcmp (e->key, new->key) == 0)
+		{
+			csc_dlist_replace (p, &new->list);
+			csc_dlist_add_head (&t->list_replace, p);
+			//TRACEF ("count %i", csc_dlist_count (list));
+			return;
+		}
+	}
+	csc_dlist_add_head (list, &new->list);
+	//TRACEF ("count %i", csc_dlist_count (list));
 }
 
 
@@ -116,74 +140,14 @@ static inline
 void csc_htable_del (struct csc_htable * t, char * key)
 {
 	ASSERT_PARAM_NOTNULL (t);
-	struct csc_htable_entry * e;
-	e = csc_htable_find (t, key);
-	if (e)
+	struct csc_dlist * list;
+	list = csc_htable_find_list (t, key);
+	if (list->next != list->prev)
 	{
-		csc_dlist_del (&e->list);
-		ASSERT (e->key);
-		free (e->key);
-		e->key = NULL;
+		csc_dlist_del (list);
+		csc_dlist_add_head (&t->list_del, list);
 	}
 }
-
-
-/*
- * Finds the entry by parameter key.
- * If the entry can not be found then allocate a new one and add it to the table.
- * Returns a new entry or found entry.
- */
-__attribute__ ((unused))
-static inline
-struct csc_htable_entry * csc_htable_acquire (struct csc_htable * t, char * key)
-{
-	ASSERT_PARAM_NOTNULL (t);
-	struct csc_htable_entry * e;
-	e = csc_htable_find (t, key);
-	if (e == NULL)
-	{
-		unsigned h = csc_htable_hash (t->size, key);
-		struct csc_dlist * list = &t->table [h].list;
-		e = calloc (1, sizeof (struct csc_htable_entry));
-		ASSERT (e);
-		e->key = strdup (key);
-		csc_dlist_add_head (&e->list, list);
-	}
-	return e;
-}
-
-
-__attribute__ ((unused))
-static inline
-void csc_htable_set_ptr (struct csc_htable * t, char * key, void * val)
-{
-	ASSERT_PARAM_NOTNULL (t);
-	struct csc_htable_entry * e = csc_htable_acquire (t, key);
-	e->pval = val;
-}
-
-
-__attribute__ ((unused))
-static inline
-void csc_htable_set_imax (struct csc_htable * t, char * key, intmax_t val)
-{
-	ASSERT_PARAM_NOTNULL (t);
-	struct csc_htable_entry * e = csc_htable_acquire (t, key);
-	e->ival = val;
-}
-
-
-__attribute__ ((unused))
-static inline
-void csc_htable_set_umax (struct csc_htable * t, char * key, uintmax_t val)
-{
-	ASSERT_PARAM_NOTNULL (t);
-	struct csc_htable_entry * e = csc_htable_acquire (t, key);
-	e->uval = val;
-}
-
-
-
 
 
 
