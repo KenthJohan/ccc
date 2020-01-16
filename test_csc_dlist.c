@@ -14,7 +14,7 @@ int main (int argc, char * argv [])
 	csc_dlist_add_head (node+1, node);
 	ASSERT (csc_dlist_count (node) == 1);
 	csc_dlist_add_head (node+2, node);
-	ASSERT (csc_dlist_count (node) == 3);
+	ASSERT (csc_dlist_count (node) == 2);
 	
 	return EXIT_SUCCESS;
 }
