@@ -11,6 +11,8 @@
 #include <assert.h>
 #include <errno.h>
 #include "argparse.h"
+#include "csc_debug.h"
+#include "csc_basic.h"
 
 
 static const char * prefix_skip (const char *str, const char *prefix)
@@ -365,6 +367,23 @@ void argparse_usage (const char *const *usages)
 }
 
 
+
+
+void argparse_aprint (FILE * f, char const * a, char const * pre, size_t len)
+{
+	size_t i;
+	while (1)
+	{
+		i = fwrite (a, 1, MIN (len, strlen (a)), f);
+		if (i < len) {break;}
+		a += i;
+		fputc ('\n', f);
+		fputs (pre, f);
+	}
+	fputc ('\n', f);
+}
+
+
 void argparse_describe (struct argparse *self)
 {
 	assert (self);
@@ -374,13 +393,16 @@ void argparse_describe (struct argparse *self)
 		switch (options->type)
 		{
 		case ARGPARSE_OPT_FLOAT:
-			fprintf (stdout, " -%c, --%-20.20s %s\n", options->short_name, options->long_name, options->help);
+			fprintf (stdout, " -%c, --%-20.20s ", options->short_name, options->long_name);
+			argparse_aprint (stdout, options->help, "                            ", 40);
 			break;
 		case ARGPARSE_OPT_INTEGER:
-			fprintf (stdout, " -%c, --%-20.20s %s\n", options->short_name, options->long_name, options->help);
+			fprintf (stdout, " -%c, --%-20.20s ", options->short_name, options->long_name);
+			argparse_aprint (stdout, options->help, "                            ", 40);
 			break;
 		case ARGPARSE_OPT_STRING:
-			fprintf (stdout, " -%c, --%-20.20s %s\n", options->short_name, options->long_name, options->help);
+			fprintf (stdout, " -%c, --%-20.20s ", options->short_name, options->long_name);
+			argparse_aprint (stdout, options->help, "                            ", 40);
 			break;
 		case ARGPARSE_OPT_GROUP:
 			fprintf (stdout, "\n%s\n", options->help);
@@ -388,7 +410,8 @@ void argparse_describe (struct argparse *self)
 		case ARGPARSE_OPT_BOOLEAN:
 			if (options->value)
 			{
-				fprintf (stdout, " -%c, --%-20.20s %s\n", options->short_name, options->long_name, options->help);
+				fprintf (stdout, " -%c, --%-20.20s ", options->short_name, options->long_name);
+				argparse_aprint (stdout, options->help, "                            ", 40);
 			}
 			else
 			{
