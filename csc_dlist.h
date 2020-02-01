@@ -177,7 +177,7 @@ static inline unsigned csc_dlist_empty_v (struct csc_dlist *list, unsigned n)
 
 
 __attribute__ ((unused))
-static inline int csc_dlist_compare_str (struct csc_dlist *entry, struct csc_dlist *base, char const * needle, void * content, unsigned stride, unsigned offset)
+static inline int csc_dlist_find_str (struct csc_dlist *entry, struct csc_dlist *base, char const * needle, void * content, unsigned stride, unsigned offset)
 {
 	ASSERT_PARAM_NOTNULL (entry);
 	char * c = content;
@@ -193,5 +193,3 @@ static inline int csc_dlist_compare_str (struct csc_dlist *entry, struct csc_dli
 	}
 	return -1;
 }
-
-#define CSC_DLIST_COMPARE_STR(entry, base, needle, content, type, member) csc_dlist_compare_str (entry, base, needle, content, sizeof (type), offsetof (type, member))

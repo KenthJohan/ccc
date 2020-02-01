@@ -11,10 +11,10 @@
 
 struct buckets
 {
-	struct csc_dlist ht [BUCKETS_HT_COUNT];
-	char * name;
-	int * count;
-	struct csc_dlist * node;
+	struct csc_dlist * ht; //Hashtable
+	struct csc_dlist * node; //node+i*stride, can be inserted to the hashtable
+	char * name; //name+i*stride
+	int * count; //count+i*stride
 };
 
 void buckets_set (struct buckets * b, unsigned i, char const * str, int count)
@@ -23,17 +23,17 @@ void buckets_set (struct buckets * b, unsigned i, char const * str, int count)
 	struct csc_dlist * node = b->node + i;
 	snprintf (name, BUCKETS_NAME_COUNT, "%s", str);
 	b->count [i] = count;
-	uint8_t hv = hash8_str (name, BUCKETS_HT_COUNT);
+	uint8_t key = hash8_str (name, BUCKETS_HT_COUNT);
 	ASSERT (node->next == NULL);
 	ASSERT (node->prev == NULL);
-	csc_dlist_add_head (b->ht + hv, node);
+	csc_dlist_add_head (b->ht + key, node);
 }
 
 int buckets_find (struct buckets * b, char const * needle)
 {
-	uint8_t hv = hash8_str (needle, BUCKETS_HT_COUNT);
-	struct csc_dlist * p = b->ht + hv;
-	int i = csc_dlist_compare_str (p, b->node, needle, b->name, BUCKETS_NAME_COUNT, 0);
+	uint8_t key = hash8_str (needle, BUCKETS_HT_COUNT);
+	struct csc_dlist * p = b->ht + key;
+	int i = csc_dlist_find_str (p, b->node, needle, b->name, BUCKETS_NAME_COUNT, 0);
 	return i;
 }
 
@@ -43,10 +43,12 @@ int main (int argc, char * argv [])
 	ASSERT (argv);
 
 	struct buckets b;
-	csc_dlist_init_v (b.ht, BUCKETS_HT_COUNT);
+	b.ht = calloc (BUCKETS_HT_COUNT, sizeof (struct csc_dlist));
 	b.node = calloc (BUCKETS_COUNT, sizeof (struct csc_dlist));
 	b.name = calloc (BUCKETS_COUNT * BUCKETS_NAME_COUNT, sizeof (char));
 	b.count = calloc (BUCKETS_COUNT, sizeof (int));
+
+	csc_dlist_init_v (b.ht, BUCKETS_HT_COUNT);
 
 	buckets_set (&b, 0, "Banana", 200);
 	buckets_set (&b, 1, "Apples", 300);
