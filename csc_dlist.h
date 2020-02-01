@@ -73,6 +73,8 @@ static inline void csc_dlist_add_tail (struct csc_dlist *head, struct csc_dlist 
 
 static inline void csc_dlist_connect (struct csc_dlist * a, struct csc_dlist * b)
 {
+	ASSERT_PARAM_NOTNULL (a);
+	ASSERT_PARAM_NOTNULL (b);
 	a->prev = b;
 	b->next = a;
 }
@@ -81,6 +83,7 @@ static inline void csc_dlist_connect (struct csc_dlist * a, struct csc_dlist * b
 __attribute__ ((unused))
 static inline void csc_dlist_del (struct csc_dlist * entry)
 {
+	ASSERT_PARAM_NOTNULL (entry);
 	csc_dlist_connect (entry->prev, entry->next);
 	entry->next = NULL;
 	entry->prev = NULL;
@@ -90,6 +93,7 @@ static inline void csc_dlist_del (struct csc_dlist * entry)
 __attribute__ ((unused))
 static inline unsigned csc_dlist_count (struct csc_dlist * entry)
 {
+	ASSERT_PARAM_NOTNULL (entry);
 	unsigned count = 0;
 	struct csc_dlist * p;
 	for (p = entry->next; p != entry; p = p->next)
@@ -99,9 +103,13 @@ static inline unsigned csc_dlist_count (struct csc_dlist * entry)
 	return count;
 }
 
+
 __attribute__ ((unused))
 static inline void csc_dlist_replace (struct csc_dlist *old, struct csc_dlist *new)
 {
+	ASSERT_PARAM_NOTNULL (old);
+	ASSERT_PARAM_NOTNULL (new);
+	ASSERT_PARAM_NOTNULL (new->next);
 	new->next = old->next;
 	new->next->prev = new;
 	new->prev = old->prev;
@@ -109,5 +117,81 @@ static inline void csc_dlist_replace (struct csc_dlist *old, struct csc_dlist *n
 }
 
 
+__attribute__ ((unused))
+static inline int csc_dlist_empty (struct csc_dlist const *head)
+{
+	ASSERT_PARAM_NOTNULL (head);
+	return head->next == head;
+}
 
 
+__attribute__ ((unused))
+static inline int csc_dlist_nonempty (struct csc_dlist const *head)
+{
+	ASSERT_PARAM_NOTNULL (head);
+	return head->next != head;
+}
+
+
+__attribute__ ((unused))
+static inline void csc_dlist_init_v (struct csc_dlist *list, unsigned n)
+{
+	ASSERT_PARAM_NOTNULL (list);
+	while (n--)
+	{
+		csc_dlist_init (list+n);
+	}
+}
+
+
+__attribute__ ((unused))
+static inline unsigned csc_dlist_nonempty_v (struct csc_dlist *list, unsigned n)
+{
+	ASSERT_PARAM_NOTNULL (list);
+	unsigned m = 0;
+	while (n--)
+	{
+		if (csc_dlist_nonempty (list + n))
+		{
+			m ++;
+		}
+	}
+	return m;
+}
+
+
+__attribute__ ((unused))
+static inline unsigned csc_dlist_empty_v (struct csc_dlist *list, unsigned n)
+{
+	ASSERT_PARAM_NOTNULL (list);
+	unsigned m = 0;
+	while (n--)
+	{
+		if (csc_dlist_empty (list + n))
+		{
+			m ++;
+		}
+	}
+	return m;
+}
+
+
+__attribute__ ((unused))
+static inline int csc_dlist_compare_str (struct csc_dlist *entry, struct csc_dlist *base, char const * needle, void * content, unsigned stride, unsigned offset)
+{
+	ASSERT_PARAM_NOTNULL (entry);
+	char * c = content;
+	struct csc_dlist * p;
+	for (p = entry->next; p != entry; p = p->next)
+	{
+		ptrdiff_t i = p - base;
+		char * s = c + offset + (i * stride);
+		if (strcmp (s, needle) == 0)
+		{
+			return (int)i;
+		}
+	}
+	return -1;
+}
+
+#define CSC_DLIST_COMPARE_STR(entry, base, needle, content, type, member) csc_dlist_compare_str (entry, base, needle, content, sizeof (type), offsetof (type, member))

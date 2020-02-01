@@ -29,130 +29,28 @@ SOFTWARE.
 #include "csc_basic.h"
 
 
-/*
- * A entry is a key-value pair.
- * entries with the same hash will be in the same list.
- */
-struct csc_htable_entry
+uint8_t hash8 (void const * buf, unsigned size8, unsigned max)
 {
-	//TODO: Support any key type instead of only cstring:
-	char * key;
-	//Linux style list head node:
-	struct csc_dlist list;
-};
-
-
-struct csc_htable
-{
-	//Number of entries, must be power of 2.
-	unsigned size;
-	struct csc_htable_entry * table;
-	struct csc_dlist list_replace;
-	struct csc_dlist list_del;
-};
-
-
-__attribute__ ((unused))
-static inline
-void csc_htable_init (struct csc_htable * t)
-{
-	ASSERT_PARAM_NOTNULL (t);
-	ASSERT_ISPOW2 (t->size);
-	csc_dlist_init (&t->list_replace);
-	csc_dlist_init (&t->list_del);
-	t->table = calloc (t->size, sizeof (struct csc_htable_entry));
-	for (unsigned i = 0; i < t->size; ++i)
+	uint8_t key = 0;
+	uint8_t const * b = buf;
+	for (size_t i = 0; i < size8; i++)
 	{
-		struct csc_dlist * list = &t->table [i].list;
-		csc_dlist_init (list);
+		key += b [i];
 	}
+	return key & (max - 1);
 }
 
 
-__attribute__ ((unused))
-static inline
-unsigned csc_htable_hash (unsigned size, char * key)
+uint8_t hash8_str (char const * buf, unsigned max)
 {
-	ASSERT_ISPOW2 (size);
-	unsigned h = 0;
-	while (*key)
+	uint8_t key = 0;
+	while (*buf)
 	{
-		h = h << 8;
-		h += (unsigned)(*key);
-		key ++;
+		key += buf [0];
+		buf ++;
 	}
-	h = h & (size - 1);
-	ASSERT (h < size);
-	return h;
+	return key & (max - 1);
 }
-
-
-__attribute__ ((unused))
-static inline
-struct csc_dlist * csc_htable_find_list (struct csc_htable * t, char * key)
-{
-	ASSERT_PARAM_NOTNULL (t);
-	unsigned h = csc_htable_hash (t->size, key);
-	//TRACEF ("%s : %i", key, h);
-	struct csc_dlist * list = &t->table [h].list;
-	struct csc_dlist * p;
-	for (p = list->next; p != list; p = p->next)
-	{
-		struct csc_htable_entry * e = container_of (p, struct csc_htable_entry, list);
-		ASSERT (e->key);
-		if (strcmp (e->key, key) == 0)
-		{
-			return p;
-		}
-	}
-	return p;
-}
-
-
-__attribute__ ((unused))
-static inline
-void csc_htable_set (struct csc_htable * t, struct csc_htable_entry * new)
-{
-	ASSERT_PARAM_NOTNULL (t);
-	unsigned h = csc_htable_hash (t->size, new->key);
-	TRACEF ("%s : %i", new->key, h);
-	struct csc_dlist * list = &t->table [h].list;
-	struct csc_dlist * p;
-	for (p = list->next; p != list; p = p->next)
-	{
-		struct csc_htable_entry * e = container_of (p, struct csc_htable_entry, list);
-		ASSERT (e->key);
-		if (strcmp (e->key, new->key) == 0)
-		{
-			csc_dlist_replace (p, &new->list);
-			csc_dlist_add_head (&t->list_replace, p);
-			//TRACEF ("count %i", csc_dlist_count (list));
-			return;
-		}
-	}
-	csc_dlist_add_head (list, &new->list);
-	//TRACEF ("count %i", csc_dlist_count (list));
-}
-
-
-__attribute__ ((unused))
-static inline
-void csc_htable_del (struct csc_htable * t, char * key)
-{
-	ASSERT_PARAM_NOTNULL (t);
-	struct csc_dlist * list;
-	list = csc_htable_find_list (t, key);
-	if (list->next != list->prev)
-	{
-		csc_dlist_del (list);
-		csc_dlist_add_head (&t->list_del, list);
-	}
-}
-
-
-
-
-
 
 
 
