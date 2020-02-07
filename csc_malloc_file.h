@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #pragma once
-#include <csc_debug.h>
+#include "csc_debug.h"
 #include <stdio.h> //fopen
 #include <string.h> //memset
 #include <stdlib.h> //malloc

@@ -310,13 +310,18 @@ void csc_str_skip (char const ** p, int (*f)(int))
 }
 
 
+void csc_isindentifer (int a)
+{
+	return isalnum (a) || (a == '_');
+}
+
+
 __attribute__ ((unused))
 static inline
 int csc_next_indentifer (char const ** p, int * col)
 {
 	char const * q = (*p);
-	csc_str_skip (p, isalpha);
-	csc_str_skip (p, isalnum);
+	csc_str_skip (p, csc_isindentifer);
 	ptrdiff_t n = (*p) - q;
 	(*col) += n;
 	return (int)n;
