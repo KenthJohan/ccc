@@ -310,7 +310,7 @@ void csc_str_skip (char const ** p, int (*f)(int))
 }
 
 
-void csc_isindentifer (int a)
+int csc_isindentifer (int a)
 {
 	return isalnum (a) || (a == '_');
 }
