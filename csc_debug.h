@@ -88,7 +88,10 @@ va_list va
 	fprintf (stderr, ASSERT_TCOLID "%s() " TCOL_RST, fn);
 	if (errno != 0) {fprintf (stderr, "[%04i:" TCOL (TCOL_BOLD, TCOL_RED , TCOL_DEFAULT) "%s" TCOL_RST "]: ", errno, strerror (errno));}
 	if (exp){fprintf (stderr, TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT) "%s" TCOL_RST " ", exp);}
-	vfprintf (stderr, fmt, va);
+	if (fmt)
+	{
+		vfprintf (stderr, fmt, va);
+	}
 	fprintf (stderr, "\n");
 	fflush (stderr);
 }
