@@ -94,6 +94,29 @@ uintmax_t str_to_umax (char ** f, int base)
 
 __attribute__ ((unused))
 static inline
+uintmax_t str_to_umax_ab (char const * a, char const * b, int base)
+{
+	uintmax_t v = 0;
+	int c;
+	while (1)
+	{
+		c = a [0];
+		if (a == b) {break;}
+		if (c == '\0') {break;}
+		else if (STR_INB (c, '0', '9', abs (base))) {c -= '0';}
+		else if (abs (base) > 10 && STR_INB (c, 'a', 'z', abs (base))) {c -= ('a' - 10);}
+		else if (abs (base) > 10 && STR_INB (c, 'A', 'Z', abs (base))) {c -= ('A' - 10);}
+		else {break;}
+		v *= (uintmax_t) base;
+		v += (uintmax_t) c;
+		a ++;
+	}
+	return v;
+}
+
+
+__attribute__ ((unused))
+static inline
 uint32_t str_to_u32 (char ** f, int base)
 {
 	uintmax_t v = str_to_umax (f, base);
