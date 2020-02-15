@@ -92,6 +92,7 @@ uintmax_t str_to_umax (char ** f, int base)
 }
 
 
+//TODO: base is not correct
 __attribute__ ((unused))
 static inline
 uintmax_t str_to_umax_ab (char const * a, char const * b, int base)
@@ -112,6 +113,25 @@ uintmax_t str_to_umax_ab (char const * a, char const * b, int base)
 		a ++;
 	}
 	return v;
+}
+
+
+__attribute__ ((unused))
+static inline
+uintmax_t str_to_umax_ab_adabase (char const * a, char const * b)
+{
+	char const * aa = a;
+	int base = (int)str_to_imax (&aa, 10);
+	if (aa[0] == '#')
+	{
+		aa++;
+		return str_to_umax_ab (aa, b, base);
+	}
+	else
+	{
+		return str_to_umax_ab (a, b, 10);
+	}
+	return 0;
 }
 
 
