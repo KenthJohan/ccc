@@ -55,6 +55,19 @@ uint8_t hash8_str (char const * buf, unsigned max)
 }
 
 
+uint8_t hash8_str_ab (char const * a, char const * b, unsigned max)
+{
+	ASSERT_ISPOW2 (max);
+	uint8_t key = 0;
+	while (*a && (*a < *b))
+	{
+		key += a [0];
+		a ++;
+	}
+	return key & (max - 1);
+}
+
+
 
 
 
