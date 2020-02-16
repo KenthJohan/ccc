@@ -31,6 +31,7 @@ SOFTWARE.
 
 uint8_t hash8 (void const * buf, unsigned size8, unsigned max)
 {
+	ASSERT_ISPOW2 (max);
 	uint8_t key = 0;
 	uint8_t const * b = buf;
 	for (size_t i = 0; i < size8; i++)
@@ -43,6 +44,7 @@ uint8_t hash8 (void const * buf, unsigned size8, unsigned max)
 
 uint8_t hash8_str (char const * buf, unsigned max)
 {
+	ASSERT_ISPOW2 (max);
 	uint8_t key = 0;
 	while (*buf)
 	{
