@@ -45,7 +45,7 @@ SOFTWARE.
 
 __attribute__ ((unused))
 static inline
-intmax_t str_to_imax (char ** f, int base)
+intmax_t str_to_imax (char const ** f, int base)
 {
 	intmax_t a = 0;
 	int c;
@@ -127,11 +127,7 @@ uintmax_t str_to_umax_ab_adabase (char const * a, char const * b)
 		aa++;
 		return str_to_umax_ab (aa, b, base);
 	}
-	else
-	{
-		return str_to_umax_ab (a, b, 10);
-	}
-	return 0;
+	return str_to_umax_ab (a, b, 10);
 }
 
 
@@ -146,7 +142,7 @@ uint32_t str_to_u32 (char ** f, int base)
 
 __attribute__ ((unused))
 static inline
-int32_t str_to_i32 (char ** f, int base)
+int32_t str_to_i32 (char const ** f, int base)
 {
 	intmax_t v = str_to_imax (f, base);
 	return (int8_t) v;
@@ -155,7 +151,7 @@ int32_t str_to_i32 (char ** f, int base)
 
 __attribute__ ((unused))
 static inline
-int8_t str_to_i8 (char ** f, int base)
+int8_t str_to_i8 (char const ** f, int base)
 {
 	intmax_t v = str_to_imax (f, base);
 	return (int8_t) v;
