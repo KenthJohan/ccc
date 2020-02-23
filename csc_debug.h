@@ -61,6 +61,7 @@ SOFTWARE.
 #define ASSERTF(A, F, ...)      do{if(!(A)){assert_format(ASSERT_CARGS, #A, (F), ## __VA_ARGS__);}}while(0)
 #define ASSERT_PARAM_NOTNULL(A) do{if((A)==NULL){assert_format(ASSERT_CARGS, NULL, "parameter "ASSERT_TCOLID"%s"TCOL_RST" of function "ASSERT_TCOLID"%s"TCOL_RST" is NULL", #A, __func__);}}while(0)
 #define ASSERT_ISPOW2(x)        ASSERTF((x & (x-1)) == 0, "The number %i must be a positive integer power of two", (int)(x))
+#define ASSERT_ISALIGN(x,a)     ASSERTF(((uintptr_t)(void const*)(x) % (a)) == 0, "The address %p must be align to %i, %u", (void const *)(x), (int)(a), (uintptr_t)(void const*)(x) % (a))
 
 #define TRACE(F)           trace_format (ASSERT_CARGS, (F)                )
 #define TRACEF(F, ...)     trace_format (ASSERT_CARGS, (F), ## __VA_ARGS__)
