@@ -193,3 +193,37 @@ static inline int csc_dlist_find_str (struct csc_dlist *entry, struct csc_dlist 
 	}
 	return -1;
 }
+
+__attribute__ ((unused))
+static inline int csc_dlist_cmp_ab (char const * s, char const * a, char const * b)
+{
+	int d = 0;
+	while (1)
+	{
+		if (s[0] == '\0') {break;}
+		if (a >= b) {break;}
+		d += s[0] - a[0];
+		s++;
+		a++;
+	}
+	return d;
+}
+
+
+__attribute__ ((unused))
+static inline int csc_dlist_find_str_ab (struct csc_dlist *entry, struct csc_dlist *base, char const * a, char const * b, void * content, unsigned stride, unsigned offset)
+{
+	ASSERT_PARAM_NOTNULL (entry);
+	char * c = content;
+	struct csc_dlist * p;
+	for (p = entry->next; p != entry; p = p->next)
+	{
+		ptrdiff_t i = p - base;
+		char * s = c + offset + (i * stride);
+		if (csc_dlist_cmp_ab (s, a, b) == 0)
+		{
+			return (int)i;
+		}
+	}
+	return -1;
+}
