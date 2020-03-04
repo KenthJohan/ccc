@@ -67,3 +67,20 @@ void csc_inverse_121 (uint32_t a [], uint32_t b [], uint32_t n)
 		b [a [i]] = i;
 	}
 }
+
+
+//Calculate the size-mask or max-size:
+//TODO: This might be too convulated to get the size mask:
+uint64_t csc_sizemask64 (unsigned size)
+{
+	uint64_t mask;
+	if (size == 64)
+	{
+		mask = UINT64_MAX;
+	}
+	else
+	{
+		mask = ((UINT64_C (1) << (uint64_t)size) - UINT64_C (1));
+	}
+	return mask;
+}
