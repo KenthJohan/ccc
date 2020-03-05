@@ -61,7 +61,7 @@ uint8_t hash8_str_ab (char const * a, char const * b, unsigned max)
 	uint8_t key = 0;
 	while (1)
 	{
-		if (a[0] == NULL) {break;}
+		if (a[0] == '\0') {break;}
 		if (a >= b) {break;}
 		key += a[0];
 		a ++;
