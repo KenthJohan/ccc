@@ -88,24 +88,56 @@ int main (int argc, char * argv [])
 	ASSERT (s1->next == root);
 	ASSERT (s1->child->next == c2);
 	ASSERT (c2->parent == s1);
+
+
+	struct csc_pcstree * c4 = csc_pcstree_malloc();
+	c4->ptr = "s1/c4";
+	csc_pcstree_addsibling (c2, c4);
+
+	struct csc_pcstree * c5 = csc_pcstree_malloc();
+	c5->ptr = "s1/c2/c5";
+	csc_pcstree_addchild (c2, c5);
+
 	/*
 	+-root
 	| +-c1
 	+-s1
 	  +-c2
+		+-c5
+	  +-c4
 	*/
 
 
 	struct csc_pcstree * c3 = csc_pcstree_malloc();
-	c2->ptr = "s1/c3/s2";
+	s1->child->ptr = "s1_child";
+	c2->child->ptr = "c2_child";
+	c3->child->ptr = "c3_child";
+	c2->ptr = "s1/c3/c2";
 	c3->ptr = "s1/c3";
 	csc_pcstree_addparent (c2, c3);
+
+
+	ASSERT (root->child->next == c1);
+	ASSERT (root->next == s1);
+	ASSERT (root->prev == s1);
+	ASSERT (s1->prev == root);
+	ASSERT (s1->next == root);
+	ASSERT (s1->child->next == c3);
+	ASSERT (c3->parent == s1);
+	ASSERT (c3->next == c4);
+	ASSERT (c3->child->next == c2);
+	ASSERT (c2->parent == c3);
+	ASSERT (c2->child->next == c5);
+	ASSERT (c5->parent == c2);
+	ASSERT (c2->next == c2);
+
 	/*
 	+-root
 	| +-c1
 	+-s1
 	  +-c3
 		+-c2
+	  +-c4
 	*/
 
 	return EXIT_SUCCESS;

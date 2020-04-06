@@ -143,8 +143,8 @@ void csc_pcstree_replace (struct csc_pcstree * old, struct csc_pcstree * new)
 	new->prev->next = new;
 	new->parent = old->parent;
 	//new->parent->child = new;//Do not do this
-	new->child = old->child;
-	new->child->parent = new;
+	//new->child = old->child;//Do not do this
+	//new->child->parent = new;
 	old->next = NULL;
 	old->prev = NULL;
 	old->parent = NULL;
@@ -168,8 +168,13 @@ void csc_pcstree_addparent (struct csc_pcstree * head, struct csc_pcstree * new)
 {
 	ASSERT_PARAM_NOTNULL (head);
 	ASSERT_PARAM_NOTNULL (new);
+	ASSERT (head->child->parent == head);
+	ASSERT (new->child->parent == new);
 	csc_pcstree_replace (head, new);
 	csc_pcstree_addchild (new, head);
+	csc_pcstree_initsibling (head);
+	ASSERT (head->child->parent == head);
+	ASSERT (new->child->parent == new);
 }
 
 
