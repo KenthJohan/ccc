@@ -29,10 +29,10 @@ SOFTWARE.
 #include "csc_basic.h"
 
 
-uint8_t hash8 (void const * buf, unsigned size8, unsigned max)
+unsigned hash8_buf (void const * buf, unsigned size8, unsigned max)
 {
 	ASSERT_ISPOW2 (max);
-	uint8_t key = 0;
+	unsigned key = 0;
 	uint8_t const * b = buf;
 	for (size_t i = 0; i < size8; i++)
 	{
@@ -42,28 +42,30 @@ uint8_t hash8 (void const * buf, unsigned size8, unsigned max)
 }
 
 
-uint8_t hash8_str (char const * buf, unsigned max)
+unsigned hash8_str (char const * buf, char const * buf_end, unsigned max)
 {
 	ASSERT_ISPOW2 (max);
-	uint8_t key = 0;
+	unsigned key = 0;
 	while (*buf)
 	{
-		key += buf [0];
+		if (buf[0] == '\0') {break;}
+		if (buf_end && (buf >= buf_end)) {break;}
+		key += (unsigned)buf [0];
 		buf ++;
 	}
 	return key & (max - 1);
 }
 
 
-uint8_t hash8_str_ab (char const * a, char const * b, unsigned max)
+unsigned hash8_str_ab (char const * a, char const * b, unsigned max)
 {
 	ASSERT_ISPOW2 (max);
-	uint8_t key = 0;
+	unsigned key = 0;
 	while (1)
 	{
 		if (a[0] == '\0') {break;}
 		if (a >= b) {break;}
-		key += a[0];
+		key += (unsigned)a[0];
 		a ++;
 	}
 	return key & (max - 1);
