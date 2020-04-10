@@ -25,6 +25,8 @@ SOFTWARE.
 #pragma once
 
 #include "csc_debug.h"
+#include "csc_basic.h"
+#include "csc_str.h"
 
 struct csc_dlist;
 struct csc_dlist
@@ -61,6 +63,8 @@ static inline void csc_dlist_add_head (struct csc_dlist *head, struct csc_dlist 
 	ASSERT_PARAM_NOTNULL (head);
 	ASSERT_PARAM_NOTNULL (new);
 	csc_dlist_add_between (head, new, head->next);
+	ASSERT (head == head->next->prev);
+	ASSERT (new == new->next->prev);
 }
 
 
@@ -70,6 +74,8 @@ static inline void csc_dlist_add_tail (struct csc_dlist *head, struct csc_dlist 
 	ASSERT_PARAM_NOTNULL (head);
 	ASSERT_PARAM_NOTNULL (new);
 	csc_dlist_add_between (head->prev, new, head);
+	ASSERT (head == head->next->prev);
+	ASSERT (new == new->next->prev);
 }
 
 
@@ -79,6 +85,8 @@ static inline void csc_dlist_connect (struct csc_dlist * a, struct csc_dlist * b
 	ASSERT_PARAM_NOTNULL (b);
 	a->prev = b;
 	b->next = a;
+	ASSERT (a == a->next->prev);
+	ASSERT (b == b->next->prev);
 }
 
 
@@ -116,6 +124,7 @@ static inline void csc_dlist_replace (struct csc_dlist *old, struct csc_dlist *n
 	new->next->prev = new;
 	new->prev = old->prev;
 	new->prev->next = new;
+	ASSERT (new == new->next->prev);
 }
 
 
@@ -179,23 +188,6 @@ static inline unsigned csc_dlist_empty_v (struct csc_dlist *list, unsigned n)
 
 
 __attribute__ ((unused))
-static inline int csc_dlist_cmp_ab (char const * s, char const * a, char const * b)
-{
-	int d = 0;
-	while (1)
-	{
-		if (a >= b) {break;}
-		d += s[0] - a[0];
-		if (s[0] == '\0') {break;}
-		if (a[0] == '\0') {break;}
-		s++;
-		a++;
-	}
-	return d;
-}
-
-
-__attribute__ ((unused))
 static inline int csc_dlist_find_str (struct csc_dlist *entry, struct csc_dlist *base, char const * needle, char const * needle_end, char const * str, unsigned stride, unsigned offset)
 {
 	ASSERT_PARAM_NOTNULL (entry);
@@ -205,11 +197,7 @@ static inline int csc_dlist_find_str (struct csc_dlist *entry, struct csc_dlist 
 	{
 		ptrdiff_t i = p - base;
 		char const * s = str + offset + (i * stride);
-		if (needle_end && (csc_dlist_cmp_ab (s, needle, needle_end) == 0))
-		{
-			return (int)i;
-		}
-		else if (strcmp (s, needle) == 0)
+		if (csc_str_cmp (s, needle, NULL, needle_end) == 0)
 		{
 			return (int)i;
 		}

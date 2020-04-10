@@ -26,6 +26,7 @@ SOFTWARE.
 #include <stddef.h> //offsetof
 #include <stdint.h> //offsetof
 
+
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
 //#define INSIDE(x, a, b) ((a) <= (x) && (x) <= (b))
@@ -60,7 +61,8 @@ typedef uint32_t utf32; //utf character
 
 
 //If a maps to x, then b maps from x
-void csc_inverse_121 (uint32_t a [], uint32_t b [], uint32_t n)
+static inline void
+csc_inverse_121 (uint32_t a [], uint32_t b [], uint32_t n)
 {
 	for (uint32_t i = 0; i < n; ++i)
 	{
@@ -71,7 +73,8 @@ void csc_inverse_121 (uint32_t a [], uint32_t b [], uint32_t n)
 
 //Calculate the size-mask or max-size:
 //TODO: This might be too convulated to get the size mask:
-uint64_t csc_sizemask64 (unsigned size)
+static inline uint64_t
+csc_sizemask64 (unsigned size)
 {
 	uint64_t mask;
 	if (size == 64)
@@ -84,3 +87,6 @@ uint64_t csc_sizemask64 (unsigned size)
 	}
 	return mask;
 }
+
+
+

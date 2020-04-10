@@ -101,6 +101,8 @@ void csc_htablestr_init (struct csc_htablestr * ht)
 
 struct csc_dlist * csc_htablestr_get_nth_node (struct csc_htablestr * ht, unsigned index)
 {
+	ASSERT_PARAM_NOTNULL (ht);
+	ASSERT (ht->node);
 	ASSERT (index <= ht->last);
 	return ht->node + index;
 }
@@ -108,20 +110,10 @@ struct csc_dlist * csc_htablestr_get_nth_node (struct csc_htablestr * ht, unsign
 
 char * csc_htablestr_get_nth_name (struct csc_htablestr * ht, unsigned index)
 {
+	ASSERT_PARAM_NOTNULL (ht);
+	ASSERT (ht->name);
 	ASSERT (index <= ht->last);
 	return ht->name + ht->name_stride * index;
-}
-
-
-struct csc_dlist * csc_htablestr_get_last_node (struct csc_htablestr * ht)
-{
-	return csc_htablestr_get_nth_node (ht, ht->last);
-}
-
-
-char * csc_htablestr_get_last_name (struct csc_htablestr * ht)
-{
-	return csc_htablestr_get_nth_name (ht, ht->last);
 }
 
 
@@ -133,13 +125,9 @@ int csc_htablestr_add (struct csc_htablestr * ht, char const * str, char const *
 	ASSERT (ht->slots);
 	ASSERT (ht->node);
 	ASSERT (ht->name);
-	if (ht->last >= ht->items_max)
-	{
-		puts ("");
-	}
 	ASSERT (ht->last < ht->items_max);
-	struct csc_dlist * nodeslot = csc_htablestr_get_last_node (ht);
-	char * name = csc_htablestr_get_last_name (ht);
+	struct csc_dlist * nodeslot = csc_htablestr_get_nth_node (ht, ht->last);
+	char * name = csc_htablestr_get_nth_name (ht, ht->last);
 	if (str_end)
 	{
 		ptrdiff_t l = MIN (str_end - str, ht->name_stride);
@@ -174,6 +162,8 @@ int csc_htablestr_find (struct csc_htablestr const * ht, char const * needle, ch
 
 int csc_htablestr_getfind (struct csc_htablestr * ht, char const * needle, char const * needle_end)
 {
+	ASSERT_PARAM_NOTNULL (ht);
+	ASSERT_PARAM_NOTNULL (needle);
 	int index;
 	index = csc_htablestr_find (ht, needle, needle_end);
 	if (index < 0)

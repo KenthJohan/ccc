@@ -435,3 +435,31 @@ void str_skip_after (char ** p, char * needles)
 		(*p)++;
 	}
 }
+
+
+/**
+ * @brief csc_cmp_str Compares two strings
+ * @param s1 First string
+ * @param s2 Second string
+ * @param s1_end End of first string. Can be NULL.
+ * @param s2_end End of second string. Can be NULL.
+ * @return
+ */
+static inline int
+csc_str_cmp (char const * s1, char const * s2, char const * s1_end, char const * s2_end)
+{
+	ASSERT_PARAM_NOTNULL (s1);
+	ASSERT_PARAM_NOTNULL (s2);
+	int d = 0;
+	while (1)
+	{
+		if (s1_end && (s1 >= s1_end)) {break;}
+		if (s2_end && (s2 >= s2_end)) {break;}
+		d += s1[0] - s2[0];
+		if (s1[0] == '\0') {break;}
+		if (s2[0] == '\0') {break;}
+		s1++;
+		s2++;
+	}
+	return d;
+}
