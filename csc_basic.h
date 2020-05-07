@@ -34,6 +34,11 @@ SOFTWARE.
 #define SWAP(t, a, b) do{t c = (b); (b) = (a); (a) = (c);} while (0)
 #define SWAPX(a, b)	((a)^=(b),(b)^=(a),(a)^=(b))
 #define INRANGE(x, a, b) ((a) <= (x) && (x) <= (b))
+#define U8_U32_LE(a, b, c, d) ((uint32_t)((a) | (b) << 8 | (c) << 16 | (d) << 24))
+#define U8_U32_BE(d, c, b, a) ((uint32_t)((a) | (b) << 8 | (c) << 16 | (d) << 24))
+#define STR4_U32_LE(s) U8_U32_LE(s[0],s[1],s[2],s[3])
+#define STR4_U32_BE(s) U8_U32_BE(s[0],s[1],s[2],s[3])
+
 
 #define container_of(ptr, type, member) ((type *)(void *)((char *)(ptr) - offsetof(type, member)))
 #define container_of_const(ptr, type, member) ((type *)(void const *)((char const *)(ptr) - offsetof(type, member)))
