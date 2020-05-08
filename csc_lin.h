@@ -119,6 +119,23 @@ static double lin_vv_dot (double const va[], double const vb[], unsigned n)
 
 
 /**
+ * @brief lin_vv_add_f32 Add two vectors
+ * @param va Input vector
+ * @param vb Input vector
+ * @param n Input number of elements in vector \p va, \p vb
+ * @return Sum of two vector
+ */
+static void lin_vv_add_f32 (float vy[], float const va[], float const vb[], unsigned n)
+{
+	for (unsigned i = 0; i < n; ++i)
+	{
+		vy[i] = va [i] + vb [i];
+	}
+}
+
+
+
+/**
  * @brief lin_mv_mul Multiply matrix \p ma by vector \p vx.
  * @param vy Output vector
  * @param ma Input left side matrix
