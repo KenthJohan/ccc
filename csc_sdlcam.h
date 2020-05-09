@@ -1,69 +1,59 @@
 #pragma once
 #include <SDL2/SDL.h>
 
-#include "csc_lin.h"
+#include "csc_math.h"
 
-struct Camera
+
+
+struct csc_sdlcam
 {
-	float mvp [4*4];
-	float mt [4*4];
-	float mr [4*4];
-	float mp [4*4];
-	float mrx [4*4];
-	float mry [4*4];
-	float ax;
-	float ay;
-	float az;
+	float d[4];//Delta
+	float p[4];//Position
+	float fov;//Field Of View
+	float w;//Width
+	float h;//Height
+	float n;//Near
+	float f;//Far
+	float pitch;
+	float yaw;
 };
 
 
-void sdl_update_projection (SDL_Window * window, float m [4*4])
+void csc_sdlcam_init (struct csc_sdlcam * cam)
 {
-	int w;
-	int h;
-	SDL_GetWindowSize (window, &w, &h);
-	VN_CLR (4*4, m);
-	m4f_perspective (m, 45.0f, (float)w/(float)h, 0.1f, 10000.0f);
-	glViewport (0, 0, w, h);
+	v4f32_set_xyzw (cam->p, 0.0f, 0.0f, 0.0f, 1.0f);
+	cam->fov = 45.0f*(M_PI/180.0f);
+	cam->w = 100.0f;
+	cam->h = 100.0f;
+	cam->n = 0.1f;
+	cam->f = 10000.0f;
+	cam->pitch = 0;
+	cam->yaw = 0;
 }
 
 
-void camera_init (struct Camera * cam, SDL_Window * window)
+void csc_sdlcam_build_matrix (struct csc_sdlcam * cam, float mvp[4*4])
 {
-	M4_IDENTITY (cam->mvp);
-	M4_IDENTITY (cam->mrx);
-	M4_IDENTITY (cam->mry);
-	M4_IDENTITY (cam->mt);
-	sdl_update_projection (window, cam->mp);
-	cam->ax = 0.0f;
-	cam->ay = 0.0f;
-	cam->az = 0.0f;
+	float mr[4*4];//Rotation matrix
+	float mp[4*4];//Projection matrix
+	float mt[4*4];//Translation matrix
+	float q[4];//Quaternion rotation
+	float q_pitch[4];//Quaternion pitch rotation
+	float q_yaw[4];//Quaternion yaw rotation
+	m4f32_identity (mvp);
+	m4f32_identity (mt);
+	qf32_identity (q);
+	qf32_xyza (q_pitch, 1.0f, 0.0f, 0.0f, cam->pitch);
+	qf32_xyza (q_yaw,   0.0f, 1.0f, 0.0f, cam->yaw);
+	qf32_mul (q, q, q_pitch); //Apply pitch rotation
+	qf32_mul (q, q, q_yaw); //Apply yaw rotation
+	qf32_normalize (q, q); //Normalize quaternion against floating point error
+	qf32_m4 (mr, q); //Convert quaternion to rotation matrix
+	m4f32_perspective1 (mp, cam->fov, cam->w/cam->h, cam->n, cam->f); //Create perspective matrix
+	mv4f32_macc_transposed (cam->p, mr, cam->d); //Accumulate the position in the direction relative to the rotation
+	v4f32_cpy (mt + M4_VT, cam->p); //Create translation matrix (copy position into the 4th matrix column)
+	m4f32_mul (mvp, mt, mvp); //Apply translation
+	m4f32_mul (mvp, mr, mvp); //Apply rotation
+	m4f32_mul (mvp, mp, mvp); //Apply perspective
 }
-
-
-void camera_update (struct Camera * cam, uint8_t const * keyboard)
-{
-	float t [4];
-	t [0] = (keyboard [SDL_SCANCODE_A] - keyboard [SDL_SCANCODE_D]);
-	t [1] = (keyboard [SDL_SCANCODE_LCTRL] - keyboard [SDL_SCANCODE_SPACE]);
-	t [2] = (keyboard [SDL_SCANCODE_W] - keyboard [SDL_SCANCODE_S]);
-	t [3] = 0;
-	v4f_normalize (t, t);
-	V4_MUL_SCALAR (t, t, 0.05f);
-	cam->ax += (keyboard [SDL_SCANCODE_DOWN] - keyboard [SDL_SCANCODE_UP]) * 0.02f;
-	cam->ay += (keyboard [SDL_SCANCODE_RIGHT] - keyboard [SDL_SCANCODE_LEFT]) * 0.02f;
-	M4_ROTX (cam->mrx, cam->ax);
-	M4_ROTY (cam->mry, cam->ay);
-	M4_IDENTITY (cam->mr);
-	M4_IDENTITY (cam->mvp);
-	m4f_mul (cam->mr, cam->mry, cam->mr);
-	m4f_mul (cam->mr, cam->mrx, cam->mr);
-	M4_MAC_TRANSPOSE (cam->mt + M4_VT, cam->mr, t);
-	m4f_mul (cam->mvp, cam->mt, cam->mvp);
-	m4f_mul (cam->mvp, cam->mr, cam->mvp);
-	m4f_mul (cam->mvp, cam->mp, cam->mvp);
-}
-
-
-
 
