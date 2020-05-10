@@ -106,10 +106,27 @@ static void vvf32_add (unsigned n, float r [], float const a [], float const b [
 	}
 }
 
+
+// r := a - b
+static void vvf32_sub (unsigned n, float r [], float const a [], float const b [])
+{
+	while (n--)
+	{
+		r [n] = a [n] - b [n];
+	}
+}
+
 // r := r + a
 static void vf32_acc (unsigned n, float r [], float const a [])
 {
 	vvf32_add (n, r, r, a);
+}
+
+
+// r := r - a
+static void vf32_decc (unsigned n, float r [], float const a [])
+{
+	vvf32_sub (n, r, r, a);
 }
 
 
@@ -132,16 +149,6 @@ static void vsf32_add_max (unsigned n, float r [], float const a [], float const
 		{
 			r [n] = a [n] + b;
 		}
-	}
-}
-
-
-// r := a - b
-static void vvf32_sub (unsigned n, float r [], float const a [], float const b [])
-{
-	while (n--)
-	{
-		r [n] = a [n] - b [n];
 	}
 }
 
@@ -474,7 +481,7 @@ void vf32_weight_ab (uint32_t n, float y [], float a [], float b [], float k)
 
 
 
-void v3f32_cross (float r[3], float a[3], float b[3])
+void v3f32_cross (float r[3], float const a[3], float const b[3])
 {
 	r[0] = a[1] * b[2] - a[2] * b[1];
 	r[1] = a[2] * b[0] - a[0] * b[2];
@@ -482,7 +489,7 @@ void v3f32_cross (float r[3], float a[3], float b[3])
 }
 
 
-void v3f32_crossacc (float r[3], float a[3], float b[3])
+void v3f32_crossacc (float r[3], float const a[3], float const b[3])
 {
 	r[0] += a[1] * b[2] - a[2] * b[1];
 	r[1] += a[2] * b[0] - a[0] * b[2];
@@ -1021,7 +1028,7 @@ void rotate_vector_by_quaternion(const Vector3& v, const Quaternion& q, Vector3&
 		  + 2.0f * s * cross(u, v);
 }
 */
-void qf32_rotate_vector (float u[4], float y[3])
+void qf32_rotate_vector_fixthis (float u[4], float y[3])
 {
 	float v[3];
 	vf32_cpy (3, v, y);
@@ -1041,9 +1048,9 @@ Method by Fabian 'ryg' Giessen (of Farbrausch)
 t = 2 * cross(q.xyz, v)
 v' = v + q.w * t + cross(q.xyz, t)
 */
-void qf32_rotate_vector1 (float q[4], float v[3])
+static void qf32_rotate_vector (float q[4], float const v[3], float r[3])
 {
-	float r[3];
+	ASSERT (v != r);
 	float t[3];
 	float u[3] = {q[0], q[1], q[2]};
 	v3f32_cross (t, q, v);
@@ -1052,6 +1059,13 @@ void qf32_rotate_vector1 (float q[4], float v[3])
 	vsf32_mul (3, t, t, q[3]);
 	vvf32_add (3, r, v, t);
 	vvf32_add (3, r, r, u);
+}
+
+
+static void qf32_rotate_vector1 (float q[4], float v[3])
+{
+	float r[3];
+	qf32_rotate_vector (q, v, r);
 	vf32_cpy (3, v, r);
 }
 
