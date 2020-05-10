@@ -106,6 +106,12 @@ static void vvf32_add (unsigned n, float r [], float const a [], float const b [
 	}
 }
 
+// r := r + a
+static void vf32_acc (unsigned n, float r [], float const a [])
+{
+	vvf32_add (n, r, r, a);
+}
+
 
 // r := a + b
 static void vsf32_add (unsigned n, float r [], float const a [], float const b)
