@@ -2,10 +2,11 @@
 #include "csc_argparse.h"
 
 
-#define FLAG_READ    0x1
-#define FLAG_WRITE   0x2
-#define FLAG_EXEC    0x4
-#define FLAG_DEFAULT 0x8
+#define FLAG_READ    0x01
+#define FLAG_WRITE   0x02
+#define FLAG_EXEC    0x04
+#define FLAG_EXEC2   0x08
+#define FLAG_DEFAULT 0x10
 
 
 int main (int argc, char const * argv [])
@@ -32,6 +33,7 @@ int main (int argc, char const * argv [])
 	{.prefix = 'r', .longname = "read",     .type = CSC_ARGV_TYPE_FLAG_INT,  .value = &permission, .flag_int = FLAG_READ},
 	{.prefix = 'w', .longname = "write",    .type = CSC_ARGV_TYPE_FLAG_INT,  .value = &permission, .flag_int = FLAG_WRITE},
 	{.prefix = 'x', .longname = "exec",     .type = CSC_ARGV_TYPE_FLAG_INT,  .value = &permission, .flag_int = FLAG_EXEC},
+	{.prefix = 'x', .longname = "exec",     .type = CSC_ARGV_TYPE_FLAG_INT,  .value = &permission, .flag_int = FLAG_EXEC2},
 	{.prefix = 'x', .longname = "exec",     .type = CSC_ARGV_TYPE_INT,       .value = &x},
 	{.type = CSC_ARGV_TYPE_END}
 	};
@@ -46,6 +48,7 @@ int main (int argc, char const * argv [])
 	ASSERT ((permission & FLAG_READ) == 0);
 	ASSERT ((permission & FLAG_WRITE) == 0);
 	ASSERT ((permission & FLAG_EXEC) == 0);
+	ASSERT ((permission & FLAG_EXEC2) == 0);
 	ASSERT (permission & FLAG_DEFAULT);
 
 	csc_argv_parse (option, "--threads=4");
@@ -58,6 +61,7 @@ int main (int argc, char const * argv [])
 	ASSERT ((permission & FLAG_READ) == 0);
 	ASSERT ((permission & FLAG_WRITE) == 0);
 	ASSERT ((permission & FLAG_EXEC) == 0);
+	ASSERT ((permission & FLAG_EXEC2) == 0);
 	ASSERT (permission & FLAG_DEFAULT);
 
 	csc_argv_parse (option, "-F4.3");
@@ -70,6 +74,7 @@ int main (int argc, char const * argv [])
 	ASSERT ((permission & FLAG_READ) == 0);
 	ASSERT ((permission & FLAG_WRITE) == 0);
 	ASSERT ((permission & FLAG_EXEC) == 0);
+	ASSERT ((permission & FLAG_EXEC2) == 0);
 	ASSERT (permission & FLAG_DEFAULT);
 
 	csc_argv_parse (option, "-wrgx");
@@ -82,6 +87,7 @@ int main (int argc, char const * argv [])
 	ASSERT (permission & FLAG_READ);
 	ASSERT (permission & FLAG_WRITE);
 	ASSERT (permission & FLAG_EXEC);
+	ASSERT (permission & FLAG_EXEC2);
 	ASSERT (permission & FLAG_DEFAULT);
 
 	csc_argv_parse (option, "--file=Banana");
@@ -94,6 +100,7 @@ int main (int argc, char const * argv [])
 	ASSERT (permission & FLAG_READ);
 	ASSERT (permission & FLAG_WRITE);
 	ASSERT (permission & FLAG_EXEC);
+	ASSERT (permission & FLAG_EXEC2);
 	ASSERT (permission & FLAG_DEFAULT);
 
 	csc_argv_parse (option, "--filename=Banana");
@@ -106,6 +113,7 @@ int main (int argc, char const * argv [])
 	ASSERT (permission & FLAG_READ);
 	ASSERT (permission & FLAG_WRITE);
 	ASSERT (permission & FLAG_EXEC);
+	ASSERT (permission & FLAG_EXEC2);
 	ASSERT (permission & FLAG_DEFAULT);
 
 	permission = 0;
@@ -119,6 +127,7 @@ int main (int argc, char const * argv [])
 	ASSERT ((permission & FLAG_READ) == 0);
 	ASSERT ((permission & FLAG_WRITE) == 0);
 	ASSERT (permission & FLAG_EXEC);
+	ASSERT (permission & FLAG_EXEC2);
 	ASSERT ((permission & FLAG_DEFAULT) == 0);
 
 	permission = 0;
@@ -132,6 +141,7 @@ int main (int argc, char const * argv [])
 	ASSERT ((permission & FLAG_READ) == 0);
 	ASSERT ((permission & FLAG_WRITE) == 0);
 	ASSERT (permission & FLAG_EXEC);
+	ASSERT (permission & FLAG_EXEC2);
 	ASSERT ((permission & FLAG_DEFAULT) == 0);
 
 	return EXIT_SUCCESS;

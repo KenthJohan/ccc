@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) 2020 CSC Project
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -135,6 +159,9 @@ static char const * csc_argv_type_tostr (enum csc_argv_type t)
 }
 
 
+
+
+
 static void csc_argv_parse (struct csc_argv_option const * option, char const * arg)
 {
 	if (arg[0] != '-'){return;}
@@ -151,11 +178,11 @@ static void csc_argv_parse (struct csc_argv_option const * option, char const * 
 			int len = strlen (o->longname);
 			if (strncmp (o->longname, arg+2, len)){continue;}
 			value = arg + 3 + len;
+			if (value[-1] != '='){continue;}
 		}
 		else if (o->prefix == 0){continue;}
 		else if (o->prefix != arg[1])
 		{
-			if ((csc_argv_alphanumbits_fromstr (arg+1) & flags & csc_argv_alphanumbits (o->prefix)) == 0){continue;}
 			switch (o->type)
 			{
 			case CSC_ARGV_TYPE_FLAG_INT:
@@ -164,6 +191,7 @@ static void csc_argv_parse (struct csc_argv_option const * option, char const * 
 			default:
 				continue;
 			}
+			if ((csc_argv_alphanumbits_fromstr (arg+1) & flags & csc_argv_alphanumbits (o->prefix)) == 0){continue;}
 		}
 		switch (o->type)
 		{
@@ -192,17 +220,9 @@ static void csc_argv_parse (struct csc_argv_option const * option, char const * 
 			break;
 		}
 
-		if (endptr == NULL){}
-		else if (endptr[0] == '\0'){}
-		else if (endptr == value)
+		if (endptr == value)
 		{
-			fprintf (stderr, "Error1 parse option (%c,%s,%s) argument (%s) value (%s)\n", o->prefix, o->longname, csc_argv_type_tostr (o->type), arg, value);
-		}
-		else if (1)
-		{
-
-			printf ("isalnum %i\n", isalnum (endptr[0]));
-			fprintf (stderr, "Error2 parse option (%c,%s)\n", o->prefix, o->longname);
+			fprintf (stderr, "csc_argv parsing error: option (%c,%s,%s), argument (%s), value (%s)\n", o->prefix, o->longname, csc_argv_type_tostr (o->type), arg, value);
 		}
 
 	}
