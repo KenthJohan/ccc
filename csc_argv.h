@@ -25,13 +25,13 @@ SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <errno.h>
 #include <ctype.h>
 #include <inttypes.h>
-#include "csc_debug.h"
-#include "csc_basic.h"
 
+#ifndef ASSERT
+#define ASSERT(x)
+#endif
 
 static uint64_t csc_argv_alphanumbits (char a)
 {
@@ -194,14 +194,14 @@ static char const * csc_argv_type_tostr (enum csc_argv_type t)
 	case CSC_ARGV_TYPE_DOUBLE:return "double";
 	case CSC_ARGV_TYPE_FLAG_INT:return "flag_int";
 	case CSC_ARGV_TYPE_FLAG_LONG:return "flag_long";
-	case CSC_ARGV_TYPE_FLAG_U8:return "u8";
-	case CSC_ARGV_TYPE_FLAG_U16:return "u16";
-	case CSC_ARGV_TYPE_FLAG_U32:return "u32";
-	case CSC_ARGV_TYPE_FLAG_U64:return "u64";
-	case CSC_ARGV_TYPE_FLAG_I8:return "i8";
-	case CSC_ARGV_TYPE_FLAG_I16:return "i16";
-	case CSC_ARGV_TYPE_FLAG_I32:return "i32";
-	case CSC_ARGV_TYPE_FLAG_I64:return "i64";
+	case CSC_ARGV_TYPE_FLAG_U8:return "flag_u8";
+	case CSC_ARGV_TYPE_FLAG_U16:return "flag_u16";
+	case CSC_ARGV_TYPE_FLAG_U32:return "flag_u32";
+	case CSC_ARGV_TYPE_FLAG_U64:return "flag_u64";
+	case CSC_ARGV_TYPE_FLAG_I8:return "flag_i8";
+	case CSC_ARGV_TYPE_FLAG_I16:return "flag_i16";
+	case CSC_ARGV_TYPE_FLAG_I32:return "flag_i32";
+	case CSC_ARGV_TYPE_FLAG_I64:return "flag_i64";
 	default:return "unknown";
 	}
 }
