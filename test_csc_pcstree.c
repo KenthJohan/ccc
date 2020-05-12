@@ -10,6 +10,7 @@ typedef void (*csc_pcstree_print_traverse_cb)(struct csc_pcstree const * node, v
  * @param ptr User pointer that is passed on to the callback function \p cb.
  * @param cb A callback function that is called for each node in the tree.
  */
+/*
 void csc_pcstree_print_traverse (struct csc_pcstree const * node, void * ptr, csc_pcstree_print_traverse_cb cb)
 {
 	char vertical[] = TCOL(TCOL_NORMAL,TCOL_GREEN,TCOL_DEFAULT) "\u2502" TCOL_RST;
@@ -56,6 +57,25 @@ void traverse_cb (struct csc_pcstree const * nodepos, void * ptr)
 	ASSERT_PARAM_NOTNULL (nodepos);
 	printf (" %s\n", nodepos->ptr);
 }
+*/
+
+enum testnode
+{
+	TESTNODE_A,
+	TESTNODE_B,
+	TESTNODE_C,
+	TESTNODE_D,
+	TESTNODE_E,
+	TESTNODE_F,
+	TESTNODE_G,
+	TESTNODE_H,
+	TESTNODE_I,
+	TESTNODE_J,
+	TESTNODE_K,
+	TESTNODE_L,
+	TESTNODE_M,
+	TESTNODE_N
+};
 
 
 int main (int argc, char * argv [])
@@ -64,81 +84,43 @@ int main (int argc, char * argv [])
 	ASSERT (argv);
 
 
-	struct csc_pcstree * root = csc_pcstree_malloc();
-	root->ptr = "root";
-	ASSERT (root->child != NULL);
-	struct csc_pcstree * c1 = csc_pcstree_malloc();
-	c1->ptr = "root/c1";
-	csc_pcstree_addchild (root, c1);
-	ASSERT (root->next == root);
-	ASSERT (root->prev == root);
-	ASSERT (root->child->next == c1);
-	ASSERT (c1->parent == root);
-	struct csc_pcstree * s1 = csc_pcstree_malloc();
-	s1->ptr = "s1";
-	csc_pcstree_addsibling (root, s1);
-	ASSERT (root->next == s1);
-	ASSERT (root->prev == s1);
-	ASSERT (root->child->next == c1);
-	ASSERT (c1->parent == root);
-	struct csc_pcstree * c2 = csc_pcstree_malloc();
-	c2->ptr = "s1/c2";
-	csc_pcstree_addchild (s1, c2);
-	ASSERT (s1->prev == root);
-	ASSERT (s1->next == root);
-	ASSERT (s1->child->next == c2);
-	ASSERT (c2->parent == s1);
+	struct csc_pcstree node [20];
+	int x [20] = {INT_MAX};
+	node [TESTNODE_A].name = "A";
+	node [TESTNODE_B].name = "B";
+	node [TESTNODE_C].name = "C";
+	node [TESTNODE_D].name = "D";
+	node [TESTNODE_E].name = "E";
+	node [TESTNODE_F].name = "F";
+	node [TESTNODE_G].name = "G";
+	node [TESTNODE_H].name = "H";
+	node [TESTNODE_I].name = "I";
+	node [TESTNODE_J].name = "J";
+	node [TESTNODE_K].name = "K";
+	node [TESTNODE_L].name = "L";
+	node [TESTNODE_M].name = "M";
+	node [TESTNODE_N].name = "N";
+	csc_pcstree_init (node + TESTNODE_A);
+	csc_pcstree_init (node + TESTNODE_B);
+	csc_pcstree_init (node + TESTNODE_C);
+	csc_pcstree_init (node + TESTNODE_D);
+	csc_pcstree_init (node + TESTNODE_E);
+	csc_pcstree_init (node + TESTNODE_F);
+	csc_pcstree_init (node + TESTNODE_G);
+	csc_pcstree_init (node + TESTNODE_H);
+	csc_pcstree_init (node + TESTNODE_I);
+	csc_pcstree_init (node + TESTNODE_J);
+	csc_pcstree_init (node + TESTNODE_K);
+	csc_pcstree_init (node + TESTNODE_L);
+	csc_pcstree_init (node + TESTNODE_M);
+	csc_pcstree_init (node + TESTNODE_N);
 
 
-	struct csc_pcstree * c4 = csc_pcstree_malloc();
-	c4->ptr = "s1/c4";
-	csc_pcstree_addsibling (c2, c4);
-
-	struct csc_pcstree * c5 = csc_pcstree_malloc();
-	c5->ptr = "s1/c2/c5";
-	csc_pcstree_addchild (c2, c5);
-
-	/*
-	+-root
-	| +-c1
-	+-s1
-	  +-c2
-		+-c5
-	  +-c4
-	*/
+	csc_pcstree_add (node+TESTNODE_A, node+TESTNODE_B);
+	csc_pcstree_add (node+TESTNODE_B, node+TESTNODE_C);
 
 
-	struct csc_pcstree * c3 = csc_pcstree_malloc();
-	s1->child->ptr = "s1_child";
-	c2->child->ptr = "c2_child";
-	c3->child->ptr = "c3_child";
-	c2->ptr = "s1/c3/c2";
-	c3->ptr = "s1/c3";
-	csc_pcstree_addparent (c2, c3);
 
-
-	ASSERT (root->child->next == c1);
-	ASSERT (root->next == s1);
-	ASSERT (root->prev == s1);
-	ASSERT (s1->prev == root);
-	ASSERT (s1->next == root);
-	ASSERT (s1->child->next == c3);
-	ASSERT (c3->parent == s1);
-	ASSERT (c3->next == c4);
-	ASSERT (c3->child->next == c2);
-	ASSERT (c2->parent == c3);
-	ASSERT (c2->child->next == c5);
-	ASSERT (c5->parent == c2);
-	ASSERT (c2->next == c2);
-
-	/*
-	+-root
-	| +-c1
-	+-s1
-	  +-c3
-		+-c2
-	  +-c4
-	*/
 
 	return EXIT_SUCCESS;
 }
