@@ -10,6 +10,6 @@ QMAKE_CFLAGS = -Wno-unused-function
 #QMAKE_CXXFLAGS += -Wno-unused-function
 #QMAKE_CFLAGS = -Wno-unused-function
 
-HEADERS += csc_argparse.h
+HEADERS += csc_argv.h
 HEADERS += csc_crossos.h
-SOURCES += test_csc_argparse.c
+SOURCES += test_csc_argv.c
