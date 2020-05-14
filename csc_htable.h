@@ -90,8 +90,6 @@ void csc_htablestr_init (struct csc_htablestr * ht)
 {
 	ASSERT_PARAM_NOTNULL (ht);
 	ASSERT_ISPOW2 (ht->htsize);
-	//Reserve element 0 for miscs. Thus skip element 1.
-	ht->last = 1;
 	ht->slots = calloc (ht->htsize, sizeof (struct csc_dlist));
 	ht->node = calloc (ht->items_max, sizeof (struct csc_dlist));
 	ht->name = calloc (ht->items_max * ht->name_stride, sizeof (char));
