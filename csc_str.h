@@ -455,7 +455,8 @@ csc_str_cmp (char const * s1, char const * s2, char const * s1_end, char const *
 	{
 		if (s1_end && (s1 >= s1_end)) {break;}
 		if (s2_end && (s2 >= s2_end)) {break;}
-		d += s1[0] - s2[0];
+		d = s1[0] - s2[0];
+		if (d) {break;}
 		if (s1[0] == '\0') {break;}
 		if (s2[0] == '\0') {break;}
 		s1++;
