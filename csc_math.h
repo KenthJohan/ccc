@@ -503,50 +503,60 @@ void v3f32_crossacc_scalar (float r[], float s, float const a[], float const b[]
 	r[2] += s * (a[0] * b[1] - a[1] * b[0]);
 }
 
+#define V4F32_FORMAT "(%f %f %f %f)\n"
+#define V4F32_ARGS(x) (x)[0], (x)[1], (x)[2], (x)[3]
 
-void v4f32_cpy (float r [4], float const a [4])
+
+static void v4f32_cpy (float r [4], float const a [4])
 {
 	vf32_cpy (4, r, a);
 }
 
-void v4f32_add (float r [4], float const a [4], float const b [4])
+
+static void v4f32_add (float r [4], float const a [4], float const b [4])
 {
 	vvf32_add (4, r, a, b);
 }
 
 
-void v4f32_sub (float r [4], float const a [4], float const b [4])
+static void v4f32_acc (float r [4], float const a [4])
+{
+	vf32_acc (4, r, a);
+}
+
+
+static void v4f32_sub (float r [4], float const a [4], float const b [4])
 {
 	vvf32_sub (4, r, a, b);
 }
 
 
-void v4f32_set1 (float r [4], float const b)
+static void v4f32_set1 (float r [4], float const b)
 {
 	vf32_set1 (4, r, b);
 }
 
 
-void v4f32_mul (float r [4], float const a [4], float const b)
+static void v4f32_mul (float r [4], float const a [4], float const b)
 {
 	vsf32_mul (4, r, a, b);
 }
 
 
-void v4f32_normalize (float r [4], float const a [4])
+static void v4f32_normalize (float r [4], float const a [4])
 {
 	vf32_normalize (4, r, a);
 }
 
 
-float v4f32_norm2 (float const a [4])
+static float v4f32_norm2 (float const a [4])
 {
 	return vvf32_dot (4, a, a);
 }
 
 
 //xyzw xyzw xyzw ... n times
-void v4f32_repeat4 (uint32_t n, float r [], float x, float y, float z, float w)
+static void v4f32_repeat4 (uint32_t n, float r [], float x, float y, float z, float w)
 {
 	while (n--)
 	{
@@ -610,6 +620,11 @@ static void mv4f32_macc (float y[4], float const a[4*4], float const b[4])
 	mvf32_macc (y, a, b, 4, 4);
 }
 
+static void mv4f32_mul (float y[4], float const a[4*4], float const b[4])
+{
+	v4f32_set1 (y, 0.0f);
+	mvf32_macc (y, a, b, 4, 4);
+}
 
 static void mv4f32_macc_transposed (float y[4], float const a[4*4], float const b[4])
 {
@@ -681,7 +696,7 @@ void m4f32_identity (float M [16])
 
 void m4f32_translation (float M [16], float const t [4])
 {
-	m4f32_identity (M);
+	//m4f32_identity (M);
 	M [M4_T0 + 0] = t [0];
 	M [M4_T0 + 1] = t [1];
 	M [M4_T0 + 2] = t [2];
@@ -998,6 +1013,7 @@ void qf32_m4 (float R [16], float const q [4])
 	R [M4_V0 + 2] = xz - yw;
 	R [M4_V1 + 0] = xy - zw;
 
+	/*
 	R [M4_V0 + 3] = 0.0f;
 	R [M4_V1 + 3] = 0.0f;
 	R [M4_V2 + 3] = 0.0f;
@@ -1007,6 +1023,7 @@ void qf32_m4 (float R [16], float const q [4])
 	R [M4_V3 + 2] = 0.0f;
 
 	R [M4_S3] = 1.0f;
+	*/
 }
 
 
@@ -1048,7 +1065,7 @@ Method by Fabian 'ryg' Giessen (of Farbrausch)
 t = 2 * cross(q.xyz, v)
 v' = v + q.w * t + cross(q.xyz, t)
 */
-static void qf32_rotate_vector (float q[4], float const v[3], float r[3])
+static void qf32_rotate_vector (float const q[4], float const v[3], float r[3])
 {
 	ASSERT (v != r);
 	float t[3];
@@ -1070,7 +1087,17 @@ static void qf32_rotate_vector1 (float q[4], float v[3])
 }
 
 
-void qf32_rotate_xyza (float q[4], float x, float y, float z, float a)
+static void qf32_rotate_vector_array (float q[4], float v[], unsigned n)
+{
+	while (n--)
+	{
+		qf32_rotate_vector1 (q, v);
+		v += 4;
+	}
+}
+
+
+static void qf32_rotate_xyza (float q[4], float x, float y, float z, float a)
 {
 	float u[4];
 	qf32_xyza (u, x, y, z, a);
@@ -1079,7 +1106,20 @@ void qf32_rotate_xyza (float q[4], float x, float y, float z, float a)
 
 
 
-
+static void qf32_ypr (float q[4], float yaw, float pitch, float roll) // yaw (Z), pitch (Y), roll (X)
+{
+	// Abbreviations for the various angular functions
+	float cy = cos(yaw * 0.5);
+	float sy = sin(yaw * 0.5);
+	float cp = cos(pitch * 0.5);
+	float sp = sin(pitch * 0.5);
+	float cr = cos(roll * 0.5);
+	float sr = sin(roll * 0.5);
+	q[0] = sr * cp * cy - cr * sp * sy;
+	q[1] = cr * sp * cy + sr * cp * sy;
+	q[2] = cr * cp * sy - sr * sp * cy;
+	q[3] = cr * cp * cy + sr * sp * sy;
+}
 
 
 

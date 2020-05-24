@@ -1,5 +1,5 @@
 #pragma once
-#include <glad.h>
+#include <GL/glew.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
