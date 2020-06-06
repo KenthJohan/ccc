@@ -35,6 +35,9 @@ https://github.com/nanomsg/nng
 #include <errno.h>
 
 
+#include <nng/nng.h>
+#include <nng/supplemental/util/platform.h>
+
 #define NNG_EXIT_ON_ERROR(r) nng_exit_on_error(r,__FILE__,__LINE__)
 void nng_exit_on_error (int r, char const * file, int line)
 {
