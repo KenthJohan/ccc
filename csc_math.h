@@ -696,12 +696,33 @@ void m4f32_identity (float M [16])
 
 void m4f32_translation (float M [16], float const t [4])
 {
-	//m4f32_identity (M);
 	M [M4_T0 + 0] = t [0];
 	M [M4_T0 + 1] = t [1];
 	M [M4_T0 + 2] = t [2];
-	//Translate 4th dimension?
-	//m [M4_T0 + 3] = t [3];
+}
+
+
+void m4f32_translation_xyz (float M [16], float x, float y, float z)
+{
+	M [M4_T0 + 0] = x;
+	M [M4_T0 + 1] = y;
+	M [M4_T0 + 2] = z;
+}
+
+
+void m4f32_scale_xyz (float M [16], float x, float y, float z)
+{
+	M [M4_S0] = x;
+	M [M4_S1] = y;
+	M [M4_S2] = z;
+}
+
+
+void m4f32_scale (float M [16], float s)
+{
+	M [M4_S0] = s;
+	M [M4_S1] = s;
+	M [M4_S2] = s;
 }
 
 
@@ -1353,6 +1374,30 @@ static void qf32_ypr (float q[4], float yaw, float pitch, float roll) // yaw (Z)
 
 
 
+
+
+//Linearly map (x) value from (A0 .. A1) to (B0 .. B1)
+float sf32_linmap (float X, float A0, float A1, float B0, float B1)
+{
+	//cropping
+	if (X < A0) {return B0;}
+	if (X > A1) {return B1;}
+	//calculate delta
+	float DA;
+	float DB;
+	DA = A1 - A0;
+	DB = B1 - B0;
+	//move to zero
+	X = X - A0;
+	//zero division protection
+	if (DA == 0) {return B1;};
+	X = X / DA;
+	//new scale
+	X = X * DB;
+	//new offset
+	X = X + B0;
+	return X;
+}
 
 
 
