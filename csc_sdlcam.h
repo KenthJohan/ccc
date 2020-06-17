@@ -63,11 +63,14 @@ void csc_sdlcam_build (struct csc_sdlcam * cam)
 	qf32_xyza (q_pitch, 1.0f, 0.0f, 0.0f, cam->pitchd);
 	qf32_xyza (q_yaw,   0.0f, 1.0f, 0.0f, cam->yawd);
 	qf32_xyza (q_roll,  0.0f, 0.0f, 1.0f, cam->rolld);
+	/*
 	qf32_mul (cam->q, q_pitch, cam->q); //Apply pitch rotation
 	qf32_mul (cam->q, q_roll, cam->q); //Apply roll rotation
 	qf32_mul (cam->q, cam->q, q_yaw); //Apply yaw rotation
-
-
+	*/
+	qf32_mul (cam->q, q_roll, cam->q); //Apply roll rotation
+	qf32_mul (cam->q, q_pitch, cam->q); //Apply pitch rotation
+	qf32_mul (cam->q, q_yaw, cam->q); //Apply yaw rotation
 
 
 	//float q[4];
