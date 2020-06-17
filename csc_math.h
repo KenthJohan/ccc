@@ -13,7 +13,7 @@ void mf32_print (float * M, unsigned rn, unsigned cn, FILE * f)
 	{
 		for (unsigned c = 0; c < cn; ++ c)
 		{
-			fprintf (f, "%f ", (double) M [c*rn+r]);
+			fprintf (f, "%+10.3f ", (double) M [c*rn+r]);
 		}
 		fprintf (f, "\n");
 	}
@@ -622,8 +622,10 @@ static void mv4f32_macc (float y[4], float const a[4*4], float const b[4])
 
 static void mv4f32_mul (float y[4], float const a[4*4], float const b[4])
 {
-	v4f32_set1 (y, 0.0f);
-	mvf32_macc (y, a, b, 4, 4);
+	float r[4] = {0.0f};
+	v4f32_set1 (r, 0.0f);
+	mvf32_macc (r, a, b, 4, 4);
+	memcpy (y, r, sizeof (r));
 }
 
 static void mv4f32_macc_transposed (float y[4], float const a[4*4], float const b[4])
@@ -1373,8 +1375,38 @@ static void qf32_ypr (float q[4], float yaw, float pitch, float roll) // yaw (Z)
 
 
 
+void m4f32_coveriance (float m[4*4], float mean[3], float v[], uint32_t n)
+{
+	memset (m, 0, sizeof (float)*4*4);
+	memset (mean, 0, sizeof (float)*3);
+	float * w;
+	w = v;
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		mean[0] += w[0];
+		mean[1] += w[1];
+		mean[2] += w[2];
+		w += 4;
+	}
+	vsf32_mul (3, mean, mean, 1.0f / (float)n);
+	w = v;
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		m[M4_V0 + 0] += (mean[0] - w[0]) * (mean[0] - w[0]);
+		m[M4_V0 + 1] += (mean[0] - w[0]) * (mean[1] - w[1]);
+		m[M4_V0 + 2] += (mean[0] - w[0]) * (mean[2] - w[2]);
 
+		m[M4_V1 + 0] += (mean[1] - w[1]) * (mean[0] - w[0]);
+		m[M4_V1 + 1] += (mean[1] - w[1]) * (mean[1] - w[1]);
+		m[M4_V1 + 2] += (mean[1] - w[1]) * (mean[2] - w[2]);
 
+		m[M4_V2 + 0] += (mean[2] - w[2]) * (mean[0] - w[0]);
+		m[M4_V2 + 1] += (mean[2] - w[2]) * (mean[1] - w[1]);
+		m[M4_V2 + 2] += (mean[2] - w[2]) * (mean[2] - w[2]);
+		w += 4;
+	}
+	vsf32_mul (4*4, m, m, 1.0f / ((float)n - 1.0f));
+}
 
 //Linearly map (x) value from (A0 .. A1) to (B0 .. B1)
 float sf32_linmap (float X, float A0, float A1, float B0, float B1)
