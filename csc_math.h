@@ -1421,31 +1421,45 @@ void m3f32_coveriance (float m[3*3], float mean[3], float v[], uint32_t n)
 	memset (mean, 0, sizeof (float)*3);
 	float * w;
 	w = v;
+	uint32_t k = 0;
 	for (uint32_t i = 0; i < n; ++i)
 	{
+		if (vvf32_dot (3, w, w) < 1.0f)
+		{
+			//printf("%f %f %f\n", w[0], w[1], w[2]);
+			w += 4;
+			continue;
+		}
 		mean[0] += w[0];
 		mean[1] += w[1];
 		mean[2] += w[2];
 		w += 4;
+		k++;
 	}
-	vsf32_mul (3, mean, mean, 1.0f / (float)n);
+	vsf32_mul (3, mean, mean, 1.0f / (float)k);
 	w = v;
 	for (uint32_t i = 0; i < n; ++i)
 	{
-		m[M4_V0 + 0] += (mean[0] - w[0]) * (mean[0] - w[0]);
-		m[M4_V0 + 1] += (mean[0] - w[0]) * (mean[1] - w[1]);
-		m[M4_V0 + 2] += (mean[0] - w[0]) * (mean[2] - w[2]);
+		if (vvf32_dot (3, w, w) < 1.0f)
+		{
+			//printf("%f %f %f\n", w[0], w[1], w[2]);
+			w += 4;
+			continue;
+		}
+		m[0] += (mean[0] - w[0]) * (mean[0] - w[0]);
+		m[1] += (mean[0] - w[0]) * (mean[1] - w[1]);
+		m[2] += (mean[0] - w[0]) * (mean[2] - w[2]);
 
-		m[M4_V1 + 0] += (mean[1] - w[1]) * (mean[0] - w[0]);
-		m[M4_V1 + 1] += (mean[1] - w[1]) * (mean[1] - w[1]);
-		m[M4_V1 + 2] += (mean[1] - w[1]) * (mean[2] - w[2]);
+		m[3] += (mean[1] - w[1]) * (mean[0] - w[0]);
+		m[4] += (mean[1] - w[1]) * (mean[1] - w[1]);
+		m[5] += (mean[1] - w[1]) * (mean[2] - w[2]);
 
-		m[M4_V2 + 0] += (mean[2] - w[2]) * (mean[0] - w[0]);
-		m[M4_V2 + 1] += (mean[2] - w[2]) * (mean[1] - w[1]);
-		m[M4_V2 + 2] += (mean[2] - w[2]) * (mean[2] - w[2]);
+		m[6] += (mean[2] - w[2]) * (mean[0] - w[0]);
+		m[7] += (mean[2] - w[2]) * (mean[1] - w[1]);
+		m[8] += (mean[2] - w[2]) * (mean[2] - w[2]);
 		w += 4;
 	}
-	vsf32_mul (3*3, m, m, 1.0f / ((float)n - 1.0f));
+	vsf32_mul (3*3, m, m, 1.0f / ((float)k - 1.0f));
 }
 
 
