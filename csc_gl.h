@@ -83,6 +83,35 @@ GLint csc_gl_program_from_files (char const * filenames[])
 
 
 
+#define CSC_GL_PROGRAM_FROM_FILES1_MAXFILENAME 128
+GLint csc_gl_program_from_files1 (char const * filenames)
+{
+	char buffer[CSC_GL_PROGRAM_FROM_FILES1_MAXFILENAME];
+	GLint program = glCreateProgram();
+	GLint shader;
+	while (1)
+	{
+		char * e = strchr (filenames, ';');
+		if (e)
+		{
+			int l = e - filenames;
+			memcpy (buffer, filenames, l);
+			buffer[l] = '\0';
+			shader = csc_gl_shader_from_file (buffer);
+			glAttachShader (program, shader);
+			filenames = e + 1;
+		}
+		else
+		{
+			shader = csc_gl_shader_from_file (filenames);
+			glAttachShader (program, shader);
+			break;
+		}
+	}
+	return program;
+}
+
+
 
 
 
