@@ -6,6 +6,7 @@
 #include "csc_debug.h"
 #include "csc_basic.h"
 #include "csc_math.h"
+#include "csc_v3f32.h"
 
 
 
