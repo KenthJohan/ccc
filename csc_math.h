@@ -236,13 +236,14 @@
 
 
 
-void mf32_print (float * M, unsigned rn, unsigned cn, FILE * f)
+void mf32_print (float m[], unsigned rn, unsigned cn, FILE * f)
 {
 	for (unsigned r = 0; r < rn; ++ r)
 	{
 		for (unsigned c = 0; c < cn; ++ c)
 		{
-			fprintf (f, "%+10.3f ", (double) M [c*rn+r]);
+			//double v = m [c*rn+r];
+			fprintf (f, "%+10.3f ", (double) m [c*rn+r]);
 		}
 		fprintf (f, "\n");
 	}
@@ -726,7 +727,3 @@ static void vf32_subv (uint32_t dim, float y[], uint32_t y_stride, float const a
 		b += b_stride;
 	}
 }
-
-
-
-

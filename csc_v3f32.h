@@ -73,3 +73,12 @@ static int v3f32_ray_sphere_intersect
 
 	return 1;
 }
+
+
+
+static void mv3f32_mul (float y[3], float const a[3*3], float const b[3])
+{
+	float r[3] = {0.0f};
+	mvf32_macc (r, a, b, 3, 3);
+	memcpy (y, r, sizeof (r));
+}

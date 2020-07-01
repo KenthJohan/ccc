@@ -112,7 +112,6 @@ static void mv4f32_macc (float y[4], float const a[4*4], float const b[4])
 static void mv4f32_mul (float y[4], float const a[4*4], float const b[4])
 {
 	float r[4] = {0.0f};
-	v4f32_set1 (r, 0.0f);
 	mvf32_macc (r, a, b, 4, 4);
 	memcpy (y, r, sizeof (r));
 }
