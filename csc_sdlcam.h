@@ -2,6 +2,9 @@
 #include <SDL2/SDL.h>
 
 #include "csc_math.h"
+#include "csc_v4f32.h"
+#include "csc_qf32.h"
+#include "csc_m4f32.h"
 
 
 
