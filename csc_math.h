@@ -730,21 +730,16 @@ static void vf32_subv (uint32_t dim, float y[], uint32_t y_stride, float const a
 
 
 
-void vf32_convolution1d (float const q[], uint32_t n, float u[])
+void vf32_convolution1d (float const q[], uint32_t n, float u[], float k[], uint32_t kn)
 {
-	uint32_t kn = 13;
 	uint32_t kn0 = kn / 2;
-	float k0[13] = {1.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 2.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f};
-	//float k1[13] = {      1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 2.0f, 2.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f};
-	//float k2[13] = {1.0f, 1.0f,  1.0f, -1.0f, -1.0f, 1.0f, 2.0f, 1.0f,  1.0f, -1.0f, -1.0f, 1.0f, 1.0f};
-	vf32_normalize (kn, k0, k0);
-
+	vf32_normalize (kn, k, k);
 	for (uint32_t i = kn0; i < n-kn0; ++i)
 	{
 		float sum = 0.0f;
 		for (uint32_t j = 0; j < kn; ++j)
 		{
-			sum += q[i - kn0 + j] * k0[j];
+			sum += q[i - kn0 + j] * k[j];
 		}
 		u[i] = sum;
 	}
@@ -930,12 +925,12 @@ void vf32_project_2d_to_1d (float p[], uint32_t xn, uint32_t yn, float k, float 
 		float sum = 0.0f;
 		for (uint32_t x = 0; x < xn; ++x)
 		{
-			uint32_t yy = (float)y + (float)x*k;
-			if (yy < 0){continue;}
-			if (yy >= yn){continue;}
-			ASSERT (yy >= 0);
-			ASSERT (yy < yn);
-			uint32_t index = yy*xn + x;
+			float yy = (float)y + (float)x*k;
+			if (yy < 0.0f){continue;}
+			if (yy >= (float)yn){continue;}
+			ASSERT (yy >= 0.0f);
+			ASSERT (yy < (float)yn);
+			uint32_t index = (uint32_t)yy*xn + x;
 			ASSERT (index < xn*yn);
 			sum += p[index];
 		}
