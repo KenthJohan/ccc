@@ -727,3 +727,131 @@ static void vf32_subv (uint32_t dim, float y[], uint32_t y_stride, float const a
 		b += b_stride;
 	}
 }
+
+
+
+void vf32_convolution1d (float const q[], uint32_t n, float u[])
+{
+	uint32_t kn = 13;
+	uint32_t kn0 = kn / 2;
+	float k0[13] = {1.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 2.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f};
+	//float k1[13] = {      1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 2.0f, 2.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f};
+	//float k2[13] = {1.0f, 1.0f,  1.0f, -1.0f, -1.0f, 1.0f, 2.0f, 1.0f,  1.0f, -1.0f, -1.0f, 1.0f, 1.0f};
+	vf32_normalize (kn, k0, k0);
+
+	for (uint32_t i = kn0; i < n-kn0; ++i)
+	{
+		float sum = 0.0f;
+		for (uint32_t j = 0; j < kn; ++j)
+		{
+			sum += q[i - kn0 + j] * k0[j];
+		}
+		u[i] = sum;
+	}
+}
+
+
+void vf32_convolution2d (float pix2[], float const pix[], int32_t xn, int32_t yn, float k[], int32_t kxn, int32_t kyn)
+{
+	int32_t kxn0 = kxn / 2;
+	int32_t kyn0 = kyn / 2;
+	//printf ("kxn0 %i\n", kxn0);
+	//printf ("kyn0 %i\n", kyn0);
+	for (int32_t y = kyn0; y < (yn-kyn0); ++y)
+	{
+		for (int32_t x = kxn0; x < (xn-kxn0); ++x)
+		{
+			float sum = 0.0f;
+			for (int32_t ky = 0; ky < kyn; ++ky)
+			{
+				for (int32_t kx = 0; kx < kxn; ++kx)
+				{
+					int32_t xx = x + kx - kxn0;
+					int32_t yy = y + ky - kyn0;
+					sum += pix[yy * xn + xx] * k[ky * kxn + kx];
+				}
+			}
+			pix2[y * xn + x] = sum;
+			//pix2[y * xn + x] = pix[y * xn + x];
+		}
+	}
+}
+
+
+
+uint32_t vf32_amount_positive (float q[], uint32_t qn, uint32_t * qi, uint32_t count)
+{
+	uint32_t n = 0;
+	while (count--)
+	{
+		if ((*qi) >= qn){break;}
+		if (q[(*qi)] < 0.0f){break;}
+		(*qi)++;
+		n++;
+	}
+	return n;
+}
+
+
+uint32_t vf32_amount_negative (float q[], uint32_t qn, uint32_t * qi, uint32_t count)
+{
+	uint32_t n = 0;
+	while (count--)
+	{
+		if ((*qi) >= qn){break;}
+		if (q[(*qi)] > 0.0f){break;}
+		(*qi)++;
+		n++;
+	}
+	return n;
+}
+
+
+
+void vf32_remove_low_values (float q[], uint32_t qn)
+{
+	float pos = 0.0f;
+	float neg = 0.0f;
+	float pos_n = 0;
+	float neg_n = 0;
+	for (uint32_t i = 0; i < qn; ++i)
+	{
+		if (q[i] > 0.0f)
+		{
+			pos += q[i];
+			pos_n += 1.0f;
+		}
+		else if (q[i] < 0.0f)
+		{
+			neg += q[i];
+			neg_n += 1.0f;
+		}
+	}
+	pos /= pos_n;
+	neg /= neg_n;
+	for (uint32_t i = 0; i < qn; ++i)
+	{
+		if ((q[i] > 0.0f) && (q[i] < pos))
+		{
+			q[i] = 0.0f;
+		}
+		if ((q[i] < 0.0f) && (q[i] > neg))
+		{
+			q[i] = 0.0f;
+		}
+	}
+}
+
+
+uint32_t vf32_skip_zero (float q[], uint32_t qn, uint32_t * qi)
+{
+	uint32_t n = 0;
+	while (1)
+	{
+		if ((*qi) >= qn){break;}
+		if (q[(*qi)] != 0.0f){break;}
+		(*qi)++;
+		n++;
+	}
+	return n;
+}
