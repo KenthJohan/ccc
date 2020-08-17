@@ -873,9 +873,11 @@ float vf32_most_common_line (float const p[], uint32_t xn, uint32_t yn, uint32_t
 				}
 				ASSERT (yy >= 0.0f);
 				ASSERT (yy < (float)yn);
+				uint32_t index = (uint32_t)yy*xn + x;
+				ASSERT (index < xn*yn);
 				//Sum of noisy pixel will become close to zero:
 				//Sum of similiar pixel will become large positive or negative value:
-				sum += p[(int)yy*xn + x];
+				sum += p[index];
 			}
 			score += sum*sum;
 		}
@@ -884,21 +886,21 @@ float vf32_most_common_line (float const p[], uint32_t xn, uint32_t yn, uint32_t
 			highscore = score;
 			k1 = k;
 		}
-		//printf ("sum:  %+f : %f\n", k, score);
+		printf ("sum:  %+f : %f\n", k, score);
 	}
-	//printf ("best: %+f : %f\n", k1, highscore);
+	printf ("best: %+f : %f\n", k1, highscore);
 	return k1;
 }
 
 
 
-void vf32_find_peaks (float q[], uint32_t qn, uint32_t g[], uint32_t gn, uint32_t r)
+void vf32_find_peaks (float q[], uint32_t qn, uint32_t g[], uint32_t gn, uint32_t r, uint32_t margin)
 {
 	for (uint32_t gi = 0; gi < gn; ++gi)
 	{
 		float qmax = 0.0f;
 		uint32_t qimax = 0;
-		for (uint32_t qi = 0; qi < qn; ++qi)
+		for (uint32_t qi = margin; qi < qn-margin; ++qi)
 		{
 			if (qmax < q[qi])
 			{
