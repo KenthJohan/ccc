@@ -852,47 +852,6 @@ uint32_t vf32_skip_zero (float q[], uint32_t qn, uint32_t * qi)
 }
 
 
-float vf32_most_common_line (float const p[], uint32_t xn, uint32_t yn, uint32_t yp)
-{
-	float highscore = 0.0f;
-	float k1 = 0.0f;
-	float const delta = 0.1f;
-	for (float k = -1.0f; k < 1.0f; k += delta)
-	{
-		float score = 0.0f;
-		for (uint32_t y = yp; y < yn-yp; ++y)
-		{
-			float sum = 0.0f;
-			for (uint32_t x = 0; x < xn; ++x)
-			{
-				//skew in the y-direction by (k) amount:
-				float yy = y + x*k;
-				if (yy < 0.0f || yy >= yn)
-				{
-					continue;
-				}
-				ASSERT (yy >= 0.0f);
-				ASSERT (yy < (float)yn);
-				uint32_t index = (uint32_t)yy*xn + x;
-				ASSERT (index < xn*yn);
-				//Sum of noisy pixel will become close to zero:
-				//Sum of similiar pixel will become large positive or negative value:
-				sum += p[index];
-			}
-			score += sum*sum;
-		}
-		if (score > highscore)
-		{
-			highscore = score;
-			k1 = k;
-		}
-		printf ("sum:  %+f : %f\n", k, score);
-	}
-	printf ("best: %+f : %f\n", k1, highscore);
-	return k1;
-}
-
-
 
 void vf32_find_peaks (float q[], uint32_t qn, uint32_t g[], uint32_t gn, uint32_t r, uint32_t margin)
 {
@@ -915,33 +874,6 @@ void vf32_find_peaks (float q[], uint32_t qn, uint32_t g[], uint32_t gn, uint32_
 		{
 			q[qi] = 0.0f;
 		}
-	}
-}
-
-
-
-void vf32_project_2d_to_1d (float p[], uint32_t xn, uint32_t yn, float k, float q[])
-{
-	for (uint32_t y = 0; y < yn; ++y)
-	{
-		float sum = 0.0f;
-		for (uint32_t x = 0; x < xn; ++x)
-		{
-			float yy = (float)y + (float)x*k;
-			if (yy < 0.0f){continue;}
-			if (yy >= (float)yn){continue;}
-			ASSERT (yy >= 0.0f);
-			ASSERT (yy < (float)yn);
-			uint32_t index = (uint32_t)yy*xn + x;
-			ASSERT (index < xn*yn);
-			sum += p[index];
-		}
-		//p[y*xn+0] = sum * (1.0f / (float)xn);
-		float val = sum;
-		q[y] = val;
-		//float yy = (float)y + ((float)xn-1.0f)*k;
-		//yy = CLAMP (yy, 0, yn);
-		//q[(int)yy] = val;
 	}
 }
 
