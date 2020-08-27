@@ -236,6 +236,19 @@
 
 
 
+struct v4f32_line
+{
+	float a[4];
+	float b[4];
+};
+
+struct u32_line
+{
+	uint32_t a;
+	uint32_t b;
+};
+
+
 void mf32_print (float m[], unsigned rn, unsigned cn, FILE * f)
 {
 	for (unsigned r = 0; r < rn; ++ r)
@@ -262,6 +275,31 @@ static void mf32_set (float * M, float c, unsigned n)
 		M [i] = c;
 	}
 }
+
+
+static void vf32_set2 (float v[], float v0, float v1)
+{
+	v[0] = v0;
+	v[1] = v1;
+}
+
+
+static void vf32_set3 (float v[], float v0, float v1, float v2)
+{
+	v[0] = v0;
+	v[1] = v1;
+	v[2] = v2;
+}
+
+
+static void vf32_set4 (float v[], float v0, float v1, float v2, float v3)
+{
+	v[0] = v0;
+	v[1] = v1;
+	v[2] = v2;
+	v[3] = v3;
+}
+
 
 
 // r := a . b
