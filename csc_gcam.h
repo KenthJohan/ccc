@@ -8,7 +8,8 @@
 
 
 
-struct csc_sdlcam
+
+struct csc_gcam
 {
 	float d[4];//Delta
 	float p[4];//Position
@@ -18,12 +19,17 @@ struct csc_sdlcam
 	float n;//Near
 	float f;//Far
 
+	float pyrd[3];
+	float pyr[3];
+
+	/*
 	float pitchd;
 	float pitch;
 	float yawd;
 	float yaw;
 	float rolld;
 	float roll;
+	*/
 
 
 	float q[4];//Quaternion rotation
@@ -35,22 +41,21 @@ struct csc_sdlcam
 };
 
 
-void csc_sdlcam_init (struct csc_sdlcam * cam)
+void csc_gcam_init (struct csc_gcam * cam)
 {
+	vf32_set1 (3, cam->pyrd, 0.0f);
+	vf32_set1 (3, cam->pyr, 0.0f);
 	v4f32_set_xyzw (cam->p, 0.0f, 0.0f, 0.0f, 1.0f);
 	cam->fov = 45.0f*(M_PI/180.0f);
 	cam->w = 100.0f;
 	cam->h = 100.0f;
 	cam->n = 0.1f;
 	cam->f = 10000.0f;
-	cam->pitch = 0;
-	cam->yaw = 0;
-	cam->roll = 0;
 	qf32_identity (cam->q);
 }
 
 
-void csc_sdlcam_build (struct csc_sdlcam * cam)
+void csc_gcam_update (struct csc_gcam * cam)
 {
 	float q_pitch[4];//Quaternion pitch rotation
 	float q_yaw[4];//Quaternion yaw rotation
@@ -63,9 +68,9 @@ void csc_sdlcam_build (struct csc_sdlcam * cam)
 	//cam->roll += cam->rolld;
 	//qf32_ypr (cam->q, cam->yaw, cam->pitch, cam->roll);
 
-	qf32_xyza (q_pitch, 1.0f, 0.0f, 0.0f, cam->pitchd);
-	qf32_xyza (q_yaw,   0.0f, 1.0f, 0.0f, cam->yawd);
-	qf32_xyza (q_roll,  0.0f, 0.0f, 1.0f, cam->rolld);
+	qf32_xyza (q_pitch, 1.0f, 0.0f, 0.0f, cam->pyrd[0]);
+	qf32_xyza (q_yaw,   0.0f, 1.0f, 0.0f, cam->pyrd[1]);
+	qf32_xyza (q_roll,  0.0f, 0.0f, 1.0f, cam->pyrd[2]);
 	/*
 	qf32_mul (cam->q, q_pitch, cam->q); //Apply pitch rotation
 	qf32_mul (cam->q, q_roll, cam->q); //Apply roll rotation
