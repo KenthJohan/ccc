@@ -47,11 +47,15 @@ void csc_sdlglew_create_window (SDL_Window ** window, SDL_GLContext * context, c
 		exit (1);
 	}
 
-	glewExperimental = 1;
-	if (glewInit() != GLEW_OK)
 	{
-		fprintf(stderr, "Failed to setup GLEW\n");
-		exit(1);
+		glewExperimental = 1;
+		GLenum err = glewInit();
+		if (GLEW_OK != err)
+		{
+			fprintf(stderr, "Error: %s\n", glewGetErrorString (err));
+			exit (1);
+		}
+		fprintf(stdout, "Status: Using GLEW %s\n", glewGetString (GLEW_VERSION));
 	}
 
 	// Enable the debug callback
