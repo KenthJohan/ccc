@@ -83,8 +83,8 @@ static inline void csc_dlist_connect (struct csc_dlist * a, struct csc_dlist * b
 {
 	ASSERT_PARAM_NOTNULL (a);
 	ASSERT_PARAM_NOTNULL (b);
-	a->prev = b;
-	b->next = a;
+	a->next = b;
+	b->prev = a;
 	ASSERT (a == a->next->prev);
 	ASSERT (b == b->next->prev);
 }
@@ -204,3 +204,21 @@ static inline int csc_dlist_find_str (struct csc_dlist *entry, struct csc_dlist 
 	}
 	return -1;
 }
+
+
+
+
+
+
+struct csc_dlist_u32
+{
+	uint32_t value;
+	struct csc_dlist node;
+};
+
+
+
+
+
+
+
