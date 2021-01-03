@@ -1,0 +1,13 @@
+* https://gitlab.com/Falconerd/ember-ecs/-/blob/master/example/main.c
+* https://github.com/discoloda/Diana/blob/master/cpp/example.cpp
+* https://skypjack.github.io/2020-08-02-ecs-baf-part-9/
+* https://skypjack.github.io/2019-09-25-ecs-baf-part-5/
+* https://stackoverflow.com/questions/6076720/sorting-a-c-array-based-on-contents-of-another-array
+* http://www.manpagez.com/man/3/qsort_r/
+* https://en.wikipedia.org/wiki/Entity%E2%80%93attribute%E2%80%93value_model#Description_of_concepts
+* https://www.gamedev.net/forums/topic/691504-ecs-mega-entity-array-vs-many-component-arrays/
+* https://github.com/cntools/rawdraw
+* https://www.geeksforgeeks.org/sparse-set/
+* https://programmingpraxis.com/2012/03/09/sparse-sets/
+* https://rams3s.github.io/blog/2019-01-09-ecs-deep-dive/
+* https://github.com/BrianWill/LearnUnity/blob/master/ecs-jobs/ecs.md
