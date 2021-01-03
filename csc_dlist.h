@@ -79,6 +79,17 @@ static inline void csc_dlist_add_tail (struct csc_dlist *head, struct csc_dlist 
 }
 
 
+static inline void csc_dlist_addv (struct csc_dlist *head, struct csc_dlist new[], uint32_t n)
+{
+	ASSERT_PARAM_NOTNULL (head);
+	ASSERT_PARAM_NOTNULL (new);
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		csc_dlist_add_tail (head, new + i);
+	}
+}
+
+
 static inline void csc_dlist_connect (struct csc_dlist * a, struct csc_dlist * b)
 {
 	ASSERT_PARAM_NOTNULL (a);
@@ -97,6 +108,38 @@ static inline void csc_dlist_del (struct csc_dlist * entry)
 	csc_dlist_connect (entry->prev, entry->next);
 	entry->next = NULL;
 	entry->prev = NULL;
+}
+
+
+__attribute__ ((unused))
+static inline void csc_dlist_swap (struct csc_dlist * a, struct csc_dlist * b)
+{
+	/*
+	ASSERT_PARAM_NOTNULL (a);
+	ASSERT_PARAM_NOTNULL (b);
+	a->prev->next = b;
+	a->next->prev = b;
+	b->prev->next = a;
+	b->next->prev = a;
+	SWAP (struct csc_dlist *, a->next, b->next);
+	SWAP (struct csc_dlist *, a->prev, b->prev);
+	*/
+}
+
+
+__attribute__ ((unused))
+static inline void csc_dlist_move_head (struct csc_dlist * head, struct csc_dlist * node)
+{
+	csc_dlist_del (node);
+	csc_dlist_add_head (head, node);
+}
+
+
+__attribute__ ((unused))
+static inline void csc_dlist_move_tail (struct csc_dlist * node, struct csc_dlist * head)
+{
+	csc_dlist_del (node);
+	csc_dlist_add_tail (head, node);
 }
 
 
@@ -206,15 +249,6 @@ static inline int csc_dlist_find_str (struct csc_dlist *entry, struct csc_dlist 
 }
 
 
-
-
-
-
-struct csc_dlist_u32
-{
-	uint32_t value;
-	struct csc_dlist node;
-};
 
 
 
