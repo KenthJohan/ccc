@@ -11,3 +11,4 @@
 * https://programmingpraxis.com/2012/03/09/sparse-sets/
 * https://rams3s.github.io/blog/2019-01-09-ecs-deep-dive/
 * https://github.com/BrianWill/LearnUnity/blob/master/ecs-jobs/ecs.md
+* https://medium.com/@5argon/unity-ecs-creating-an-efficient-system-with-chunk-iteration-didaddorchange-didchange-221427f5361b
