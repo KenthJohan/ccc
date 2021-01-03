@@ -96,3 +96,47 @@ csc_sizemask64 (unsigned size)
 
 
 
+//https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+// compute the next highest power of 2 of 32-bit v
+unsigned int csc_round_up_pow2(unsigned int v)
+{
+	v--;
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >> 16;
+	v++;
+	return v;
+}
+
+
+
+
+void csc_mask_unravel_u64 (uint64_t mask, uint64_t set[64])
+{
+	set[0] = mask & 0x0000000000000001;
+	set[1] = mask & 0x0000000000000002;
+	set[2] = mask & 0x0000000000000004;
+	set[3] = mask & 0x0000000000000008;
+	set[4] = mask & 0x0000000000000010;
+	set[5] = mask & 0x0000000000000020;
+	//TODO: etc...
+}
+
+
+//https://en.wikipedia.org/wiki/Hamming_weight
+int csc_hamming_weight_u32 (uint32_t x)
+{
+	return __builtin_popcount (x);
+}
+
+//https://en.wikipedia.org/wiki/Hamming_weight
+int csc_hamming_weight_u64 (uint32_t x)
+{
+	return __builtin_popcountll (x);
+}
+
+
+
+
