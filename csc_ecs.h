@@ -172,7 +172,7 @@ void csc_ecs_init (struct csc_ecs * ecs)
 }
 
 
-void * csc_ecs_get_data (struct csc_ecs * ecs, uint32_t chunk_index, uint32_t component_index)
+void * csc_ecs_get_data2 (struct csc_ecs * ecs, uint32_t chunk_index, uint32_t component_index)
 {
 	ASSERT (chunk_index < ecs->chunks.count);
 	ASSERT (chunk_index < ecs->chunks.capacity);
@@ -181,6 +181,21 @@ void * csc_ecs_get_data (struct csc_ecs * ecs, uint32_t chunk_index, uint32_t co
 	uint32_t offset = ecs->chunks.component_sparse_offsets[CSC_COMPONENT_MAX * chunk_index + component_index];
 	ASSERT (offset != CSC_ECS_UNDEFINED);
 	return chunk + offset;
+}
+
+
+void * csc_ecs_get_data1 (struct csc_ecs * ecs, uint32_t entity_index, uint32_t component_index)
+{
+	ASSERT (entity_index < ecs->entities.count);
+	ASSERT (entity_index < ecs->entities.capacity);
+	ASSERT (component_index < CSC_COMPONENT_MAX);
+	uint32_t entity_chunk_index = ecs->entities.chunks[entity_index];
+	uint32_t entity_chunk_offset = ecs->entities.offsets[entity_index];
+	uint8_t * chunk = ecs->chunks.memory;
+	uint32_t offset = ecs->chunks.component_sparse_offsets[CSC_COMPONENT_MAX * entity_chunk_index + component_index];
+	uint32_t component_size = ecs->components.sizes[component_index];
+	ASSERT (offset != CSC_ECS_UNDEFINED);
+	return chunk + offset + (component_size * entity_chunk_offset);
 }
 
 
