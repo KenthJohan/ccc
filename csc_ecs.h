@@ -91,17 +91,25 @@ struct csc_ecs_chunks
 	uint32_t count;
 	uint8_t * memory;
 	uint64_t * masks;
-	uint32_t * entity_counts;
+	uint32_t * entity_caps;
+	uint32_t * entity_count;
 	uint32_t * component_sparse_offsets;
 	uint32_t * component_totalsizes;
 };
 
-
+struct csc_ecs_entities
+{
+	uint32_t capacity;
+	uint32_t count;
+	uint32_t * chunks;
+	uint32_t * offsets;
+};
 
 struct csc_ecs
 {
 	struct csc_ecs_chunks chunks;
 	struct csc_ecs_components components;
+	struct csc_ecs_entities entities;
 };
 
 
@@ -110,7 +118,7 @@ void csc_ecs_realloc (struct csc_ecs * ecs, uint32_t capacity)
 	ASSERTF (capacity >= ecs->chunks.capacity, "realloc will lose data if capacity is less than before");
 	ecs->chunks.capacity = capacity;
 	void * memory = realloc (ecs->chunks.memory, capacity * sizeof (void*));
-	uint32_t * entity_counts = realloc (ecs->chunks.entity_counts, ecs->chunks.capacity * sizeof (uint32_t));
+	uint32_t * entity_counts = realloc (ecs->chunks.entity_caps, ecs->chunks.capacity * sizeof (uint32_t));
 	uint32_t * component_sparse_offsets = realloc (ecs->chunks.component_sparse_offsets,ecs->chunks.capacity * CSC_COMPONENT_MAX * sizeof (uint32_t));
 	uint32_t * component_totalsizes = realloc (ecs->chunks.component_totalsizes, ecs->chunks.capacity * sizeof (uint32_t));
 	uint64_t * masks = realloc (ecs->chunks.masks, ecs->chunks.capacity *sizeof (uint64_t));
@@ -123,38 +131,45 @@ void csc_ecs_realloc (struct csc_ecs * ecs, uint32_t capacity)
 	ASSERT_NOTNULL (masks);
 
 	ecs->chunks.memory = memory;
-	ecs->chunks.entity_counts = entity_counts;
+	ecs->chunks.entity_caps = entity_counts;
 	ecs->chunks.component_sparse_offsets = component_sparse_offsets;
 	ecs->chunks.component_totalsizes = component_totalsizes;
 	ecs->chunks.masks = masks;
 }
 
 
-
 void csc_ecs_init (struct csc_ecs * ecs)
 {
 	ecs->chunks.memory = calloc (ecs->chunks.capacity, CSC_ECS_CHUNK_SIZE);
-	ecs->chunks.entity_counts = calloc (ecs->chunks.capacity, sizeof (uint32_t));
+	ecs->chunks.entity_caps = calloc (ecs->chunks.capacity, sizeof (uint32_t));
+	ecs->chunks.entity_count = calloc (ecs->chunks.capacity, sizeof (uint32_t));
 	ecs->chunks.component_sparse_offsets = calloc (ecs->chunks.capacity * CSC_COMPONENT_MAX, sizeof (uint32_t));
 	ecs->chunks.component_totalsizes = calloc (ecs->chunks.capacity, sizeof (uint32_t));
 	ecs->chunks.masks = calloc (ecs->chunks.capacity, sizeof (uint64_t));
 
+	ecs->entities.chunks = calloc (ecs->entities.capacity, sizeof (uint32_t));
+	ecs->entities.offsets = calloc (ecs->entities.capacity, sizeof (uint32_t));
+
 	//TODO: Add error handling:
 	ASSERT_NOTNULL (ecs->chunks.memory);
-	ASSERT_NOTNULL (ecs->chunks.entity_counts);
+	ASSERT_NOTNULL (ecs->chunks.entity_caps);
+	ASSERT_NOTNULL (ecs->chunks.entity_count);
 	ASSERT_NOTNULL (ecs->chunks.component_sparse_offsets);
 	ASSERT_NOTNULL (ecs->chunks.component_totalsizes);
 	ASSERT_NOTNULL (ecs->chunks.masks);
+	ASSERT_NOTNULL (ecs->entities.chunks);
+	ASSERT_NOTNULL (ecs->entities.offsets);
 
 	for (uint32_t i = 0; i < ecs->chunks.capacity * CSC_COMPONENT_MAX; ++i)
 	{
 		ecs->chunks.component_sparse_offsets[i] = CSC_ECS_UNDEFINED;
 	}
+	for (uint32_t i = 0; i < ecs->entities.capacity; ++i)
+	{
+		ecs->entities.chunks[i] = CSC_ECS_UNDEFINED;
+		ecs->entities.offsets[i] = CSC_ECS_UNDEFINED;
+	}
 }
-
-
-
-
 
 
 void * csc_ecs_get_data (struct csc_ecs * ecs, uint32_t chunk_index, uint32_t component_index)
@@ -197,8 +212,9 @@ uint32_t csc_ecs_add_chunk (struct csc_ecs * ecs, uint32_t comps[CSC_COMPONENT_M
 	uint32_t     chunk_index = ecs->chunks.count;
 	uint32_t *       offsets = ecs->chunks.component_sparse_offsets;
 	uint32_t *    totalsizes = ecs->chunks.component_totalsizes;
+	uint32_t * entity_counts = ecs->chunks.entity_caps;
+	uint64_t *         masks = ecs->chunks.masks;
 	uint32_t *         sizes = ecs->components.sizes;
-	uint32_t * entity_counts = ecs->chunks.entity_counts;
 
 	ASSERT_NOTNULL (offsets);
 	ASSERT_NOTNULL (totalsizes);
@@ -212,6 +228,7 @@ uint32_t csc_ecs_add_chunk (struct csc_ecs * ecs, uint32_t comps[CSC_COMPONENT_M
 	{
 		uint32_t c = comps[i];
 		totalsize += sizes[c];
+		masks[chunk_index] |= (1 << c);
 	}
 	totalsizes[chunk_index] = totalsize;
 
@@ -242,9 +259,11 @@ uint32_t csc_ecs_add_chunk (struct csc_ecs * ecs, uint32_t comps[CSC_COMPONENT_M
 	//If all went well we can incrament number of chunks:
 	ecs->chunks.count++;
 
+	//If number of chunks has reached critical capacity then we need to allocate more to be safe:
 	if (ecs->chunks.count >= ecs->chunks.capacity)
 	{
-		uint32_t capacity = csc_round_up_pow2(ecs->chunks.capacity);
+		//Reduce number of future realloc by allating more memory than we need:
+		uint32_t capacity = csc_round_up_pow2 (ecs->chunks.capacity);
 		csc_ecs_realloc (ecs, capacity);
 	}
 
@@ -254,51 +273,79 @@ uint32_t csc_ecs_add_chunk (struct csc_ecs * ecs, uint32_t comps[CSC_COMPONENT_M
 }
 
 
-
-void csc_ecs_test1()
+//TODO: Create effecient entity generator:
+uint32_t csc_ecs_gen_entity (struct csc_ecs * ecs)
 {
-	enum my_comp
-	{
-		COMP_A,
-		COMP_B,
-		COMP_C,
-	};
-	struct csc_ecs ecs = {0};
-	ecs.chunks.capacity = 4;
-	uint32_t * sizes = ecs.components.sizes;
-	sizes[COMP_A] = sizeof (float) * 1;
-	sizes[COMP_B] = sizeof (float) * 2;
-	sizes[COMP_C] = sizeof (float) * 7;
-	csc_ecs_init (&ecs);
+	//TODO: Recycle unused entities.
+	uint32_t entity_index = ecs->entities.count;
+	ecs->entities.count++;
+	return entity_index;
+};
 
-	{
-		enum my_comp comps[3] = {COMP_A, COMP_B, COMP_C};
-		uint32_t chunk_index = csc_ecs_add_chunk (&ecs, comps, 3);
-		uint32_t entity_count = ecs.chunks.entity_counts[chunk_index];
-		uint32_t component_totalsize = ecs.chunks.component_totalsizes[chunk_index];
-		printf ("               sizes: (%u, %u, %u)\n", sizes[comps[0]], sizes[comps[1]], sizes[comps[2]]);
-		printf ("        entity count: %u\n", entity_count);
-		printf (" component totalsize: %u\n", component_totalsize);
-		printf ("     chunk totalsize: %u = %u * %u\n", component_totalsize * entity_count, component_totalsize, entity_count);
-		printf ("allocated chunk size: %u\n", CSC_ECS_CHUNK_SIZE);
-		ASSERT (component_totalsize == ((1+2+7)*sizeof(float)));
-	}
 
-	{
-		enum my_comp comps[2] = {COMP_C, COMP_A};
-		uint32_t chunk_index = csc_ecs_add_chunk (&ecs, comps, 2);
-		uint32_t entity_count = ecs.chunks.entity_counts[chunk_index];
-		uint32_t component_totalsize = ecs.chunks.component_totalsizes[chunk_index];
-		printf ("               sizes: (%u, %u)\n", sizes[comps[0]], sizes[comps[1]]);
-		printf ("        entity count: %u\n", entity_count);
-		printf (" component totalsize: %u\n", component_totalsize);
-		printf ("     chunk totalsize: %u = %u * %u\n", component_totalsize * entity_count, component_totalsize, entity_count);
-		printf ("allocated chunk size: %u\n", CSC_ECS_CHUNK_SIZE);
-		ASSERT (component_totalsize == ((7+1)*sizeof(float)));
-	}
-
+void csc_ecs_insert_entity (struct csc_ecs * ecs, uint32_t entity_index, uint32_t chunk_index)
+{
+	ASSERT_NOTNULL (ecs);
+	ASSERT_NOTNULL (ecs->entities.chunks);
+	ASSERT_NOTNULL (ecs->entities.offsets);
+	ASSERT_NOTNULL (ecs->chunks.entity_count);
+	ASSERT_NOTNULL (ecs->chunks.entity_caps);
+	ASSERT (chunk_index != CSC_ECS_UNDEFINED);
+	ASSERT (ecs->chunks.entity_count[chunk_index] < ecs->chunks.entity_caps[chunk_index]);
+	ecs->entities.chunks[entity_index] = chunk_index;
+	ecs->entities.offsets[entity_index] = ecs->chunks.entity_count[chunk_index];
+	ecs->chunks.entity_count[chunk_index]++;
+	ASSERT (ecs->chunks.entity_count[chunk_index] <= ecs->chunks.entity_caps[chunk_index]);
 }
 
+
+void csc_ecs_add_entity (struct csc_ecs * ecs, uint64_t mask, uint32_t * out_chunk_index, uint32_t * out_entity_index)
+{
+	ASSERT (ecs->entities.count < ecs->entities.capacity);
+	uint64_t * m = ecs->chunks.masks; //Rename
+	uint32_t * chunk_entity_count = ecs->chunks.entity_count; //Rename
+	uint32_t * chunk_entity_caps = ecs->chunks.entity_caps; //Rename
+	uint32_t chunk_index = CSC_ECS_UNDEFINED; //This index need to be found.
+	for (uint32_t i = 0; i < ecs->chunks.count; ++i)
+	{
+		//Check if chunk is full of entities:
+		if (chunk_entity_count[i] >= chunk_entity_caps[i])
+		{
+			continue;
+		}
+
+		//https://www.chessprogramming.org/General_Setwise_Operations
+		//Equivalence: The chunk has exactly the same components as entity:
+		if (m[i] == mask)
+		{
+			//TODO: This might increases number of chunks significantly!
+			chunk_index = i;
+		}
+		//Subset: Entity components is a subset of chunk components:
+		if ((m[i] & mask) == mask)
+		{
+			//TODO: This will activate wrong systems! There could be a workaround.
+			//Need to keep track of induvidial entities components.
+		}
+	}
+
+	//TODO: Create chunk if not found:
+
+	//Entity derives this chunk components:
+	uint32_t entity_index = csc_ecs_gen_entity (ecs);
+	csc_ecs_insert_entity (ecs, entity_index, chunk_index);
+
+
+	if (out_chunk_index)
+	{
+		(*out_chunk_index) = chunk_index;
+	}
+
+	if (out_entity_index)
+	{
+		(*out_entity_index) = entity_index;
+	}
+}
 
 
 
