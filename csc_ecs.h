@@ -82,7 +82,7 @@ Chunk1, size=1024B
 struct csc_ecs_components
 {
 	uint32_t sizes[CSC_COMPONENT_MAX];
-	const char * names[CSC_COMPONENT_MAX];
+	char const * names[CSC_COMPONENT_MAX];
 };
 
 struct csc_ecs_chunks
@@ -101,8 +101,8 @@ struct csc_ecs_entities
 {
 	uint32_t capacity;
 	uint32_t count;
-	uint32_t * chunks;
-	uint32_t * offsets;
+	uint32_t * chunk_i1; //Chunk index
+	uint32_t * chunk_i2; //Index inside the chunk
 };
 
 struct csc_ecs
@@ -147,8 +147,8 @@ void csc_ecs_init (struct csc_ecs * ecs)
 	ecs->chunks.component_totalsizes = calloc (ecs->chunks.capacity, sizeof (uint32_t));
 	ecs->chunks.masks = calloc (ecs->chunks.capacity, sizeof (uint64_t));
 
-	ecs->entities.chunks = calloc (ecs->entities.capacity, sizeof (uint32_t));
-	ecs->entities.offsets = calloc (ecs->entities.capacity, sizeof (uint32_t));
+	ecs->entities.chunk_i1 = calloc (ecs->entities.capacity, sizeof (uint32_t));
+	ecs->entities.chunk_i2 = calloc (ecs->entities.capacity, sizeof (uint32_t));
 
 	//TODO: Add error handling:
 	ASSERT_NOTNULL (ecs->chunks.memory);
@@ -157,8 +157,8 @@ void csc_ecs_init (struct csc_ecs * ecs)
 	ASSERT_NOTNULL (ecs->chunks.component_sparse_offsets);
 	ASSERT_NOTNULL (ecs->chunks.component_totalsizes);
 	ASSERT_NOTNULL (ecs->chunks.masks);
-	ASSERT_NOTNULL (ecs->entities.chunks);
-	ASSERT_NOTNULL (ecs->entities.offsets);
+	ASSERT_NOTNULL (ecs->entities.chunk_i1);
+	ASSERT_NOTNULL (ecs->entities.chunk_i2);
 
 	for (uint32_t i = 0; i < ecs->chunks.capacity * CSC_COMPONENT_MAX; ++i)
 	{
@@ -166,8 +166,8 @@ void csc_ecs_init (struct csc_ecs * ecs)
 	}
 	for (uint32_t i = 0; i < ecs->entities.capacity; ++i)
 	{
-		ecs->entities.chunks[i] = CSC_ECS_UNDEFINED;
-		ecs->entities.offsets[i] = CSC_ECS_UNDEFINED;
+		ecs->entities.chunk_i1[i] = CSC_ECS_UNDEFINED;
+		ecs->entities.chunk_i2[i] = CSC_ECS_UNDEFINED;
 	}
 }
 
@@ -177,10 +177,10 @@ void * csc_ecs_get_data2 (struct csc_ecs * ecs, uint32_t chunk_index, uint32_t c
 	ASSERT (chunk_index < ecs->chunks.count);
 	ASSERT (chunk_index < ecs->chunks.capacity);
 	ASSERT (component_index < CSC_COMPONENT_MAX);
-	uint8_t * chunk = ecs->chunks.memory;
+	uint8_t * memory = ecs->chunks.memory;
 	uint32_t offset = ecs->chunks.component_sparse_offsets[CSC_COMPONENT_MAX * chunk_index + component_index];
 	ASSERT (offset != CSC_ECS_UNDEFINED);
-	return chunk + offset;
+	return memory + offset;
 }
 
 
@@ -189,13 +189,14 @@ void * csc_ecs_get_data1 (struct csc_ecs * ecs, uint32_t entity_index, uint32_t 
 	ASSERT (entity_index < ecs->entities.count);
 	ASSERT (entity_index < ecs->entities.capacity);
 	ASSERT (component_index < CSC_COMPONENT_MAX);
-	uint32_t entity_chunk_index = ecs->entities.chunks[entity_index];
-	uint32_t entity_chunk_offset = ecs->entities.offsets[entity_index];
-	uint8_t * chunk = ecs->chunks.memory;
-	uint32_t offset = ecs->chunks.component_sparse_offsets[CSC_COMPONENT_MAX * entity_chunk_index + component_index];
-	uint32_t component_size = ecs->components.sizes[component_index];
+	uint32_t chunk_i1 = ecs->entities.chunk_i1[entity_index];
+	uint32_t chunk_i2 = ecs->entities.chunk_i2[entity_index];
+	uint8_t * memory = ecs->chunks.memory;
+	uint32_t offset = ecs->chunks.component_sparse_offsets[CSC_COMPONENT_MAX * chunk_i1 + component_index];
+	uint32_t size = ecs->components.sizes[component_index];
 	ASSERT (offset != CSC_ECS_UNDEFINED);
-	return chunk + offset + (component_size * entity_chunk_offset);
+	ASSERT (size != CSC_ECS_UNDEFINED);
+	return memory + offset + (size * chunk_i2);
 }
 
 
@@ -268,8 +269,8 @@ uint32_t csc_ecs_add_chunk (struct csc_ecs * ecs, uint32_t comps[CSC_COMPONENT_M
 	}
 
 	//TODO: Check a bunch stuff if everything is okey:
-	//uint8_t * chunk = ecs->chunks.memory + (CSC_ECS_CHUNK_SIZE * chunk_index);
-	//ASSERT (chunk);
+	//uint8_t * memory = ecs->chunks.memory + (CSC_ECS_CHUNK_SIZE * chunk_index);
+	//ASSERT (memory);
 
 	//If all went well we can incrament number of chunks:
 	ecs->chunks.count++;
@@ -301,14 +302,14 @@ uint32_t csc_ecs_gen_entity (struct csc_ecs * ecs)
 void csc_ecs_insert_entity (struct csc_ecs * ecs, uint32_t entity_index, uint32_t chunk_index)
 {
 	ASSERT_NOTNULL (ecs);
-	ASSERT_NOTNULL (ecs->entities.chunks);
-	ASSERT_NOTNULL (ecs->entities.offsets);
+	ASSERT_NOTNULL (ecs->entities.chunk_i1);
+	ASSERT_NOTNULL (ecs->entities.chunk_i2);
 	ASSERT_NOTNULL (ecs->chunks.entity_count);
 	ASSERT_NOTNULL (ecs->chunks.entity_caps);
 	ASSERT (chunk_index != CSC_ECS_UNDEFINED);
 	ASSERT (ecs->chunks.entity_count[chunk_index] < ecs->chunks.entity_caps[chunk_index]);
-	ecs->entities.chunks[entity_index] = chunk_index;
-	ecs->entities.offsets[entity_index] = ecs->chunks.entity_count[chunk_index];
+	ecs->entities.chunk_i1[entity_index] = chunk_index;
+	ecs->entities.chunk_i2[entity_index] = ecs->chunks.entity_count[chunk_index];
 	ecs->chunks.entity_count[chunk_index]++;
 	ASSERT (ecs->chunks.entity_count[chunk_index] <= ecs->chunks.entity_caps[chunk_index]);
 }
