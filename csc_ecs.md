@@ -1,8 +1,24 @@
 # Experimental entity component system
 
+## Files
+* ../master/csc_ecs.h
+* ../master/test_csc_ecs.h
+
+
 ## Data structures
 
 ### Chunks
+1. Define chunk size to 14 bytes: `CSC_ECS_CHUNK_SIZE = 14`<br>
+2. Add component A with size 1 bytes: `ecs.components.size[A] = 1`
+2. Add component B with size 2 bytes: `ecs.components.size[B] = 2`
+2. Add component C with size 4 bytes: `ecs.components.size[C] = 4`
+2. Add chunk with components (AB): `csc_ecs_add_chunk (ecs, (AB), 2)`
+3. Add chunk with components (CBA): `csc_ecs_add_chunk (ecs, (CBA), 3)`
+4. Add entity with components (AB): `csc_ecs_gen_entity (ecs, AB)`
+5. Add entity with components (AB): `csc_ecs_gen_entity (ecs, AB)`
+6. Add entity with components (ABC): `csc_ecs_gen_entity (ecs, ABC)`
+7. Add entity with components (ABC): `csc_ecs_gen_entity (ecs, ABC)`
+8. Add entity with components (AB): `csc_ecs_gen_entity (ecs, AB)`
 ![csc_ecs1](../master/csc_ecs1.png)
 
 ### Components
