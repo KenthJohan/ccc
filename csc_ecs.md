@@ -1,5 +1,14 @@
 # Experimental entity component system
 
+## Data structures
+
+### Chunks
+![csc_ecs1](../master/csc_ecs1.png)
+
+### Components
+
+### Entities
+
 
 ## Questions
 * Support Array of Structures of Arrays? https://en.wikipedia.org/wiki/AoS_and_SoA
@@ -33,3 +42,4 @@
 * Building a Data-Oriented Future - Mike Acton https://www.youtube.com/watch?v=u8B3j8rqYMw
 * Data-Oriented Demo: SOA, composition https://www.youtube.com/watch?v=ZHqFrNyLlpA
 * https://www.chessprogramming.org/General_Setwise_Operations
+* Discussion of SIMD, SOA, AOSOA. Followed by Questions & Answers. https://www.youtube.com/watch?v=YGTZr6bmNmk

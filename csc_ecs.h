@@ -78,10 +78,9 @@ Chunk1, size=1024B
 #define CSC_ECS_UNDEFINED UINT32_MAX
 #define CSC_ECS_CHUNK_SIZE 1024
 
-
 struct csc_ecs_components
 {
-	uint32_t size[CSC_COMPONENT_MAX];
+	uint64_t size[CSC_COMPONENT_MAX];
 	char const * name[CSC_COMPONENT_MAX];
 };
 
