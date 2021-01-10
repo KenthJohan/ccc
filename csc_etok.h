@@ -1,4 +1,4 @@
-
+/* SPDX-License-Identifier: GPL-2.0 */
 /*
 int parser (char const ** p, int * v, unsigned n, struct main_kv * kv)
 {

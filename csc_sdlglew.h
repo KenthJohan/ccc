@@ -67,7 +67,7 @@ void csc_sdlglew_create_window (SDL_Window ** window, SDL_GLContext * context, c
 	glDebugMessageControl (GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_ERROR, GL_DONT_CARE, 0, NULL, GL_TRUE);//Enable error messages
 
 
-	//glEnable (GL_DEPTH_TEST);
+	glEnable (GL_DEPTH_TEST);
 	//glEnable (GL_PROGRAM_POINT_SIZE_EXT);
 	//glEnable (GL_VERTEX_PROGRAM_POINT_SIZE);
 	//glEnable (GL_TEXTURE_2D);
