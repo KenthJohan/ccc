@@ -4,10 +4,23 @@
 * ../master/csc_ecs.h
 * ../master/test_csc_ecs.h
 
+## Words
+|Name|Description|
+|----|----|
+|Component|Component is a specific type of data that one or more entities has.|
+|Entity|A entitie is a number that represent a object and is composed of one ore more components.|
+|System|A system reads and writes to one or more components|
 
 ## Data structures
 
 ### Chunks
+All entity data are stored in chunks.
+All chunks are stored continuously in memory.
+All chunks are the same size.
+
+
+
+
 1. Define chunk size to 14 bytes: `CSC_ECS_CHUNK_SIZE = 14`<br>
 2. Add component A with size 1 bytes: `ecs.components.size[A] = 1`
 2. Add component B with size 2 bytes: `ecs.components.size[B] = 2`
@@ -19,6 +32,7 @@
 6. Add entity with components (ABC): `csc_ecs_gen_entity (ecs, ABC)`
 7. Add entity with components (ABC): `csc_ecs_gen_entity (ecs, ABC)`
 8. Add entity with components (AB): `csc_ecs_gen_entity (ecs, AB)`
+
 ![csc_ecs1](../master/csc_ecs1.png)
 
 ### Components
@@ -59,3 +73,4 @@
 * Data-Oriented Demo: SOA, composition https://www.youtube.com/watch?v=ZHqFrNyLlpA
 * https://www.chessprogramming.org/General_Setwise_Operations
 * Discussion of SIMD, SOA, AOSOA. Followed by Questions & Answers. https://www.youtube.com/watch?v=YGTZr6bmNmk
+* Data layout and SIMD abstraction layers: decouplinginterfaces from implementations https://hal.archives-ouvertes.fr/hal-01915529/document

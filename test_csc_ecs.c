@@ -19,7 +19,7 @@ void print_ecs (struct csc_ecs * ecs, uint32_t chunk_index, uint32_t comps[], ui
 {
 	uint32_t * sizes = ecs->components.size; //Rename
 	uint32_t entity_count = ecs->chunks.entity_capacity[chunk_index]; //Rename
-	uint32_t component_totalsize = ecs->chunks.component_totalsizes[chunk_index]; //Rename
+	uint32_t component_totalsize = ecs->chunks.component_totalsize[chunk_index]; //Rename
 	printf ("         chunk_index: %u\n", chunk_index);
 	//printf ("               sizes: (%u, %u, %u)\n", sizes[comps[0]], sizes[comps[1]], sizes[comps[2]]);
 	printf ("               sizes: ( ");
@@ -56,30 +56,34 @@ void test1()
 		COMP_B,
 		COMP_C,
 	};
+
 	struct csc_ecs ecs = {0};
+	ecs.memlines.capacity = 2;
 	ecs.chunks.capacity = 4;
 	ecs.entities.capacity = 4;
+	csc_ecs_init (&ecs);
+	csc_ecs_init_memline (&ecs, 0);
+
 	uint32_t * sizes = ecs.components.size; //Rename
 	sizes[COMP_A] = sizeof (float) * 1;
 	sizes[COMP_B] = sizeof (float) * 2;
 	sizes[COMP_C] = sizeof (float) * 7;
-	csc_ecs_init (&ecs);
 
 	{
 		printf ("csc_ecs_add_chunk (COMP_A, COMP_B, COMP_C):\n");
 		enum my_comp comps[3] = {COMP_A, COMP_B, COMP_C};
-		uint32_t chunk_index = csc_ecs_add_chunk (&ecs, comps, countof (comps));
+		uint32_t chunk_index = csc_ecs_add_chunk (&ecs, 0, comps, countof (comps));
 		print_ecs (&ecs, chunk_index, comps, countof (comps));
-		ASSERT (ecs.chunks.component_totalsizes[chunk_index] == (sizes[COMP_A] + sizes[COMP_B] + sizes[COMP_C]));
+		ASSERT (ecs.chunks.component_totalsize[chunk_index] == (sizes[COMP_A] + sizes[COMP_B] + sizes[COMP_C]));
 		print_hr();
 	}
 
 	{
 		printf ("csc_ecs_add_chunk (COMP_C, COMP_A):\n");
 		enum my_comp comps[2] = {COMP_C, COMP_A};
-		uint32_t chunk_index = csc_ecs_add_chunk (&ecs, comps, 2);
+		uint32_t chunk_index = csc_ecs_add_chunk (&ecs, 0, comps, 2);
 		print_ecs (&ecs, chunk_index, comps, countof (comps));
-		ASSERT (ecs.chunks.component_totalsizes[chunk_index] == (sizes[COMP_C] + sizes[COMP_A]));
+		ASSERT (ecs.chunks.component_totalsize[chunk_index] == (sizes[COMP_C] + sizes[COMP_A]));
 		print_hr();
 	}
 
@@ -118,13 +122,13 @@ void test1()
 		float * y2 = csc_ecs_data_entity (&ecs, 1, COMP_C);
 		float * z1 = csc_ecs_data_entity (&ecs, 2, COMP_A);
 		float * z2 = csc_ecs_data_entity (&ecs, 2, COMP_C);
-		intptr_t x1d = (intptr_t)x1 - (intptr_t)ecs.chunks.memory;
-		intptr_t x2d = (intptr_t)x2 - (intptr_t)ecs.chunks.memory;
-		intptr_t x3d = (intptr_t)x3 - (intptr_t)ecs.chunks.memory;
-		intptr_t y1d = (intptr_t)y1 - (intptr_t)ecs.chunks.memory;
-		intptr_t y2d = (intptr_t)y2 - (intptr_t)ecs.chunks.memory;
-		intptr_t z1d = (intptr_t)z1 - (intptr_t)ecs.chunks.memory;
-		intptr_t z2d = (intptr_t)z2 - (intptr_t)ecs.chunks.memory;
+		intptr_t x1d = (intptr_t)x1 - (intptr_t)ecs.memlines.memory[0];
+		intptr_t x2d = (intptr_t)x2 - (intptr_t)ecs.memlines.memory[0];
+		intptr_t x3d = (intptr_t)x3 - (intptr_t)ecs.memlines.memory[0];
+		intptr_t y1d = (intptr_t)y1 - (intptr_t)ecs.memlines.memory[0];
+		intptr_t y2d = (intptr_t)y2 - (intptr_t)ecs.memlines.memory[0];
+		intptr_t z1d = (intptr_t)z1 - (intptr_t)ecs.memlines.memory[0];
+		intptr_t z2d = (intptr_t)z2 - (intptr_t)ecs.memlines.memory[0];
 		printf ("e0: %i %i %i\n", x1d, x2d, x3d);
 		printf ("e1: %i %i\n", y1d, y2d);
 		printf ("e2: %i %i\n", z1d, z2d);
@@ -135,7 +139,7 @@ void test1()
 		uint32_t incrementor = 0;
 		for (uint32_t chunk_index = 0; chunk_index < ecs.chunks.count; ++chunk_index)
 		{
-			uint64_t c = ecs.chunks.component_flags[chunk_index];
+			uint64_t c = ecs.chunks.component_mask[chunk_index];
 			uint32_t n = ecs.chunks.entity_count[chunk_index];
 			if ((c & (1 << COMP_A)) == 0) {continue;}
 			float * a = csc_ecs_data_chunk (&ecs, chunk_index, COMP_A);
@@ -149,7 +153,7 @@ void test1()
 
 		for (uint32_t chunk_index = 0; chunk_index < ecs.chunks.count; ++chunk_index)
 		{
-			uint64_t c = ecs.chunks.component_flags[chunk_index];
+			uint64_t c = ecs.chunks.component_mask[chunk_index];
 			uint32_t n = ecs.chunks.entity_count[chunk_index];
 			if ((c & (1 << COMP_B)) == 0) {continue;}
 			float * a = csc_ecs_data_chunk (&ecs, chunk_index, COMP_B);
@@ -164,7 +168,7 @@ void test1()
 
 		for (uint32_t chunk_index = 0; chunk_index < ecs.chunks.count; ++chunk_index)
 		{
-			uint64_t c = ecs.chunks.component_flags[chunk_index];
+			uint64_t c = ecs.chunks.component_mask[chunk_index];
 			uint32_t n = ecs.chunks.entity_count[chunk_index];
 			if ((c & (1 << COMP_C)) == 0) {continue;}
 			float * a = csc_ecs_data_chunk (&ecs, chunk_index, COMP_C);
@@ -185,10 +189,8 @@ void test1()
 		ASSERT (((float*)csc_ecs_data_entity (&ecs, 0, COMP_A))[0] == 0.0f);
 		ASSERT (((float*)csc_ecs_data_entity (&ecs, 1, COMP_A))[0] == 1.0f);
 		ASSERT (((float*)csc_ecs_data_entity (&ecs, 2, COMP_A))[0] == 2.0f);
-
 		ASSERT (((float*)csc_ecs_data_entity (&ecs, 0, COMP_B))[0] == 3.0f);
 		ASSERT (((float*)csc_ecs_data_entity (&ecs, 0, COMP_B))[1] == 30.0f);
-
 		ASSERT (((float*)csc_ecs_data_entity (&ecs, 0, COMP_C))[0] == 4.0f);
 		ASSERT (((float*)csc_ecs_data_entity (&ecs, 0, COMP_C))[1] == 40.0f);
 		ASSERT (((float*)csc_ecs_data_entity (&ecs, 0, COMP_C))[2] == 400.0f);
@@ -215,6 +217,53 @@ void test1()
 
 
 }
+
+
+
+void test2()
+{
+	enum my_comp
+	{
+		COMP_A,
+		COMP_B,
+		COMP_C,
+	};
+
+	struct csc_ecs ecs = {0};
+	ecs.memlines.capacity = 2;
+	ecs.chunks.capacity = 4;
+	ecs.entities.capacity = 4;
+	csc_ecs_init (&ecs);
+	csc_ecs_init_memline (&ecs, 0);
+
+	uint32_t * sizes = ecs.components.size; //Rename
+	sizes[COMP_A] = sizeof (float) * 1;
+	sizes[COMP_B] = sizeof (float) * 2;
+	sizes[COMP_C] = sizeof (float) * 7;
+
+	{
+		printf ("csc_ecs_add_chunk (COMP_A, COMP_B, COMP_C):\n");
+		enum my_comp comps[3] = {COMP_A, COMP_B, COMP_C};
+		uint32_t chunk_index = csc_ecs_add_chunk (&ecs, 0, comps, countof (comps));
+		print_ecs (&ecs, chunk_index, comps, countof (comps));
+		ASSERT (ecs.chunks.component_totalsize[chunk_index] == (sizes[COMP_A] + sizes[COMP_B] + sizes[COMP_C]));
+		print_hr();
+	}
+
+	{
+		printf ("csc_ecs_add_chunk (COMP_C, COMP_A):\n");
+		enum my_comp comps[2] = {COMP_C, COMP_A};
+		uint32_t chunk_index = csc_ecs_add_chunk (&ecs, 0, comps, 2);
+		print_ecs (&ecs, chunk_index, comps, countof (comps));
+		ASSERT (ecs.chunks.component_totalsize[chunk_index] == (sizes[COMP_C] + sizes[COMP_A]));
+		print_hr();
+	}
+
+
+
+
+}
+
 
 
 
@@ -250,7 +299,7 @@ void system_overall (struct csc_ecs * ecs)
 {
 	for (uint32_t chunk_index = 0; chunk_index < ecs->chunks.count; ++chunk_index)
 	{
-		uint64_t component_flags = ecs->chunks.component_flags[chunk_index];
+		uint64_t component_flags = ecs->chunks.component_mask[chunk_index];
 		if ((component_flags & (COMP_POS_BIT|COMP_VEL_BIT|COMP_MASS_BIT)) == (COMP_POS_BIT|COMP_VEL_BIT|COMP_MASS_BIT))
 		{
 			system_move (ecs, chunk_index);
