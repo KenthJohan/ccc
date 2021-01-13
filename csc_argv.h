@@ -479,7 +479,7 @@ int csc_argv_parsev (struct csc_argv_option const option[], char const * argv[])
 {
 	int errorcode = 0;
 	uint64_t flags = csc_argv_build_flags (option);
-	for (char const ** a = argv; a != NULL; ++a)
+	for (char const ** a = argv; *a != NULL; ++a)
 	{
 		if (csc_argv_parse (option, *a, flags))
 		{
