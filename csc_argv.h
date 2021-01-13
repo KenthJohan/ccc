@@ -12,22 +12,23 @@
 
 static uint64_t csc_argv_alphanumbits (char a)
 {
+	uint64_t o = 0;
 	if ('a' <= a && a <= 'z')
 	{
-		int o = a - 'a' + 0;
-		return 1 << o;
+		o = a - 'a' + 0;
+		o = UINT64_C(1) << o;
 	}
 	if ('A' <= a && a <= 'A')
 	{
-		int o = a - 'A' + 26;
-		return 1 << o;
+		o = a - 'A' + 26;
+		o = UINT64_C(1) << o;
 	}
 	if ('0' <= a && a <= '9')
 	{
-		int o = a - 'A' + 26 + 26;
-		return 1 << o;
+		o = a - 'A' + 26 + 26;
+		o = UINT64_C(1) << o;
 	}
-	return 0;
+	return o;
 }
 
 
@@ -36,7 +37,8 @@ static uint64_t csc_argv_alphanumbits_fromstr (char const * str)
 	uint64_t set = 0;
 	while (*str)
 	{
-		set |= csc_argv_alphanumbits (*str);
+		uint64_t a = csc_argv_alphanumbits (*str);
+		set |= a;
 		str++;
 	}
 	return set;
@@ -308,7 +310,9 @@ static int csc_argv_parse (struct csc_argv_option const * option, char const * a
 		if (o->flag.val_umax != 0)
 		{
 			//Check e.g. "r" against "wr".
-			if ((csc_argv_alphanumbits_fromstr (arg+1) & flags & csc_argv_alphanumbits (o->character)) == 0){continue;}
+			uint64_t a = csc_argv_alphanumbits_fromstr (arg+1);
+			uint64_t c = csc_argv_alphanumbits (o->character);
+			if ((a & flags & c) == 0){continue;}
 			csc_argv_convert_flag (o->type, o->value, o->flag);
 		}
 		else
