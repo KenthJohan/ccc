@@ -90,6 +90,7 @@ enum csc_argv_type
 	CSC_ARGV_TYPE_I16,
 	CSC_ARGV_TYPE_I32,
 	CSC_ARGV_TYPE_I64,
+	/*
 	CSC_ARGV_TYPE_FLAG_INT,
 	CSC_ARGV_TYPE_FLAG_LONG,
 	CSC_ARGV_TYPE_FLAG_U8,
@@ -100,11 +101,13 @@ enum csc_argv_type
 	CSC_ARGV_TYPE_FLAG_I16,
 	CSC_ARGV_TYPE_FLAG_I32,
 	CSC_ARGV_TYPE_FLAG_I64,
+	*/
 };
 
 
 union csc_argv_value
 {
+	char const * val_string;
 	float val_float;
 	double val_double;
 	int val_int;
@@ -138,10 +141,11 @@ static uint64_t csc_argv_build_flags (struct csc_argv_option const * option)
 	uint64_t flags = 0;
 	for (struct csc_argv_option const * o = option; o->type != CSC_ARGV_TYPE_END; ++o)
 	{
+		if (o->flag.val_umax == 0){continue;}
 		switch (o->type)
 		{
-		case CSC_ARGV_TYPE_FLAG_INT:
-		case CSC_ARGV_TYPE_FLAG_LONG:
+		case CSC_ARGV_TYPE_INT:
+		case CSC_ARGV_TYPE_LONG:
 			flags |= csc_argv_alphanumbits (o->character);
 			break;
 		default:
@@ -169,6 +173,7 @@ static char const * csc_argv_type_tostr (enum csc_argv_type t)
 	case CSC_ARGV_TYPE_I64:return "i64";
 	case CSC_ARGV_TYPE_FLOAT:return "float";
 	case CSC_ARGV_TYPE_DOUBLE:return "double";
+		/*
 	case CSC_ARGV_TYPE_FLAG_INT:return "flag_int";
 	case CSC_ARGV_TYPE_FLAG_LONG:return "flag_long";
 	case CSC_ARGV_TYPE_FLAG_U8:return "flag_u8";
@@ -179,17 +184,18 @@ static char const * csc_argv_type_tostr (enum csc_argv_type t)
 	case CSC_ARGV_TYPE_FLAG_I16:return "flag_i16";
 	case CSC_ARGV_TYPE_FLAG_I32:return "flag_i32";
 	case CSC_ARGV_TYPE_FLAG_I64:return "flag_i64";
+		*/
 	default:return "unknown";
 	}
 }
 
 
-static void csc_argv_convert (enum csc_argv_type type, void * des, char const * strvalue, union csc_argv_value value, union csc_argv_value flag)
+static void csc_argv_convert_value (enum csc_argv_type type, void * des, union csc_argv_value value)
 {
 	switch (type)
 	{
 	case CSC_ARGV_TYPE_STRING:
-		*(char const **)des = strvalue;
+		*(char const **)des = value.val_string;
 		break;
 	case CSC_ARGV_TYPE_U8:
 		*(uint8_t *)des = value.val_umax;
@@ -227,40 +233,52 @@ static void csc_argv_convert (enum csc_argv_type type, void * des, char const * 
 	case CSC_ARGV_TYPE_DOUBLE:
 		*(double *)des = value.val_double;
 		break;
-	case CSC_ARGV_TYPE_FLAG_INT:
+	default:
+		break;
+	}
+}
+
+
+static void csc_argv_convert_flag (enum csc_argv_type type, void * des, union csc_argv_value flag)
+{
+	switch (type)
+	{
+	case CSC_ARGV_TYPE_INT:
 		*(int*)des |= flag.val_int;
 		break;
-	case CSC_ARGV_TYPE_FLAG_LONG:
+	case CSC_ARGV_TYPE_LONG:
 		*(long*)des |= flag.val_int;
 		break;
-	case CSC_ARGV_TYPE_FLAG_U8:
+	case CSC_ARGV_TYPE_U8:
 		*(uint8_t*)des |= flag.val_u8;
 		break;
-	case CSC_ARGV_TYPE_FLAG_U16:
+	case CSC_ARGV_TYPE_U16:
 		*(uint16_t*)des |= flag.val_u16;
 		break;
-	case CSC_ARGV_TYPE_FLAG_U32:
+	case CSC_ARGV_TYPE_U32:
 		*(uint32_t*)des |= flag.val_u32;
 		break;
-	case CSC_ARGV_TYPE_FLAG_U64:
+	case CSC_ARGV_TYPE_U64:
 		*(uint64_t*)des |= flag.val_u64;
 		break;
-	case CSC_ARGV_TYPE_FLAG_I8:
+	case CSC_ARGV_TYPE_I8:
 		*(int8_t*)des |= flag.val_i8;
 		break;
-	case CSC_ARGV_TYPE_FLAG_I16:
+	case CSC_ARGV_TYPE_I16:
 		*(int16_t*)des |= flag.val_i16;
 		break;
-	case CSC_ARGV_TYPE_FLAG_I32:
+	case CSC_ARGV_TYPE_I32:
 		*(int32_t*)des |= flag.val_i32;
 		break;
-	case CSC_ARGV_TYPE_FLAG_I64:
+	case CSC_ARGV_TYPE_I64:
 		*(int64_t*)des |= flag.val_i64;
 		break;
 	default:
 		break;
 	}
 }
+
+
 
 
 static int csc_argv_parse (struct csc_argv_option const * option, char const * arg, uint64_t flags)
@@ -270,6 +288,7 @@ static int csc_argv_parse (struct csc_argv_option const * option, char const * a
 	if (arg[1] == '\0'){return 1;}
 	char * endptr = NULL;
 	char const * strvalue = arg + 2;
+	while (strvalue[0] == ' '){strvalue++;}
 	for (struct csc_argv_option const * o = option; o->type != CSC_ARGV_TYPE_END; ++o)
 	{
 		if (arg[1] == '-')
@@ -280,63 +299,51 @@ static int csc_argv_parse (struct csc_argv_option const * option, char const * a
 			if (strncmp (o->name, arg+2, len)){continue;}
 			//--name=strvalue, +2 for double dash (--), +len for longname length, +1 for equal sign (=)
 			strvalue = arg + 2 + len + 1;
-			if (strvalue[-1] != '='){continue;}
+			if ((o->flag.val_umax == 0) && (strvalue[-1] != '=')){continue;}
 		}
 		else if (o->character == 0){continue;}
-		else if (o->character != arg[1])
+		else if (o->flag.val_umax == 0 && arg[1] != o->character){continue;};
+
+
+		if (o->flag.val_umax != 0)
 		{
+			//Check e.g. "r" against "wr".
+			if ((csc_argv_alphanumbits_fromstr (arg+1) & flags & csc_argv_alphanumbits (o->character)) == 0){continue;}
+			csc_argv_convert_flag (o->type, o->value, o->flag);
+		}
+		else
+		{
+			union csc_argv_value value;
 			switch (o->type)
 			{
-			case CSC_ARGV_TYPE_FLAG_INT:
-			case CSC_ARGV_TYPE_FLAG_LONG:
-			case CSC_ARGV_TYPE_FLAG_U8:
-			case CSC_ARGV_TYPE_FLAG_U16:
-			case CSC_ARGV_TYPE_FLAG_U32:
-			case CSC_ARGV_TYPE_FLAG_U64:
-			case CSC_ARGV_TYPE_FLAG_I8:
-			case CSC_ARGV_TYPE_FLAG_I16:
-			case CSC_ARGV_TYPE_FLAG_I32:
-			case CSC_ARGV_TYPE_FLAG_I64:
+			case CSC_ARGV_TYPE_STRING:
+				value.val_string = strvalue;
+				break;
+			case CSC_ARGV_TYPE_FLOAT:
+			case CSC_ARGV_TYPE_DOUBLE:
+				value.val_double = strtod (strvalue, &endptr);
+				break;
+			case CSC_ARGV_TYPE_U8:
+			case CSC_ARGV_TYPE_U16:
+			case CSC_ARGV_TYPE_U32:
+			case CSC_ARGV_TYPE_U64:
+				value.val_umax = strtoumax (strvalue, &endptr, 0);
+				break;
+			case CSC_ARGV_TYPE_INT:
+			case CSC_ARGV_TYPE_LONG:
+			case CSC_ARGV_TYPE_I8:
+			case CSC_ARGV_TYPE_I16:
+			case CSC_ARGV_TYPE_I32:
+			case CSC_ARGV_TYPE_I64:
+				value.val_imax = strtoimax (strvalue, &endptr, 0);
 				break;
 			default:
 				continue;
 			}
-			if ((csc_argv_alphanumbits_fromstr (arg+1) & flags & csc_argv_alphanumbits (o->character)) == 0){continue;}
+			csc_argv_convert_value (o->type, o->value, value);
 		}
 
-		union csc_argv_value value;
-		switch (o->type)
-		{
-		case CSC_ARGV_TYPE_FLOAT:
-		case CSC_ARGV_TYPE_DOUBLE:
-			value.val_double = strtod (strvalue, &endptr);
-			break;
-		case CSC_ARGV_TYPE_U8:
-		case CSC_ARGV_TYPE_U16:
-		case CSC_ARGV_TYPE_U32:
-		case CSC_ARGV_TYPE_U64:
-			value.val_umax = strtoumax (strvalue, &endptr, 0);
-			break;
-		case CSC_ARGV_TYPE_INT:
-		case CSC_ARGV_TYPE_LONG:
-		case CSC_ARGV_TYPE_I8:
-		case CSC_ARGV_TYPE_I16:
-		case CSC_ARGV_TYPE_I32:
-		case CSC_ARGV_TYPE_I64:
-			value.val_imax = strtoimax (strvalue, &endptr, 0);
-			break;
-		default:
-			break;
-		}
 
-		if (endptr == strvalue)
-		{
-			fprintf (stderr, "csc_argv parsing error: option (%c,%s,%s), argument (%s), value (%s)\n", o->character, o->name, csc_argv_type_tostr (o->type), arg, strvalue);
-			errorcode = 1;
-			continue;
-		}
-
-		csc_argv_convert (o->type, o->value, strvalue, value, o->flag);
 	}
 	return errorcode;
 }
@@ -377,82 +384,92 @@ void csc_argv_print_value (struct csc_argv_option const * option)
 			fprintf (stdout, " -%c --%-20.20s", o->character, o->name);
 			break;
 		}
-		switch (o->type)
+		if (o->flag.val_umax == 0)
 		{
-		case CSC_ARGV_TYPE_END:
-		case CSC_ARGV_TYPE_GROUP:
-			break;
+			switch (o->type)
+			{
+			case CSC_ARGV_TYPE_END:
+			case CSC_ARGV_TYPE_GROUP:
+				break;
 
-		case CSC_ARGV_TYPE_DOUBLE:
-			fprintf (stdout, "%f\n", *(double*)o->value);
-			break;
-		case CSC_ARGV_TYPE_FLOAT:
-			fprintf (stdout, "%f\n", *(float*)o->value);
-			break;
-		case CSC_ARGV_TYPE_INT:
-			fprintf (stdout, "%i\n", *(int*)o->value);
-			break;
-		case CSC_ARGV_TYPE_LONG:
-			fprintf (stdout, "%li\n", *(long*)o->value);
-			break;
-		case CSC_ARGV_TYPE_I8:
-			fprintf (stdout, "%i\n", *(int8_t*)o->value);
-			break;
-		case CSC_ARGV_TYPE_I16:
-			fprintf (stdout, "%i\n", *(int16_t*)o->value);
-			break;
-		case CSC_ARGV_TYPE_I32:
-			fprintf (stdout, "%i\n", *(int32_t*)o->value);
-			break;
-		case CSC_ARGV_TYPE_I64:
-			fprintf (stdout, "%ji\n", *(int64_t*)o->value);
-			break;
-		case CSC_ARGV_TYPE_U8:
-			fprintf (stdout, "%u\n", *(uint8_t*)o->value);
-			break;
-		case CSC_ARGV_TYPE_U16:
-			fprintf (stdout, "%u\n", *(uint16_t*)o->value);
-			break;
-		case CSC_ARGV_TYPE_U32:
-			fprintf (stdout, "%u\n", *(uint32_t*)o->value);
-			break;
-		case CSC_ARGV_TYPE_U64:
-			fprintf (stdout, "%ju\n", *(uint64_t*)o->value);
-			break;
-		case CSC_ARGV_TYPE_STRING:
-			fprintf (stdout, "%s\n", *(char**)o->value);
-			break;
-		case CSC_ARGV_TYPE_FLAG_INT:
-			fprintf (stdout, "%s\n", (*(int*)o->value & o->flag.val_int) ? "True" : "False");
-			break;
-		case CSC_ARGV_TYPE_FLAG_LONG:
-			fprintf (stdout, "%s\n", (*(int*)o->value & o->flag.val_int) ? "True" : "False");
-			break;
-		case CSC_ARGV_TYPE_FLAG_I8:
-			fprintf (stdout, "%s\n", (*(int8_t*)o->value & o->flag.val_int) ? "True" : "False");
-			break;
-		case CSC_ARGV_TYPE_FLAG_I16:
-			fprintf (stdout, "%s\n", (*(int16_t*)o->value & o->flag.val_int) ? "True" : "False");
-			break;
-		case CSC_ARGV_TYPE_FLAG_I32:
-			fprintf (stdout, "%s\n", (*(int32_t*)o->value & o->flag.val_int) ? "True" : "False");
-			break;
-		case CSC_ARGV_TYPE_FLAG_I64:
-			fprintf (stdout, "%s\n", (*(int64_t*)o->value & o->flag.val_int) ? "True" : "False");
-			break;
-		case CSC_ARGV_TYPE_FLAG_U8:
-			fprintf (stdout, "%s\n", (*(uint8_t*)o->value & o->flag.val_int) ? "True" : "False");
-			break;
-		case CSC_ARGV_TYPE_FLAG_U16:
-			fprintf (stdout, "%s\n", (*(uint16_t*)o->value & o->flag.val_int) ? "True" : "False");
-			break;
-		case CSC_ARGV_TYPE_FLAG_U32:
-			fprintf (stdout, "%s\n", (*(uint32_t*)o->value & o->flag.val_int) ? "True" : "False");
-			break;
-		case CSC_ARGV_TYPE_FLAG_U64:
-			fprintf (stdout, "%s\n", (*(uint64_t*)o->value & o->flag.val_int) ? "True" : "False");
-			break;
+			case CSC_ARGV_TYPE_DOUBLE:
+				fprintf (stdout, "%f\n", *(double*)o->value);
+				break;
+			case CSC_ARGV_TYPE_FLOAT:
+				fprintf (stdout, "%f\n", *(float*)o->value);
+				break;
+			case CSC_ARGV_TYPE_INT:
+				fprintf (stdout, "%i\n", *(int*)o->value);
+				break;
+			case CSC_ARGV_TYPE_LONG:
+				fprintf (stdout, "%li\n", *(long*)o->value);
+				break;
+			case CSC_ARGV_TYPE_I8:
+				fprintf (stdout, "%i\n", *(int8_t*)o->value);
+				break;
+			case CSC_ARGV_TYPE_I16:
+				fprintf (stdout, "%i\n", *(int16_t*)o->value);
+				break;
+			case CSC_ARGV_TYPE_I32:
+				fprintf (stdout, "%i\n", *(int32_t*)o->value);
+				break;
+			case CSC_ARGV_TYPE_I64:
+				fprintf (stdout, "%ji\n", *(int64_t*)o->value);
+				break;
+			case CSC_ARGV_TYPE_U8:
+				fprintf (stdout, "%u\n", *(uint8_t*)o->value);
+				break;
+			case CSC_ARGV_TYPE_U16:
+				fprintf (stdout, "%u\n", *(uint16_t*)o->value);
+				break;
+			case CSC_ARGV_TYPE_U32:
+				fprintf (stdout, "%u\n", *(uint32_t*)o->value);
+				break;
+			case CSC_ARGV_TYPE_U64:
+				fprintf (stdout, "%ju\n", *(uint64_t*)o->value);
+				break;
+			case CSC_ARGV_TYPE_STRING:
+				fprintf (stdout, "%s\n", *(char**)o->value);
+				break;
+			}
 		}
+		else
+		{
+			switch (o->type)
+			{
+			case CSC_ARGV_TYPE_INT:
+				fprintf (stdout, "%s\n", (*(int*)o->value & o->flag.val_int) ? "True" : "False");
+				break;
+			case CSC_ARGV_TYPE_LONG:
+				fprintf (stdout, "%s\n", (*(int*)o->value & o->flag.val_int) ? "True" : "False");
+				break;
+			case CSC_ARGV_TYPE_I8:
+				fprintf (stdout, "%s\n", (*(int8_t*)o->value & o->flag.val_int) ? "True" : "False");
+				break;
+			case CSC_ARGV_TYPE_I16:
+				fprintf (stdout, "%s\n", (*(int16_t*)o->value & o->flag.val_int) ? "True" : "False");
+				break;
+			case CSC_ARGV_TYPE_I32:
+				fprintf (stdout, "%s\n", (*(int32_t*)o->value & o->flag.val_int) ? "True" : "False");
+				break;
+			case CSC_ARGV_TYPE_I64:
+				fprintf (stdout, "%s\n", (*(int64_t*)o->value & o->flag.val_int) ? "True" : "False");
+				break;
+			case CSC_ARGV_TYPE_U8:
+				fprintf (stdout, "%s\n", (*(uint8_t*)o->value & o->flag.val_int) ? "True" : "False");
+				break;
+			case CSC_ARGV_TYPE_U16:
+				fprintf (stdout, "%s\n", (*(uint16_t*)o->value & o->flag.val_int) ? "True" : "False");
+				break;
+			case CSC_ARGV_TYPE_U32:
+				fprintf (stdout, "%s\n", (*(uint32_t*)o->value & o->flag.val_int) ? "True" : "False");
+				break;
+			case CSC_ARGV_TYPE_U64:
+				fprintf (stdout, "%s\n", (*(uint64_t*)o->value & o->flag.val_int) ? "True" : "False");
+				break;
+			}
+		}
+
 	}
 	fputc ('\n', stdout);
 }
