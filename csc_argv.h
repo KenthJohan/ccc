@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
+#pragma once
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -148,6 +149,14 @@ static uint64_t csc_argv_build_flags (struct csc_argv_option const * option)
 		{
 		case CSC_ARGV_TYPE_INT:
 		case CSC_ARGV_TYPE_LONG:
+		case CSC_ARGV_TYPE_U8:
+		case CSC_ARGV_TYPE_U16:
+		case CSC_ARGV_TYPE_U32:
+		case CSC_ARGV_TYPE_U64:
+		case CSC_ARGV_TYPE_I8:
+		case CSC_ARGV_TYPE_I16:
+		case CSC_ARGV_TYPE_I32:
+		case CSC_ARGV_TYPE_I64:
 			flags |= csc_argv_alphanumbits (o->character);
 			break;
 		default:
@@ -435,6 +444,8 @@ void csc_argv_print_value (struct csc_argv_option const * option)
 			case CSC_ARGV_TYPE_STRING:
 				fprintf (stdout, "%s\n", *(char**)o->value);
 				break;
+			default:
+				break;
 			}
 		}
 		else
@@ -470,6 +481,8 @@ void csc_argv_print_value (struct csc_argv_option const * option)
 				break;
 			case CSC_ARGV_TYPE_U64:
 				fprintf (stdout, "%s\n", (*(uint64_t*)o->value & o->flag.val_int) ? "True" : "False");
+				break;
+			default:
 				break;
 			}
 		}
