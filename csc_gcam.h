@@ -20,8 +20,8 @@ struct csc_gcam
 	float n;//Near
 	float f;//Far
 
-	float pyrd[3];
-	float pyr[3];
+	float pyrd[4]; //Euler angles
+	float pyr[4]; //Euler angles
 
 	/*
 	float pitchd;
