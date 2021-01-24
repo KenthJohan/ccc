@@ -74,3 +74,5 @@ All chunks are the same size.
 * https://www.chessprogramming.org/General_Setwise_Operations
 * Discussion of SIMD, SOA, AOSOA. Followed by Questions & Answers. https://www.youtube.com/watch?v=YGTZr6bmNmk
 * Data layout and SIMD abstraction layers: decouplinginterfaces from implementations https://hal.archives-ouvertes.fr/hal-01915529/document
+* Get Started with the Unity* Entity Component System (ECS), C# Job System, and Burst Compiler 
+https://software.intel.com/content/www/us/en/develop/articles/get-started-with-the-unity-entity-component-system-ecs-c-sharp-job-system-and-burst-compiler.html

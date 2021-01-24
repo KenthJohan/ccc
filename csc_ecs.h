@@ -55,6 +55,37 @@ Chunk1, size=1024B
 
 
 
+Chunk2, size=1024B
+|I|ent| c3   |
+|0| 4 | data |
+|1| 5 | data |
+|2| 1 | data |
+|3| 7 | data |
+|4| 8 | data |
+|5| 9 | data |
+|6| 10| data |
+|7| 11| data |
+
+
+memlines[pppp] = 0
+memlines[vvvv] = 0
+
+memline[ppppvvvv] = 8
+memline[iiiiiiii] = 1
+
+0        1        2        3
+01234567 89ABCDEF GHIJKLMN OPQRSTWX (base=32)
+ppppvvvv ppppvvvv iiiiiiii iiiiiiii
+01230123 45674567 01234567 89ABCDEF
+
+chunk_index(0,p) = 0
+chunk_index(0,v) = 0
+chunk_index(0,i) = 2
+
+
+data(0,p) = 0
+data(0,v) = 4
+data(0,i) = G
 
 
 
@@ -86,20 +117,13 @@ struct csc_ecs_components
 
 
 /*
-Memory lines were added for following reasons:
-* Allowing different chunk sizes. So we can use Array of Structures of Arrays (AoSoA).
-  This means that one chunk can look like (xxxxyyyyzzzzwwww) and a continuous memory line can look like xxxxyyyyzzzzwwwwxxxxyyyyzzzzwwww...
-  This memory line would use chunk size 64 bytes.
-  Unity uses 16kb chunk size.
-* Allow large creation and deletion of entities without causing fragmentation in other memory lines.
-* One memory line could be vertices in a AoSoA format (xxxxyyyyzzzzwwww). Which has 4 components (x,y,z,w).
+Memory lines could be used to sort entities.
 */
 struct csc_ecs_memlines
 {
 	uint32_t capacity;
 	uint32_t count;
-	//Array of continuous memory:
-	//Every continuous memory element is discontinuous from eachother.
+	//Array of memoryline:
 	uint8_t ** memory;
 };
 
@@ -122,8 +146,8 @@ struct csc_ecs_entities
 {
 	uint32_t capacity;
 	uint32_t count;
-	uint32_t * chunk_index; //Chunk index
-	uint32_t * chunk_indexo;  //Relative index offset from chunk index
+	uint32_t * chunk_index;
+	uint32_t * chunk_indexo; //Relative index offset from chunk index
 };
 
 

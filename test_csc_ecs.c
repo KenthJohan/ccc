@@ -186,6 +186,9 @@ void test1()
 			};
 		}
 
+		//Component A has 2 x floats
+		//Component B has 2 x floats
+		//Component C has 7 x floats
 		ASSERT (((float*)csc_ecs_data_entity (&ecs, 0, COMP_A))[0] == 0.0f);
 		ASSERT (((float*)csc_ecs_data_entity (&ecs, 1, COMP_A))[0] == 1.0f);
 		ASSERT (((float*)csc_ecs_data_entity (&ecs, 2, COMP_A))[0] == 2.0f);
