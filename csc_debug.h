@@ -37,6 +37,7 @@
 #define ASSERT(A)               do{if(!(A)){assert_format(ASSERT_CARGS, #A, (NULL)             );}}while(0)
 #define ASSERTF(A, F, ...)      do{if(!(A)){assert_format(ASSERT_CARGS, #A, (F), ## __VA_ARGS__);}}while(0)
 #define ASSERT_NOTNULL(A) do{if((A)==NULL){assert_format(ASSERT_CARGS, NULL, "variable " ASSERT_TCOLID "%s" TCOL_RST " can not be NULL", #A, __func__);}}while(0)
+#define ASSERT_FALSE(A) do{if((A)==0){assert_format(ASSERT_CARGS, NULL, "variable " ASSERT_TCOLID "%s" TCOL_RST " can not be false", #A, __func__);}}while(0)
 #define ASSERT_PARAM_NOTNULL(A) do{if((A)==NULL){assert_format(ASSERT_CARGS, NULL, "parameter " ASSERT_TCOLID "%s" TCOL_RST " can not be NULL", #A, __func__);}}while(0)
 #define ASSERT_ISPOW2(x)        ASSERTF((x & (x-1)) == 0, "The number %i must be a positive integer power of two", (int)(x))
 #define ASSERT_ISALIGN(x,a)     ASSERTF(((uintptr_t)(void const*)(x) % (a)) == 0, "The address %p must be align to %i, %u", (void const *)(x), (int)(a), (uintptr_t)(void const*)(x) % (a))

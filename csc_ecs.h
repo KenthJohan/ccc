@@ -151,12 +151,21 @@ struct csc_ecs_entities
 };
 
 
+struct csc_ecs_compgroups
+{
+	uint32_t capacity;
+	uint32_t count;
+	uint64_t * mask;
+};
+
+
 struct csc_ecs
 {
 	struct csc_ecs_memlines memlines;
 	struct csc_ecs_chunks chunks;
 	struct csc_ecs_components components;
 	struct csc_ecs_entities entities;
+	struct csc_ecs_compgroups compgroups;
 };
 
 
@@ -172,6 +181,7 @@ void csc_ecs_init (struct csc_ecs * ecs)
 	ecs->chunks.component_mask = calloc (ecs->chunks.capacity, sizeof (uint64_t));
 	ecs->entities.chunk_index = calloc (ecs->entities.capacity, sizeof (uint32_t));
 	ecs->entities.chunk_indexo = calloc (ecs->entities.capacity, sizeof (uint32_t));
+	ecs->compgroups.mask = calloc (ecs->compgroups.capacity, sizeof (uint64_t));
 
 	//TODO: Add error handling:
 	ASSERT_NOTNULL (ecs->chunks.entity_capacity);

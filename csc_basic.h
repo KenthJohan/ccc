@@ -23,6 +23,32 @@
 
 #define countof(array) (sizeof(array) / sizeof(array[0]))
 
+#define BITS_SUBSET(a,b) ((a) & (b))
+
+enum csc_type
+{
+	CSC_TYPE_U8,
+	CSC_TYPE_U16,
+	CSC_TYPE_U32,
+	CSC_TYPE_U64,
+	CSC_TYPE_I8,
+	CSC_TYPE_I16,
+	CSC_TYPE_I32,
+	CSC_TYPE_I64,
+	CSC_TYPE_F32,
+	CSC_TYPE_F64,
+
+
+	CSC_TYPE_V4F32,
+
+
+	CSC_TYPE_RGBA8888,
+
+	CSC_TYPE_TEXTURE2D,
+};
+
+
+
 /*
 
 typedef uint32_t u32;

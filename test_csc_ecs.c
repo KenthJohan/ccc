@@ -1,6 +1,7 @@
 #include "csc_debug.h"
 #include "csc_dlist.h"
 #include "csc_ecs.h"
+#include "csc_basic.h"
 
 
 
@@ -61,6 +62,7 @@ void test1()
 	ecs.memlines.capacity = 2;
 	ecs.chunks.capacity = 4;
 	ecs.entities.capacity = 4;
+	ecs.compgroups.capacity = 4;
 	csc_ecs_init (&ecs);
 	csc_ecs_init_memline (&ecs, 0);
 
@@ -303,11 +305,11 @@ void system_overall (struct csc_ecs * ecs)
 	for (uint32_t chunk_index = 0; chunk_index < ecs->chunks.count; ++chunk_index)
 	{
 		uint64_t component_flags = ecs->chunks.component_mask[chunk_index];
-		if ((component_flags & (COMP_POS_BIT|COMP_VEL_BIT|COMP_MASS_BIT)) == (COMP_POS_BIT|COMP_VEL_BIT|COMP_MASS_BIT))
+		if (component_flags & (COMP_POS_BIT|COMP_VEL_BIT|COMP_MASS_BIT))
 		{
 			system_move (ecs, chunk_index);
 		}
-		if ((component_flags & (COMP_POS_BIT)) == (COMP_POS_BIT))
+		if (component_flags & (COMP_POS_BIT))
 		{
 			system_draw (ecs, chunk_index);
 		}
