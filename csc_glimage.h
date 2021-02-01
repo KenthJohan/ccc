@@ -10,6 +10,8 @@
 
 
 
+
+
 struct csc_rectangle_v4f32
 {
 	float a[4];
@@ -21,40 +23,40 @@ struct csc_rectangle_v4f32
 };
 
 
-void csc_rectangle_setcoord_v4f32 (struct csc_rectangle_v4f32 * item, float x, float y, float z, float w, float h)
+void csc_rectangle_setcoord_v4f32 (struct csc_rectangle_v4f32 * item, float x, float y, float z, float w, float width, float height)
 {
-	float wr = w/2.0f;
-	float hr = h/2.0f;
+	float wr = width / 2.0f;
+	float hr = height / 2.0f;
 
 	item->a[0] = -wr + x;
 	item->a[1] = -hr + y;
 	item->a[2] = z;
-	//item->a[3] = 1.0f;
+	item->a[3] = w;
 
 	item->b[0] = wr + x;
 	item->b[1] = -hr + y;
 	item->b[2] = z;
-	//item->b[3] = 1.0f;
+	item->b[3] = w;
 
 	item->c[0] = wr + x;
 	item->c[1] = hr + y;
 	item->c[2] = z;
-	//item->c[3] = 1.0f;
+	item->c[3] = w;
 
 	item->d[0] = -wr + x;
 	item->d[1] = -hr + y;
 	item->d[2] = z;
-	//item->d[3] = 1.0f;
+	item->d[3] = w;
 
 	item->e[0] = wr + x;
 	item->e[1] = hr + y;
 	item->e[2] = z;
-	//item->e[3] = 1.0f;
+	item->e[3] = w;
 
 	item->f[0] = -wr + x;
 	item->f[1] = hr + y;
 	item->f[2] = z;
-	//item->f[3] = 1.0f;
+	item->f[3] = w;
 }
 
 
@@ -91,7 +93,7 @@ void csc_rectangle_setuv_vf32 (float uv[], uint32_t n)
 #define CSC_GLIMAGE_VERTS_COUNT 6
 
 
-struct csc_glimage
+struct csc_glimgcontext
 {
 	uint32_t cap;
 	GLuint vbop;
@@ -106,7 +108,7 @@ struct csc_glimage
 };
 
 
-void csc_glimage_init (struct csc_glimage * img)
+void csc_glimage_init (struct csc_glimgcontext * img)
 {
 	img->uniform_mvp = glGetUniformLocation (img->glprogram, "mvp");
 	img->uniform_texture1 = glGetUniformLocation (img->glprogram, "texture1");
@@ -132,26 +134,18 @@ void csc_glimage_init (struct csc_glimage * img)
 	glBufferData (GL_ARRAY_BUFFER, img->cap * CSC_GLIMAGE_VERTS_COUNT * CSC_GLIMAGE_TEX_DIM * sizeof(float), img->vtex, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer (1, CSC_GLIMAGE_TEX_DIM, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray (1);
-}
 
 
-void csc_glimage_update_xywh (struct csc_glimage * img, float xyzw[], float wh[], uint32_t n)
-{
-	float * vpos = img->vpos;
-	for (uint32_t i = 0; i < n; ++i)
-	{
-		csc_rectangle_setcoord_v4f32((void*)vpos, xyzw[0], xyzw[1], xyzw[2], wh[0], wh[1]);
-		xyzw += 4;
-		wh += 2;
-		vpos += CSC_GLIMAGE_POS_DIM*CSC_GLIMAGE_VERTS_COUNT;
-	}
-	glBindBuffer (GL_ARRAY_BUFFER, img->vbop);
-	glBufferSubData (GL_ARRAY_BUFFER, 0, img->cap * CSC_GLIMAGE_VERTS_COUNT * CSC_GLIMAGE_POS_DIM * sizeof (float), img->vpos);
+
+
+
+
+
 }
 
 
 
-void csc_glimage_draw (struct csc_glimage * img, float mvp[4*4])
+void csc_glimage_draw (struct csc_glimgcontext * img, float mvp[4*4])
 {
 	glBindVertexArray (img->vao);
 	glUseProgram (img->glprogram);
@@ -164,12 +158,36 @@ void csc_glimage_draw (struct csc_glimage * img, float mvp[4*4])
 
 
 
+struct csc_glimg
+{
+	union
+	{
+		struct
+		{
+			float x;
+			float y;
+			float z;
+			float w;
+		};
+		float pos[4];
+	};
+	float width;
+	float height;
+	uint32_t layer;
+};
 
 
-
-
-
-
+void csc_glimage_update (struct csc_glimgcontext * ctx, struct csc_glimg img[], uint32_t n)
+{
+	float * vpos = ctx->vpos;
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		csc_rectangle_setcoord_v4f32((void*)vpos, img[i].x, img[i].y, img[i].z, img[i].layer, img[i].width, img[i].height);
+		vpos += CSC_GLIMAGE_POS_DIM*CSC_GLIMAGE_VERTS_COUNT;
+	}
+	glBindBuffer (GL_ARRAY_BUFFER, ctx->vbop);
+	glBufferSubData (GL_ARRAY_BUFFER, 0, ctx->cap * CSC_GLIMAGE_VERTS_COUNT * CSC_GLIMAGE_POS_DIM * sizeof (float), ctx->vpos);
+}
 
 
 
