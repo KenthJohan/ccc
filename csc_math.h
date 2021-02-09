@@ -982,3 +982,39 @@ void mf32_get_covariance (uint32_t dim, float v[], uint32_t v_stride, uint32_t n
 	mf32_symmetric_xxt (3, c, 3, v, v_stride, n);
 	vsf32_mul (dim*dim, c, c, 1.0f / ((float)n - 1.0f));
 }
+
+
+struct v4f32
+{
+	float v[4];
+};
+
+struct v3f32
+{
+	float v[3];
+};
+
+struct v2f32
+{
+	float v[2];
+};
+
+
+
+struct v4f32_xyzw
+{
+	float x;
+	float y;
+	float z;
+	float w;
+};
+
+
+struct v2f32_wh
+{
+	float w;
+	float h;
+};
+
+
+

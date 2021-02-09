@@ -85,7 +85,12 @@ void csc_glpointcloud_draw (struct csc_glpointcloud * item, float mvp[4*4])
 
 
 
-
+static void csc_glpointcloud_begin_draw (struct csc_glpointcloud * item, float mvp[4*4])
+{
+	glBindVertexArray (item->vao);
+	glUseProgram (item->glprogram);
+	glUniformMatrix4fv (item->uniform_mvp, 1, GL_FALSE, (const GLfloat *) mvp);
+}
 
 
 
