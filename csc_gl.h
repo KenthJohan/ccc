@@ -119,3 +119,81 @@ GLint csc_gl_program_from_files1 (char const * filenames)
 
 
 
+
+
+void csc_gl_make_rectangle_pos (float v[], float x, float y, float z, float w, float width, float height, uint32_t stride)
+{
+	float wr = width / 2.0f;
+	float hr = height / 2.0f;
+
+	v[0] = -wr + x;
+	v[1] = -hr + y;
+	v[2] = z;
+	v[3] = w;
+	v += stride;
+
+	v[0] = wr + x;
+	v[1] = -hr + y;
+	v[2] = z;
+	v[3] = w;
+	v += stride;
+
+	v[0] = wr + x;
+	v[1] = hr + y;
+	v[2] = z;
+	v[3] = w;
+	v += stride;
+
+	v[0] = -wr + x;
+	v[1] = -hr + y;
+	v[2] = z;
+	v[3] = w;
+	v += stride;
+
+	v[0] = wr + x;
+	v[1] = hr + y;
+	v[2] = z;
+	v[3] = w;
+	v += stride;
+
+	v[0] = -wr + x;
+	v[1] = hr + y;
+	v[2] = z;
+	v[3] = w;
+	v += stride;
+}
+
+
+void csc_gl_make_rectangle_uv (float uv[], uint32_t n, uint32_t stride)
+{
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		uv[0] = 0.0f;
+		uv[1] = 0.0f;
+		uv += stride;
+
+		uv[0] = 1.0f;
+		uv[1] = 0.0f;
+		uv += stride;
+
+		uv[0] = 1.0f;
+		uv[1] = 1.0f;
+		uv += stride;
+
+		uv[0] = 0.0f;
+		uv[1] = 0.0f;
+		uv += stride;
+
+		uv[0] = 1.0f;
+		uv[1] = 1.0f;
+		uv += stride;
+
+		uv[0] = 0.0f;
+		uv[1] = 1.0f;
+		uv += stride;
+	}
+}
+
+
+
+

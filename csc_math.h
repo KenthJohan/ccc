@@ -277,6 +277,15 @@ static void mf32_set (float * M, float c, unsigned n)
 	}
 }
 
+static void vf32_set1_strided (float v[], float x, unsigned n, unsigned inc)
+{
+	for (unsigned i = 0; i < n; ++i)
+	{
+		v[0] = x;
+		v += inc;
+	}
+}
+
 
 static void vf32_set2 (float v[], float v0, float v1)
 {
