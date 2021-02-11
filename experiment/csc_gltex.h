@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glew.h>
-#include "csc_basic.h"
-#include "csc_debug.h"
+#include "../csc_basic.h"
+#include "../csc_debug.h"
 
 void fill_texture (uint8_t * data, int w, int h, uint32_t c, uint32_t n)
 {

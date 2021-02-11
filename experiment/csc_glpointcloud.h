@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glew.h>
-#include "csc_basic.h"
-#include "csc_debug.h"
+#include "../csc_basic.h"
+#include "../csc_debug.h"
 
 
 
@@ -66,10 +66,12 @@ void csc_glpointcloud_init (struct csc_glpointcloud * item)
 }
 
 
-void csc_glpointcloud_update (struct csc_glpointcloud * item)
+void csc_glpointcloud_update (struct csc_glpointcloud * item, uint32_t from, uint32_t count, void * data)
 {
 	glBindBuffer (GL_ARRAY_BUFFER, item->vbop);
-	glBufferSubData (GL_ARRAY_BUFFER, 0, item->cap * CSC_GLPOINTCLOUD_POS_DIM * sizeof (float), item->vpos);
+	GLintptr offset = from * CSC_GLPOINTCLOUD_POS_DIM * sizeof (float);
+	GLsizeiptr size = count * CSC_GLPOINTCLOUD_POS_DIM * sizeof (float);
+	glBufferSubData (GL_ARRAY_BUFFER, offset, size, data);
 }
 
 
@@ -91,6 +93,12 @@ static void csc_glpointcloud_begin_draw (struct csc_glpointcloud * item, float m
 	glUseProgram (item->glprogram);
 	glUniformMatrix4fv (item->uniform_mvp, 1, GL_FALSE, (const GLfloat *) mvp);
 }
+
+
+
+
+
+
 
 
 

@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glew.h>
-#include "csc_basic.h"
-#include "csc_debug.h"
-#include "csc_gl.h"
+#include "../csc_basic.h"
+#include "../csc_debug.h"
+#include "../csc_gl.h"
 
 
 
