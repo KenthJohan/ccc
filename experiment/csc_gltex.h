@@ -73,6 +73,13 @@ struct csc_gltexcontext
 };
 
 
+
+
+
+
+
+
+
 void csc_gltexcontext_init (struct csc_gltexcontext * ctx)
 {
 	ASSERT (ctx->cap < 100);
