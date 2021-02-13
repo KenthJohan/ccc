@@ -8,6 +8,30 @@
 #include "csc_basic.h"
 
 
+typedef float m4f32[16];
+typedef float v2f32[2];
+typedef float v3f32[3];
+typedef float v4f32[4];
+typedef float qf32[4];
+
+
+struct v4f32_xyzw
+{
+	float x;
+	float y;
+	float z;
+	float w;
+};
+
+
+struct v2f32_wh
+{
+	float w;
+	float h;
+};
+
+
+
 #define V4F32_FORMAT "(%f %f %f %f)\n"
 #define V4F32_ARGS(x) (x)[0], (x)[1], (x)[2], (x)[3]
 //Matrix can be stored in column major or row major.
@@ -53,25 +77,7 @@
 }
 
 
-//Translation vector
-#define M4_TX 12
-#define M4_T0 12
-#define M4_TY 13
-#define M4_T1 13
-#define M4_TZ 14
-#define M4_T2 14
-#define M4_TW 15
-#define M4_T3 15
 
-//Column vectors
-#define M4_V0 0
-#define M4_VX 0
-#define M4_V1 4
-#define M4_VY 4
-#define M4_V2 8
-#define M4_VZ 8
-#define M4_V3 12
-#define M4_VT 12
 
 
 #define M4_IDENTITY(m)\
@@ -203,37 +209,6 @@
 	(v)[_i] = 0;\
 }
 
-
-//Translation vector
-//Independent from row/col major
-#define M4_TX 12
-#define M4_T0 12
-#define M4_TY 13
-#define M4_T1 13
-#define M4_TZ 14
-#define M4_T2 14
-#define M4_TW 15
-#define M4_T3 15
-
-
-//Column vectors
-//Independent from row/col major
-#define M4_V0 0
-#define M4_VX 0
-#define M4_V1 4
-#define M4_VY 4
-#define M4_V2 8
-#define M4_VZ 8
-#define M4_V3 12
-#define M4_VT 12
-
-
-//Scale scalars
-//Independent from row/col major
-#define M4_S0 0
-#define M4_S1 5
-#define M4_S2 10
-#define M4_S3 15
 
 
 
@@ -983,26 +958,7 @@ void mf32_get_covariance (uint32_t dim, float v[], uint32_t v_stride, uint32_t n
 	vsf32_mul (dim*dim, c, c, 1.0f / ((float)n - 1.0f));
 }
 
-typedef float m4f32[16];
-typedef float v2f32[2];
-typedef float v3f32[3];
-typedef float v4f32[4];
 
-
-struct v4f32_xyzw
-{
-	float x;
-	float y;
-	float z;
-	float w;
-};
-
-
-struct v2f32_wh
-{
-	float w;
-	float h;
-};
 
 
 

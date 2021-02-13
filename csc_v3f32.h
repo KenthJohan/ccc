@@ -4,6 +4,32 @@
 #include <stdint.h>
 #include "csc_math.h"
 
+
+static void v3f32_set_xyz (v3f32 r, float x, float y, float z)
+{
+	r[0] = x;
+	r[1] = y;
+	r[2] = z;
+}
+
+
+
+static void v3f32_cpy (v3f32 r, v3f32 const a)
+{
+	r[0] = a[0];
+	r[1] = a[1];
+	r[2] = a[2];
+}
+
+
+static void v3f32_mul (v3f32 r, v3f32 const a, float b)
+{
+	r[0] = a[0] * b;
+	r[1] = a[1] * b;
+	r[2] = a[2] * b;
+}
+
+
 static void v3f32_cross (float r[3], float const a[3], float const b[3])
 {
 	r[0] = a[1] * b[2] - a[2] * b[1];
