@@ -59,7 +59,7 @@ static void qf32_xyza (qf32 q, float x, float y, float z, float a)
 }
 
 
-static void qf32_axis_angle (float q [4], float const v [3], float angle)
+static void qf32_axis_angle (qf32 q, v3f32 const v, float angle)
 {
 	qf32_xyza (q, v[0], v[1], v[2], angle);
 }
@@ -157,8 +157,8 @@ v' = v + q.w * t + cross(q.xyz, t)
 static void qf32_rotate_vector (qf32 q, v3f32 const v, v3f32 r)
 {
 	ASSERT (v != r);
-	float t[3];
-	float u[3] = {q[0], q[1], q[2]};
+	v3f32 t;
+	v3f32 u = {q[0], q[1], q[2]};
 	v3f32_cross (t, q, v);
 	vsf32_mul (3, t, t, 2.0f);
 	v3f32_cross (u, q, t);

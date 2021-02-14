@@ -13,7 +13,6 @@ static void v3f32_set_xyz (v3f32 r, float x, float y, float z)
 }
 
 
-
 static void v3f32_cpy (v3f32 r, v3f32 const a)
 {
 	r[0] = a[0];
@@ -30,7 +29,7 @@ static void v3f32_mul (v3f32 r, v3f32 const a, float b)
 }
 
 
-static void v3f32_cross (float r[3], float const a[3], float const b[3])
+static void v3f32_cross (v3f32 r, v3f32 const a, v3f32 const b)
 {
 	r[0] = a[1] * b[2] - a[2] * b[1];
 	r[1] = a[2] * b[0] - a[0] * b[2];
@@ -38,7 +37,7 @@ static void v3f32_cross (float r[3], float const a[3], float const b[3])
 }
 
 
-static void v3f32_crossacc (float r[3], float const a[3], float const b[3])
+static void v3f32_crossacc (v3f32 r, v3f32 const a, v3f32 const b)
 {
 	r[0] += a[1] * b[2] - a[2] * b[1];
 	r[1] += a[2] * b[0] - a[0] * b[2];
@@ -46,7 +45,7 @@ static void v3f32_crossacc (float r[3], float const a[3], float const b[3])
 }
 
 
-static void v3f32_crossacc_scalar (float r[], float s, float const a[], float const b[])
+static void v3f32_crossacc_scalar (v3f32 r, float s, v3f32 const a, v3f32 const b)
 {
 	r[0] += s * (a[1] * b[2] - a[2] * b[1]);
 	r[1] += s * (a[2] * b[0] - a[0] * b[2]);
@@ -54,7 +53,7 @@ static void v3f32_crossacc_scalar (float r[], float s, float const a[], float co
 }
 
 
-static void v3f32_sum (float y[3], float x[], uint32_t x_stride, uint32_t x_count)
+static void v3f32_sum (v3f32 y, float x[], uint32_t x_stride, uint32_t x_count)
 {
 	for (uint32_t i = 0; i < x_count; ++i)
 	{
@@ -69,8 +68,7 @@ static void v3f32_sum (float y[3], float x[], uint32_t x_stride, uint32_t x_coun
 
 
 
-static int v3f32_ray_sphere_intersect
-(float p [3], float d [3], float sc [3], float sr, float *t, float q [3])
+static int v3f32_ray_sphere_intersect (v3f32 p, v3f32 d, v3f32 sc, float sr, float *t, v3f32 q)
 {
 	//Vector m = p - s.c;
 	float m [3];
@@ -103,7 +101,11 @@ static int v3f32_ray_sphere_intersect
 
 
 
-static void mv3f32_mul (float y[3], float const a[3*3], float const b[3])
+
+
+
+
+static void mv3f32_mul (v3f32 y, m3f32 const a, v3f32 const b)
 {
 	float r[3] = {0.0f};
 	mvf32_macc (r, a, b, 3, 3);

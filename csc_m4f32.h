@@ -119,11 +119,11 @@ static void m4f32_scale_xyz (m4f32 m, float x, float y, float z)
 }
 
 
-static void m4f32_scale (m4f32 m, float s)
+static void m4f32_scale (m4f32 m, v3f32 s)
 {
-	m [M4_00] = s;
-	m [M4_11] = s;
-	m [M4_22] = s;
+	m [M4_00] = s[0];
+	m [M4_11] = s[1];
+	m [M4_22] = s[2];
 }
 
 
