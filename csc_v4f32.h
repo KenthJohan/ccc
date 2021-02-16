@@ -127,6 +127,16 @@ static void v4f32_set_xyzw_repeat (uint32_t n, float r [], float x, float y, flo
 }
 
 
+static void v4f32_set_w_repeat (uint32_t n, float r [], float w)
+{
+	while (n--)
+	{
+		r [3] = w;
+		r += 4;
+	}
+}
+
+
 static void v4f32_repeat_random (unsigned n, float r [])
 {
 	uint32_t const dim = 4;
@@ -148,7 +158,15 @@ static void v4f32_repeat_channel (unsigned n, float r [], unsigned channel, floa
 }
 
 
-
+static void vu32_repeat_random_mask (unsigned n, uint32_t r [], uint32_t mask)
+{
+	for (unsigned i = 0; i < n; ++i)
+	{
+		uint32_t g = rand ();
+		g *= (UINT32_MAX / RAND_MAX);
+		r[i] = g & mask;
+	}
+}
 
 
 

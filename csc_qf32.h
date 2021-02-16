@@ -53,6 +53,7 @@ static void qf32_xyza (qf32 q, float x, float y, float z, float a)
 	q [1] = s * y;
 	q [2] = s * z;
 	q [3] = c;
+	qf32_normalize (q, q);
 	//vf32_normalize (4, q, q);
 	//float n = vf32_norm (4, q);
 	//printf ("%f\n", n);
@@ -197,7 +198,7 @@ static void qf32_rotate2_xyza (qf32 q, float x, float y, float z, float a)
 {
 	qf32 u;
 	qf32_xyza (u, x, y, z, a);
-	qf32_mul (q, q, u);
+	qf32_mul (q, q, u); // q = q * u
 }
 
 
