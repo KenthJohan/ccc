@@ -14,7 +14,7 @@ static void GLAPIENTRY csc_sdlglew_gldebug_callback
 	(void)severity;
 	(void)length;
 	(void)userParam;
-	fprintf (stderr, "%s\n", message);
+	fprintf (stderr, "[OPENGL_DEBUG] %s\n", message);
 	if (severity == GL_DEBUG_SEVERITY_HIGH)
 	{
 		fprintf (stderr, "Aborting...\n");
