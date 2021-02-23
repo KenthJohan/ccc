@@ -102,6 +102,30 @@ static void m4f32_translation (m4f32 m, v3f32 const t)
 }
 
 
+static void m4f32_set_columns (m4f32 m, v4f32 const x, v4f32 const y, v4f32 const z, v4f32 const w)
+{
+	m [M4_00] = x [0];
+	m [M4_10] = x [1];
+	m [M4_20] = x [2];
+	m [M4_20] = x [3];
+
+	m [M4_01] = y [0];
+	m [M4_11] = y [1];
+	m [M4_21] = y [2];
+	m [M4_21] = y [3];
+
+	m [M4_02] = z [0];
+	m [M4_12] = z [1];
+	m [M4_22] = z [2];
+	m [M4_22] = z [3];
+
+	m [M4_03] = w [0];
+	m [M4_13] = w [1];
+	m [M4_23] = w [2];
+	m [M4_23] = w [3];
+}
+
+
 static void m4f32_translation_xyz (m4f32 m, float x, float y, float z)
 {
 	//Translation vector in 4th column
