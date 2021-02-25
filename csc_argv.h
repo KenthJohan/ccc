@@ -19,7 +19,7 @@ static uint64_t csc_argv_alphanumbits (char a)
 		o = a - 'a' + 0;
 		o = UINT64_C(1) << o;
 	}
-	if ('A' <= a && a <= 'A')
+	if ('A' <= a && a <= 'Z')
 	{
 		o = a - 'A' + 26;
 		o = UINT64_C(1) << o;
