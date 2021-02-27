@@ -1,6 +1,8 @@
 #include "csc_debug.h"
 #include "csc_crossos.h"
 #include "csc_argv.h"
+#include "csc_basic.h"
+#include "csc_type_str.h"
 
 
 #define FLAG_READ    0x01
@@ -10,215 +12,231 @@
 #define FLAG_DEFAULT 0x10
 
 
-void test_strings()
+static void test_float1()
 {
-	char * string1;
-	char * string2;
-
-	struct csc_argv_option option[] =
+	char const * a[] =
 	{
-	{.character = 'a', .name = "string1", .type = CSC_ARGV_TYPE_STRING, .value = &string1, .description = "The string value"},
-	{.character = 'b', .name = "string2", .type = CSC_ARGV_TYPE_STRING, .value = &string2, .description = "The string value"},
-	{.type = CSC_ARGV_TYPE_END}};
-
-	string1 = NULL;
-	csc_argv_parse (option, "-apotato", csc_argv_build_flags (option));
-	ASSERT_NOTNULL (string1);
-	ASSERT (strcmp (string1, "potato") == 0);
-
-	string1 = NULL;
-	csc_argv_parse (option, "-a tomato", csc_argv_build_flags (option));
-	ASSERT_NOTNULL (string1);
-	ASSERT (strcmp (string1, "tomato") == 0);
-
-	string1 = NULL;
-	csc_argv_parse (option, "--string1=carrot", csc_argv_build_flags (option));
-	ASSERT_NOTNULL (string1);
-	ASSERT (strcmp (string1, "carrot") == 0);
-
-	string1 = NULL;
-	csc_argv_parse (option, "--string1=lime", csc_argv_build_flags (option));
-	ASSERT_NOTNULL (string1);
-	ASSERT (strcmp (string1, "lime") == 0);
-
-	string2 = NULL;
-	csc_argv_parse (option, "-bonion", csc_argv_build_flags (option));
-	ASSERT_NOTNULL (string2);
-	ASSERT (strcmp (string2, "onion") == 0);
-
-	string2 = NULL;
-	csc_argv_parse (option, "-b cabbage", csc_argv_build_flags (option));
-	ASSERT_NOTNULL (string2);
-	ASSERT (strcmp (string2, "cabbage") == 0);
-
-	string2 = NULL;
-	csc_argv_parse (option, "--string2=garlic", csc_argv_build_flags (option));
-	ASSERT_NOTNULL (string2);
-	ASSERT (strcmp (string2, "garlic") == 0);
+	"--duration=3",
+	NULL,
+	};
+	float value = 1.0f;
+	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0, 0);
+	ASSERT (value == 3.0);
 }
 
-void test_numbers()
+static void test_float2()
 {
-	float f;
-	double d;
-	long l;
-	struct csc_argv_option option[] =
+	char const * a[] =
 	{
-	{.character = 'f', .name = "float",  .type = CSC_ARGV_TYPE_FLOAT,  .value = &f, .description = "The float value"},
-	{.character = 'd', .name = "double", .type = CSC_ARGV_TYPE_DOUBLE, .value = &d, .description = "The double value"},
-	{.character = 'l', .name = "long",   .type = CSC_ARGV_TYPE_LONG,   .value = &l, .description = "The number of threads value"},
-	{.type = CSC_ARGV_TYPE_END}};
-
-	f = 0.0f;
-	csc_argv_parse (option, "-f3.3", csc_argv_build_flags (option));
-	ASSERT (f == 3.3f);
-	f = 0.0f;
-	csc_argv_parse (option, "-f 3.3", csc_argv_build_flags (option));
-	ASSERT (f == 3.3f);
-	f = 0.0f;
-	csc_argv_parse (option, "--float=3.3", csc_argv_build_flags (option));
-	ASSERT (f == 3.3f);
-
-	d = 0.0;
-	csc_argv_parse (option, "-d3.4", csc_argv_build_flags (option));
-	ASSERT (d == 3.4);
-	d = 0.0;
-	csc_argv_parse (option, "-d 3.4", csc_argv_build_flags (option));
-	ASSERT (d == 3.4);
-	d = 0.0;
-	csc_argv_parse (option, "--double=3.4", csc_argv_build_flags (option));
-	ASSERT (d == 3.4);
-
-
-	l = 0;
-	csc_argv_parse (option, "-l345", csc_argv_build_flags (option));
-	ASSERT (l == 345);
-	l = 0;
-	csc_argv_parse (option, "-l 345", csc_argv_build_flags (option));
-	ASSERT (l == 345);
-	l = 0;
-	csc_argv_parse (option, "--long=345", csc_argv_build_flags (option));
-	ASSERT (l == 345);
+	"-d3",
+	NULL,
+	};
+	float value = 1.0f;
+	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0, 0);
+	ASSERT (value == 3.0);
 }
 
-void test_bitfield()
+static void test_float3()
 {
-	int permission;
-	struct csc_argv_option option[] =
+	char const * a[] =
 	{
-	{.character = 'r', .name = "read",     .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_READ,  .description = "The permission read flag"},
-	{.character = 'w', .name = "write",    .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_WRITE, .description = "The permission write flag"},
-	{.character = 'x', .name = "exec",     .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_EXEC,  .description = "The permission exec flag"},
-	{.character = 'x', .name = "exec",     .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_EXEC2, .description = "The permission exec2 flag"},
-	{.type = CSC_ARGV_TYPE_END}};
+	"-d",
+	"4",
+	NULL,
+	};
+	float value = 1.0f;
+	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0, 0);
+	ASSERT (value == 4.0);
+}
 
-	permission = FLAG_DEFAULT;
-	csc_argv_parse (option, "-r", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_READ));
+static void test_string1()
+{
+	char const * a[] =
+	{
+	"-aBob",
+	NULL,
+	};
+	char * value;
+	csc_argv_parse (a, 'a', "name", CSC_TYPE_STRING, &value, 0, 0);
+	ASSERT (strcmp("Bob", value) == 0);
+}
 
-	permission = FLAG_DEFAULT;
-	csc_argv_parse (option, "-w", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_WRITE));
+static void test_string2()
+{
+	char const * a[] =
+	{
+	"-a",
+	"Bob",
+	NULL,
+	};
+	char * value;
+	csc_argv_parse (a, 'a', "name", CSC_TYPE_STRING, &value, 0, 0);
+	ASSERT (strcmp("Bob", value) == 0);
+}
 
-	permission = FLAG_DEFAULT;
-	csc_argv_parse (option, "-r", csc_argv_build_flags (option));
-	csc_argv_parse (option, "-w", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE));
+static void test_string3()
+{
+	char const * a[] =
+	{
+	"--name=Bob",
+	NULL,
+	};
+	char * value;
+	csc_argv_parse (a, 'a', "name", CSC_TYPE_STRING, &value, 0, 0);
+	ASSERT (strcmp("Bob", value) == 0);
+}
 
-	permission = FLAG_DEFAULT;
-	csc_argv_parse (option, "-rw", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE));
+static void test_flags1()
+{
+	char const * a[] =
+	{
+	"-r",
+	NULL,
+	};
+	uint32_t perm = FLAG_DEFAULT;
+	uint64_t flagmask = csc_argv_alphanumbits_fromstr("rw");
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ));
+}
 
-	permission = FLAG_DEFAULT;
-	csc_argv_parse (option, "-wr", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE));
+static void test_flags2()
+{
+	char const * a[] =
+	{
+	"-rw",
+	NULL,
+	};
+	uint32_t perm = FLAG_DEFAULT;
+	uint64_t flagmask = csc_argv_alphanumbits_fromstr("rw");
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE));
+}
 
-	permission = FLAG_DEFAULT;
-	csc_argv_parse (option, "--read", csc_argv_build_flags (option));
-	csc_argv_parse (option, "--write", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE));
+static void test_flags3()
+{
+	char const * a[] =
+	{
+	"-wr",
+	NULL,
+	};
+	uint32_t perm = FLAG_DEFAULT;
+	uint64_t flagmask = csc_argv_alphanumbits_fromstr("rw");
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE));
+}
 
-	permission = FLAG_DEFAULT;
-	csc_argv_parse (option, "-x", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_EXEC|FLAG_EXEC2));
+static void test_flags4()
+{
+	char const * a[] =
+	{
+	"-r",
+	"-w",
+	NULL,
+	};
+	uint32_t perm = FLAG_DEFAULT;
+	uint64_t flagmask = csc_argv_alphanumbits_fromstr("rw");
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE));
+}
 
-	permission = FLAG_DEFAULT;
-	csc_argv_parse (option, "--exec", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_EXEC|FLAG_EXEC2));
+static void test_flags5()
+{
+	char const * a[] =
+	{
+	"-rw",
+	"-x",
+	NULL,
+	};
+	uint32_t perm = FLAG_DEFAULT;
+	uint64_t flagmask = csc_argv_alphanumbits_fromstr("rwx");
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, flagmask);
+	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE|FLAG_EXEC));
+}
 
-	permission = FLAG_DEFAULT;
-	csc_argv_parse (option, "--read", csc_argv_build_flags (option));
-	csc_argv_parse (option, "--write", csc_argv_build_flags (option));
-	csc_argv_parse (option, "--exec", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE|FLAG_EXEC|FLAG_EXEC2));
+static void test_flags6()
+{
+	char const * a[] =
+	{
+	"-xrw",
+	NULL,
+	};
+	uint32_t perm = FLAG_DEFAULT;
+	uint64_t flagmask = csc_argv_alphanumbits_fromstr("rwx");
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, flagmask);
+	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE|FLAG_EXEC));
+}
 
-	permission = FLAG_DEFAULT;
-	csc_argv_parse (option, "-wxr", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE|FLAG_EXEC|FLAG_EXEC2));
+static void test_flags7()
+{
+	char const * a[] =
+	{
+	"-x",
+	"-r",
+	"-w",
+	NULL,
+	};
+	uint32_t perm = FLAG_DEFAULT;
+	uint64_t flagmask = csc_argv_alphanumbits_fromstr("rwx");
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, flagmask);
+	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE|FLAG_EXEC));
+}
+
+static void test_flags8()
+{
+	char const * a[] =
+	{
+	"-x",
+	"-r",
+	"-w",
+	NULL,
+	};
+	uint32_t perm = FLAG_DEFAULT;
+	uint64_t flagmask = csc_argv_alphanumbits_fromstr("r");
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, flagmask);
+	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ));
 }
 
 
-void test_mixing()
+
+static void test_expanded()
 {
-	int permission;
-	int x;
-	struct csc_argv_option option[] =
+	char const * a[] =
 	{
-	{.character = 'r', .name = "read",     .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_READ,  .description = "The permission read flag"},
-	{.character = 'w', .name = "write",    .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_WRITE, .description = "The permission write flag"},
-	{.character = 'x', .name = "exec",     .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_EXEC,  .description = "The permission exec flag"},
-	{.character = 'x', .name = "exec",     .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_EXEC2, .description = "The permission exec2 flag"},
-	{.character = 'x', .name = "x",        .type = CSC_ARGV_TYPE_INT,  .value = &x, .description = "The x value"},
-	{.type = CSC_ARGV_TYPE_END}};
-
-	permission = FLAG_DEFAULT;
-	x = 0;
-	csc_argv_parse (option, "-x1", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_EXEC|FLAG_EXEC2));
-	ASSERT (x == 1);
-
-	permission = FLAG_DEFAULT;
-	x = 0;
-	csc_argv_parse (option, "-x999", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_EXEC|FLAG_EXEC2));
-	ASSERT (x == 999);
-
-	permission = FLAG_DEFAULT;
-	x = 0;
-	csc_argv_parse (option, "-x 999", csc_argv_build_flags (option));
-	csc_argv_parse (option, "-wr", csc_argv_build_flags (option));
-	ASSERT (permission == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE|FLAG_EXEC|FLAG_EXEC2));
-	ASSERT (x == 999);
-}
-
-
-void test_printing()
-{
-	float F = 0.0f;
-	double D = 0.0;
-	char * S = NULL;
-	char * filename = "Default";
-	long j = 0;
-	int permission = FLAG_DEFAULT|FLAG_EXEC2|FLAG_READ;
-	int x = 123;
-	struct csc_argv_option option[] =
-	{
-	{.type = CSC_ARGV_TYPE_GROUP, .description = "Basic group"},
-	{.character = 'S', .name = "String",   .type = CSC_ARGV_TYPE_STRING,    .value = &S, .description = "The string value"},
-	{.character = 'F', .name = "Float",    .type = CSC_ARGV_TYPE_FLOAT,     .value = &F, .description = "The float value"},
-	{.character = 'D', .name = "Double",   .type = CSC_ARGV_TYPE_DOUBLE,    .value = &D, .description = "The double value"},
-	{.character = 'f', .name = "filename", .type = CSC_ARGV_TYPE_STRING,    .value = &filename, .description = "The filename value"},
-	{.character = 'j', .name = "threads",  .type = CSC_ARGV_TYPE_LONG,      .value = &j, .description = "The number of threads value"},
-	{.type = CSC_ARGV_TYPE_GROUP, .description = "Permission bits"},
-	{.character = 'r', .name = "read",     .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_READ, .description = "The permission value"},
-	{.character = 'w', .name = "write",    .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_WRITE, .description = "The permission value"},
-	{.character = 'x', .name = "exec",     .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_EXEC, .description = "The permission value"},
-	{.character = 'x', .name = "exec",     .type = CSC_ARGV_TYPE_INT,  .value = &permission, .flag.val_int = FLAG_EXEC2, .description = "The permission value"},
-	{.character = 'x', .name = "exec",     .type = CSC_ARGV_TYPE_INT,       .value = &x, .description = "The permission value"},
-	{.type = CSC_ARGV_TYPE_END}
-};
-	csc_argv_print_description (option);
-	csc_argv_print_value (option);
+	"-xX",
+	"--read",
+	"-h",
+	"-a",
+	"192.168.0.1:4000",
+	NULL,
+	};
+	char * address = NULL;
+	int threads = 0;
+	uint32_t perm = 0;
+	struct csc_argv_option o[] ={
+	CSC_ARGV_DEFINE_GROUP("Options"),
+	{'a', "address", CSC_TYPE_STRING, &address, 0, "The address"},
+	{'j', "threads", CSC_TYPE_INT, &threads, 0, "Number of threads"},
+	{'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, "Read"},
+	CSC_ARGV_DEFINE_GROUP("Permissions"),
+	{'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, "Write"},
+	{'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, "Exec"},
+	{'X', "exec2", CSC_TYPE_U32, &perm, FLAG_EXEC2, "Exec2"},
+	CSC_ARGV_END};
+csc_argv_parseall(a, o);
+	csc_argv_description0 (o, stdout);
+	csc_argv_description1 (o, stdout);
 }
 
 
@@ -228,11 +246,39 @@ int main (int argc, char const * argv [])
 	ASSERT (argc);
 	ASSERT (argv);
 
-	test_strings();
-	test_numbers();
-	test_bitfield();
-	test_mixing();
-	test_printing();
+
+	test_float1();
+	test_float2();
+	test_float3();
+	test_string1();
+	test_string2();
+	test_string3();
+	test_flags1();
+	test_flags2();
+	test_flags3();
+	test_flags4();
+	test_flags5();
+	test_flags6();
+	test_flags7();
+	test_flags8();
+	test_expanded();
+
+	/*
+	char const * a [4] =
+	{
+	"--duration=3",
+	NULL,
+	};
+	float value = 1.0f;
+	uint32_t perm = 0;
+	uint64_t flagmask = csc_argv_alphanumbits_fromstr("rw");
+	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0, 0);
+	ASSERT (value == 3.0);
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	*/
+
+
 
 	return EXIT_SUCCESS;
 }

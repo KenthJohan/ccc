@@ -27,6 +27,13 @@
 
 enum csc_type
 {
+	CSC_TYPE_NONE,
+	CSC_TYPE_STRING,
+	CSC_TYPE_CHAR,
+	CSC_TYPE_INT,
+	CSC_TYPE_LONG,
+	CSC_TYPE_FLOAT,
+	CSC_TYPE_DOUBLE,
 	CSC_TYPE_U8,
 	CSC_TYPE_U16,
 	CSC_TYPE_U32,
@@ -40,12 +47,38 @@ enum csc_type
 
 
 	CSC_TYPE_V4F32,
-
-
 	CSC_TYPE_RGBA8888,
-
 	CSC_TYPE_TEXTURE2D,
+
+
+
+	CSC_TYPE_RESERVED0 = 10000,
 };
+
+
+
+
+
+union csc_union
+{
+	char const * val_string;
+	float val_float;
+	double val_double;
+	int val_int;
+	long val_long;
+	char val_char;
+	uint8_t val_u8;
+	uint16_t val_u16;
+	uint32_t val_u32;
+	uint64_t val_u64;
+	uintmax_t val_umax;
+	int8_t val_i8;
+	int16_t val_i16;
+	int32_t val_i32;
+	int64_t val_i64;
+	intmax_t val_imax;
+};
+
 
 
 

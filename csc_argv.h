@@ -7,9 +7,11 @@
 #include <ctype.h>
 #include <inttypes.h>
 
-#ifndef ASSERT
-#define ASSERT(x)
-#endif
+#include "csc_basic.h"
+#include "csc_debug.h"
+#include "csc_type_str.h"
+
+
 
 static uint64_t csc_argv_alphanumbits (char a)
 {
@@ -35,6 +37,7 @@ static uint64_t csc_argv_alphanumbits (char a)
 
 static uint64_t csc_argv_alphanumbits_fromstr (char const * str)
 {
+	ASSERT_PARAM_NOTNULL (str);
 	uint64_t set = 0;
 	while (*str)
 	{
@@ -46,8 +49,183 @@ static uint64_t csc_argv_alphanumbits_fromstr (char const * str)
 }
 
 
+static void csc_argv_convert_flag (enum csc_type type, union csc_union * dst, uint64_t flag)
+{
+	ASSERT_PARAM_NOTNULL (dst);
+	switch (type)
+	{
+	case CSC_TYPE_U8:
+		dst->val_u8 |= flag;
+		break;
+	case CSC_TYPE_U16:
+		dst->val_u16 |= flag;
+		break;
+	case CSC_TYPE_U32:
+		dst->val_u32 |= flag;
+		break;
+	case CSC_TYPE_U64:
+		dst->val_u64 |= flag;
+		break;
+	default:
+		break;
+	}
+}
+
+
+static void csc_argv_convert_value (enum csc_type type, union csc_union * dst, char const * src)
+{
+	ASSERT_PARAM_NOTNULL (dst);
+	ASSERT_PARAM_NOTNULL (src);
+	char * endptr = NULL;
+	switch (type)
+	{
+	case CSC_TYPE_STRING:
+		dst->val_string = src;
+		break;
+	case CSC_TYPE_FLOAT:
+		dst->val_float = strtod (src, &endptr);
+		break;
+	case CSC_TYPE_DOUBLE:
+		dst->val_double = strtod (src, &endptr);
+		break;
+	case CSC_TYPE_U8:
+		dst->val_u8 = strtoumax (src, &endptr, 0);
+		break;
+	case CSC_TYPE_U16:
+		dst->val_u16 = strtoumax (src, &endptr, 0);
+		break;
+	case CSC_TYPE_U32:
+		dst->val_u32 = strtoumax (src, &endptr, 0);
+		break;
+	case CSC_TYPE_U64:
+		dst->val_u64 = strtoumax (src, &endptr, 0);
+		break;
+	case CSC_TYPE_INT:
+		dst->val_int = strtoimax (src, &endptr, 0);
+		break;
+	case CSC_TYPE_LONG:
+		dst->val_long = strtoimax (src, &endptr, 0);
+		break;
+	case CSC_TYPE_I8:
+		dst->val_i8 = strtoimax (src, &endptr, 0);
+		break;
+	case CSC_TYPE_I16:
+		dst->val_i16 = strtoimax (src, &endptr, 0);
+		break;
+	case CSC_TYPE_I32:
+		dst->val_i32 = strtoimax (src, &endptr, 0);
+		break;
+	case CSC_TYPE_I64:
+		dst->val_i64 = strtoimax (src, &endptr, 0);
+		break;
+	default:
+		break;
+	}
+}
+
+
+static void csc_argv_parse (char const * argv[], char name_char, char const * name_str, enum csc_type type, void * dst, uint64_t setflag, uint64_t flags)
+{
+	ASSERT_PARAM_NOTNULL (argv);
+	ASSERT_PARAM_NOTNULL (name_str);
+	ASSERT_PARAM_NOTNULL (dst);
+	char const * s;
+	argv--;
+again:
+	argv++;
+	s = argv[0];
+	if (s == NULL) {return;}
+	if (s[0] != '-') {goto again;}
+
+	// Possible cases: {--read, --write, --year=2, --name=Bob}:
+	if (s[1] == '-')
+	{
+		int len = strlen (name_str);
+		int diff = strncmp (s+2, name_str, len);
+		if (diff){goto again;}
+		s += len + 2 + 1; //Make s the value
+		// Possible cases: {--year=2, --name=Bob}:
+		if (s[-1] == '=')
+		{
+			csc_argv_convert_value (type, dst, s);
+			return;
+		}
+		// Possible cases: {--read, --write}:
+		else if (s[-1] == '\0' && setflag)
+		{
+			csc_argv_convert_flag (type, dst, setflag);
+			return;
+		}
+	}
+	// Possible cases: {-rw, -rWarren}:
+	else if (setflag)
+	{
+		uint64_t a = csc_argv_alphanumbits_fromstr (s+1);
+		if ((a & flags) == 0) {goto again;}
+		if ((csc_argv_alphanumbits (name_char) & a) == 0) {goto again;}
+		csc_argv_convert_flag (type, dst, setflag);
+		return;
+	}
+	// Possible cases: {-aHello, -a Hello}:
+	else if (s[1] == name_char)
+	{
+		if (s[2]){s += 2;}
+		else if (argv[1]) {s = argv[1];}
+		else {goto again;}
+		csc_argv_convert_value (type, dst, s);
+		return;
+	}
+	goto again;
+}
+
+
+
+
+
+
+
+//Expanded functionality:
+enum csc_argv_type
+{
+	CSC_ARGV_GROUP = CSC_TYPE_RESERVED0
+};
+#define CSC_ARGV_END {0, NULL, CSC_TYPE_NONE, NULL, 0, NULL}
+#define CSC_ARGV_DEFINE_GROUP(x) {0, NULL, (enum csc_type)CSC_ARGV_GROUP, NULL, 0, x}
+
+
+struct csc_argv_option
+{
+	char c;
+	char const * s;
+	enum csc_type t;
+	void * v;
+	uint64_t f;
+	char * d;
+};
+
+
+static void csc_argv_parseall (char const * argv[], struct csc_argv_option * options)
+{
+	ASSERT_PARAM_NOTNULL (argv);
+	ASSERT_PARAM_NOTNULL (options);
+	uint64_t flagmask = 0;
+	for (struct csc_argv_option * o = options; o->t != CSC_TYPE_NONE; ++o)
+	{
+		flagmask |= csc_argv_alphanumbits (o->c);
+	}
+	for (struct csc_argv_option * o = options; o->t != CSC_TYPE_NONE; ++o)
+	{
+		if (o->t != CSC_ARGV_GROUP)
+		{
+			csc_argv_parse (argv, o->c, o->s, o->t, o->v, o->f, flagmask);
+		}
+	}
+}
+
+
 static void csc_argv_flag_get_str (uint64_t flag, char buf[64])
 {
+	ASSERT_PARAM_NOTNULL (buf);
 	unsigned i = 0;
 	for (char a = 'a'; a <= 'z'; ++a)
 	{
@@ -76,67 +254,65 @@ static void csc_argv_flag_get_str (uint64_t flag, char buf[64])
 }
 
 
-enum csc_argv_type
+static void csc_argv_description0 (struct csc_argv_option const * option, FILE * f)
 {
-	CSC_ARGV_TYPE_END,
-	CSC_ARGV_TYPE_GROUP,
-	CSC_ARGV_TYPE_STRING,
-	CSC_ARGV_TYPE_FLOAT,
-	CSC_ARGV_TYPE_DOUBLE,
-	CSC_ARGV_TYPE_INT,
-	CSC_ARGV_TYPE_LONG,
-	CSC_ARGV_TYPE_U8,
-	CSC_ARGV_TYPE_U16,
-	CSC_ARGV_TYPE_U32,
-	CSC_ARGV_TYPE_U64,
-	CSC_ARGV_TYPE_I8,
-	CSC_ARGV_TYPE_I16,
-	CSC_ARGV_TYPE_I32,
-	CSC_ARGV_TYPE_I64,
-	/*
-	CSC_ARGV_TYPE_FLAG_INT,
-	CSC_ARGV_TYPE_FLAG_LONG,
-	CSC_ARGV_TYPE_FLAG_U8,
-	CSC_ARGV_TYPE_FLAG_U16,
-	CSC_ARGV_TYPE_FLAG_U32,
-	CSC_ARGV_TYPE_FLAG_U64,
-	CSC_ARGV_TYPE_FLAG_I8,
-	CSC_ARGV_TYPE_FLAG_I16,
-	CSC_ARGV_TYPE_FLAG_I32,
-	CSC_ARGV_TYPE_FLAG_I64,
-	*/
-};
+	ASSERT_PARAM_NOTNULL (option);
+	ASSERT_PARAM_NOTNULL (f);
+	fputc ('\n', f);
+	for (struct csc_argv_option const * o = option; o->t != CSC_TYPE_NONE; ++o)
+	{
+		switch (o->t)
+		{
+		case CSC_ARGV_GROUP:
+			fprintf (stdout, "%s\n", o->d);
+			break;
+		default:
+			fprintf (f, " -%c --%-20.20s: %s (%s)\n", o->c, o->s, o->d, csc_type_tostr (o->t));
+			break;
+		}
+	}
+	fputc ('\n', f);
+}
 
 
-union csc_argv_value
+static void csc_argv_description1 (struct csc_argv_option const * option, FILE * f)
 {
-	char const * val_string;
-	float val_float;
-	double val_double;
-	int val_int;
-	long val_long;
-	uint8_t val_u8;
-	uint16_t val_u16;
-	uint32_t val_u32;
-	uint64_t val_u64;
-	uintmax_t val_umax;
-	int8_t val_i8;
-	int16_t val_i16;
-	int32_t val_i32;
-	int64_t val_i64;
-	intmax_t val_imax;
-};
+	ASSERT_PARAM_NOTNULL (option);
+	ASSERT_PARAM_NOTNULL (f);
+	fputc ('\n', stdout);
+	for (struct csc_argv_option const * o = option; o->t != CSC_TYPE_NONE; ++o)
+	{
+		switch (o->t)
+		{
+		case CSC_ARGV_GROUP:
+			fprintf (stdout, "%s\n", o->d);
+			break;
+		default:
+			fprintf (stdout, " -%c --%-20.20s", o->c, o->s);
+			break;
+		}
+		if (o->f == 0)
+		{
+			csc_type_print (o->t, o->v, f);
+		}
+		else
+		{
+			csc_type_printflag (o->t, o->v, o->f);
+		}
+
+	}
+	fputc ('\n', stdout);
+}
 
 
-struct csc_argv_option
-{
-	char character;
-	char const * name;
-	enum csc_argv_type type;
-	void * value;
-	union csc_argv_value flag;
-	char const * description;
-};
+
+
+
+
+
+
+
+/*
 
 
 static uint64_t csc_argv_build_flags (struct csc_argv_option const * option)
@@ -184,7 +360,6 @@ static char const * csc_argv_type_tostr (enum csc_argv_type t)
 	case CSC_ARGV_TYPE_I64:return "i64";
 	case CSC_ARGV_TYPE_FLOAT:return "float";
 	case CSC_ARGV_TYPE_DOUBLE:return "double";
-		/*
 	case CSC_ARGV_TYPE_FLAG_INT:return "flag_int";
 	case CSC_ARGV_TYPE_FLAG_LONG:return "flag_long";
 	case CSC_ARGV_TYPE_FLAG_U8:return "flag_u8";
@@ -195,7 +370,7 @@ static char const * csc_argv_type_tostr (enum csc_argv_type t)
 	case CSC_ARGV_TYPE_FLAG_I16:return "flag_i16";
 	case CSC_ARGV_TYPE_FLAG_I32:return "flag_i32";
 	case CSC_ARGV_TYPE_FLAG_I64:return "flag_i64";
-		*/
+
 	default:return "unknown";
 	}
 }
@@ -412,42 +587,60 @@ void csc_argv_print_value (struct csc_argv_option const * option)
 }
 
 
-static int csc_argv_parse (struct csc_argv_option const * option, char const * arg, uint64_t flags)
+
+static int csc_argv_parse (struct csc_argv_option const * option, char const * arg0, char const * arg1, uint64_t flags)
 {
 	int errorcode = 0;
-	if (arg[0] != '-'){return 1;}
-	if (arg[1] == '\0'){return 1;}
 	char * endptr = NULL;
-	char const * strvalue = arg + 2;
-	while (strvalue[0] == ' '){strvalue++;}
+	char const * strvalue;
+
+	if (arg0[0] != '-'){return 1;}
+	if (arg0[1] == '\0'){return 1;}
+	if (arg0[1] == '-')
+	{
+
+	}
+
+	strvalue = arg0 + 2;
+
+	if (strvalue[0] == ' ')
+	{
+		if (arg1 == NULL){return errorcode;}
+		if (isalnum (arg1[0]) == 0){return errorcode;}
+		strvalue = arg1;
+	}
 	for (struct csc_argv_option const * o = option; o->type != CSC_ARGV_TYPE_END; ++o)
 	{
-		if (arg[1] == '-')
+		if (arg0[1] == '-')
 		{
 			if (o->name == NULL){continue;}
-			if (arg[2] == '\0'){continue;}
+			if (arg0[2] == '\0'){continue;}
 			int len = strlen (o->name);
-			if (strncmp (o->name, arg+2, len)){continue;}
+			if (strncmp (o->name, arg0+2, len)){continue;}
 			//--name=strvalue, +2 for double dash (--), +len for longname length, +1 for equal sign (=)
-			strvalue = arg + 2 + len + 1;
+			strvalue = arg0 + 2 + len + 1;
 			if ((o->flag.val_umax == 0) && (strvalue[-1] != '=')){continue;}
+			if ((o->flag.val_umax != 0) && (strvalue[-1] != '='))
+			{
+				csc_argv_convert_flag (o->type, o->value, o->flag);
+				continue;
+			}
 		}
 		else if (o->character == 0){continue;}
-		else if (o->flag.val_umax == 0 && arg[1] != o->character){continue;};
+		else if (o->flag.val_umax == 0 && arg0[1] != o->character){continue;};
 
-
+		//When this option is a flag:
 		if (o->flag.val_umax != 0)
 		{
 			//Check e.g. "r" against "wr".
-			uint64_t a = csc_argv_alphanumbits (arg[1]);
-			uint64_t b = csc_argv_alphanumbits_fromstr (arg+1);
+			uint64_t a = csc_argv_alphanumbits (arg0[1]);
+			if ((a & flags) == 0) {continue;} //Make sure the first arg char is a flag.
+			uint64_t b = csc_argv_alphanumbits_fromstr (arg0+1);
 			uint64_t c = csc_argv_alphanumbits (o->character);
-			if ((a & b & c & flags) == 0)
-			{
-				continue;
-			}
+			if ((b & c & flags) == 0) {continue;} //Check if current option matches any char in arg
 			csc_argv_convert_flag (o->type, o->value, o->flag);
 		}
+		//When this option is not a flag:
 		else
 		{
 			union csc_argv_value value;
@@ -512,7 +705,7 @@ int csc_argv_parsev (struct csc_argv_option const option[], char const * argv[])
 	uint64_t flags = csc_argv_build_flags (option);
 	for (char const ** a = argv; *a != NULL; ++a)
 	{
-		if (csc_argv_parse (option, *a, flags))
+		if (csc_argv_parse (option, a[0], a[1], flags))
 		{
 			errorcode = 1;
 		};
@@ -520,6 +713,6 @@ int csc_argv_parsev (struct csc_argv_option const option[], char const * argv[])
 	return errorcode;
 }
 
-
+*/
 
 
