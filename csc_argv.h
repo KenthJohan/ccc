@@ -137,39 +137,45 @@ again:
 	if (s == NULL) {return;}
 	if (s[0] != '-') {goto again;}
 
-	// Possible cases: {--read, --write, --year=2, --name=Bob}:
+	//Handles long names: e.g: {"--read", "--write", "--year=2", "--name=Bob"}:
 	if (s[1] == '-')
 	{
+		//Compare the long argument name with the long option name:
 		int len = strlen (name_str);
 		int diff = strncmp (s+2, name_str, len);
 		if (diff){goto again;}
-		s += len + 2 + 1; //Make s the value
-		// Possible cases: {--year=2, --name=Bob}:
+		//Point s to the value:
+		s += len + 2 + 1;
+		//Handles long name with values: e.g: {"--year=2", "--name=Bob"}:
 		if (s[-1] == '=')
 		{
 			csc_argv_convert_value (type, dst, s);
 			return;
 		}
-		// Possible cases: {--read, --write}:
+		//Handles long name for flags: e.g: {"--read", "--write"}:
 		else if (s[-1] == '\0' && setflag)
 		{
 			csc_argv_convert_flag (type, dst, setflag);
 			return;
 		}
 	}
-	// Possible cases: {-rw, -rWarren}:
+	//Handles short names for flags: e.g: {"-x", "-rw", -rWarren}:
 	else if (setflag)
 	{
+		//Make sure every character in the argument is part of a flag:
 		uint64_t a = csc_argv_alphanumbits_fromstr (s+1);
 		if ((a & flags) == 0) {goto again;}
+		//Check if this flag matches a character in the argument:
 		if ((csc_argv_alphanumbits (name_char) & a) == 0) {goto again;}
 		csc_argv_convert_flag (type, dst, setflag);
 		return;
 	}
-	// Possible cases: {-aHello, -a Hello}:
+	//Handles short names for values: e.g: {"-aHello", "-a", "Hello"}:
 	else if (s[1] == name_char)
 	{
+		//Check if value exist in current argument:
 		if (s[2]){s += 2;}
+		//Check if the value exist in the next argument:
 		else if (argv[1]) {s = argv[1];}
 		else {goto again;}
 		csc_argv_convert_value (type, dst, s);
@@ -190,7 +196,7 @@ enum csc_argv_type
 	CSC_ARGV_GROUP = CSC_TYPE_RESERVED0
 };
 #define CSC_ARGV_END {0, NULL, CSC_TYPE_NONE, NULL, 0, NULL}
-#define CSC_ARGV_DEFINE_GROUP(x) {0, NULL, (enum csc_type)CSC_ARGV_GROUP, NULL, 0, x}
+#define CSC_ARGV_DEFINE_GROUP(x) {0, NULL, (enum csc_type)CSC_ARGV_GROUP, NULL, 0, (x)}
 
 
 struct csc_argv_option
@@ -267,7 +273,14 @@ static void csc_argv_description0 (struct csc_argv_option const * option, FILE *
 			fprintf (stdout, "%s\n", o->d);
 			break;
 		default:
-			fprintf (f, " -%c --%-20.20s: %s (%s)\n", o->c, o->s, o->d, csc_type_tostr (o->t));
+			if (o->f)
+			{
+				fprintf (f, " -%c --%-20.20s: [%s] %s\n", o->c, o->s, csc_type_tostr (o->t), o->d);
+			}
+			else
+			{
+				fprintf (f, " -%c --%-20.20s: (%s) %s\n", o->c, o->s, csc_type_tostr (o->t), o->d);
+			}
 			break;
 		}
 	}

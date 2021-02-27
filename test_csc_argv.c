@@ -212,29 +212,24 @@ static void test_flags8()
 
 static void test_expanded()
 {
-	char const * a[] =
-	{
-	"-xX",
-	"--read",
-	"-h",
-	"-a",
-	"192.168.0.1:4000",
-	NULL,
-	};
+	char const * a[] ={"-xX","--read","-h","-a","192.168.0.1:4000",NULL};
 	char * address = NULL;
 	int threads = 0;
 	uint32_t perm = 0;
-	struct csc_argv_option o[] ={
+	struct csc_argv_option o[] =
+	{
 	CSC_ARGV_DEFINE_GROUP("Options"),
 	{'a', "address", CSC_TYPE_STRING, &address, 0, "The address"},
 	{'j', "threads", CSC_TYPE_INT, &threads, 0, "Number of threads"},
-	{'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, "Read"},
 	CSC_ARGV_DEFINE_GROUP("Permissions"),
+	{'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, "Read"},
 	{'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, "Write"},
 	{'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, "Exec"},
 	{'X', "exec2", CSC_TYPE_U32, &perm, FLAG_EXEC2, "Exec2"},
-	CSC_ARGV_END};
-csc_argv_parseall(a, o);
+	CSC_ARGV_END
+};
+//
+csc_argv_parseall (a, o);
 	csc_argv_description0 (o, stdout);
 	csc_argv_description1 (o, stdout);
 }
