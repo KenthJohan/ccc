@@ -10,43 +10,14 @@
 #include "csc_basic.h"
 #include "csc_debug.h"
 #include "csc_type_str.h"
+#include "csc_base64set.h"
 
 
 
-static uint64_t csc_argv_alphanumbits (char a)
-{
-	uint64_t o = 0;
-	if ('a' <= a && a <= 'z')
-	{
-		o = a - 'a' + 0;
-		o = UINT64_C(1) << o;
-	}
-	if ('A' <= a && a <= 'Z')
-	{
-		o = a - 'A' + 26;
-		o = UINT64_C(1) << o;
-	}
-	if ('0' <= a && a <= '9')
-	{
-		o = a - 'A' + 26 + 26;
-		o = UINT64_C(1) << o;
-	}
-	return o;
-}
 
 
-static uint64_t csc_argv_alphanumbits_fromstr (char const * str)
-{
-	ASSERT_PARAM_NOTNULL (str);
-	uint64_t set = 0;
-	while (*str)
-	{
-		uint64_t a = csc_argv_alphanumbits (*str);
-		set |= a;
-		str++;
-	}
-	return set;
-}
+
+
 
 
 static void csc_argv_convert_flag (enum csc_type type, union csc_union * dst, uint64_t flag)
@@ -163,10 +134,10 @@ again:
 	else if (setflag)
 	{
 		//Make sure every character in the argument is part of a flag:
-		uint64_t a = csc_argv_alphanumbits_fromstr (s+1);
+		uint64_t a = csc_base64set_fromstr (s+1);
 		if ((a & flags) == 0) {goto again;}
 		//Check if this flag matches a character in the argument:
-		if ((csc_argv_alphanumbits (name_char) & a) == 0) {goto again;}
+		if ((csc_base64set_fromchar (name_char) & a) == 0) {goto again;}
 		csc_argv_convert_flag (type, dst, setflag);
 		return;
 	}
@@ -217,44 +188,13 @@ static void csc_argv_parseall (char const * argv[], struct csc_argv_option * opt
 	uint64_t flagmask = 0;
 	for (struct csc_argv_option * o = options; o->t != CSC_TYPE_NONE; ++o)
 	{
-		flagmask |= csc_argv_alphanumbits (o->c);
+		flagmask |= csc_base64set_fromchar (o->c);
 	}
 	for (struct csc_argv_option * o = options; o->t != CSC_TYPE_NONE; ++o)
 	{
 		if (o->t != CSC_ARGV_GROUP)
 		{
 			csc_argv_parse (argv, o->c, o->s, o->t, o->v, o->f, flagmask);
-		}
-	}
-}
-
-
-static void csc_argv_flag_get_str (uint64_t flag, char buf[64])
-{
-	ASSERT_PARAM_NOTNULL (buf);
-	unsigned i = 0;
-	for (char a = 'a'; a <= 'z'; ++a)
-	{
-		if (flag & csc_argv_alphanumbits(a))
-		{
-			buf[i] = a;
-			i++;
-		}
-	}
-	for (char a = 'A'; a <= 'Z'; ++a)
-	{
-		if (flag & csc_argv_alphanumbits(a))
-		{
-			buf[i] = a;
-			i++;
-		}
-	}
-	for (char a = '0'; a <= '0'; ++a)
-	{
-		if (flag & csc_argv_alphanumbits(a))
-		{
-			buf[i] = a;
-			i++;
 		}
 	}
 }
