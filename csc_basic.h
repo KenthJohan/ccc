@@ -25,6 +25,12 @@
 
 #define BITS_SUBSET(a,b) ((a) & (b))
 
+
+enum csc_status
+{
+	CSC_STATUS_COMPILED
+};
+
 enum csc_type
 {
 	CSC_TYPE_NONE,
@@ -44,19 +50,11 @@ enum csc_type
 	CSC_TYPE_I64,
 	CSC_TYPE_F32,
 	CSC_TYPE_F64,
-
-
 	CSC_TYPE_V4F32,
 	CSC_TYPE_RGBA8888,
 	CSC_TYPE_TEXTURE2D,
-
-
-
 	CSC_TYPE_RESERVED0 = 10000,
 };
-
-
-
 
 
 union csc_union
