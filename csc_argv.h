@@ -120,13 +120,13 @@ again:
 		//Handles long name with values: e.g: {"--year=2", "--name=Bob"}:
 		if (s[-1] == '=')
 		{
-			csc_argv_convert_value (type, dst, s);
+			csc_argv_convert_value (type, (union csc_union*)dst, s);
 			return;
 		}
 		//Handles long name for flags: e.g: {"--read", "--write"}:
 		else if (s[-1] == '\0' && setflag)
 		{
-			csc_argv_convert_flag (type, dst, setflag);
+			csc_argv_convert_flag (type, (union csc_union*)dst, setflag);
 			return;
 		}
 	}
@@ -138,7 +138,7 @@ again:
 		if ((a & flags) == 0) {goto again;}
 		//Check if this flag matches a character in the argument:
 		if ((csc_base64set_fromchar (name_char) & a) == 0) {goto again;}
-		csc_argv_convert_flag (type, dst, setflag);
+		csc_argv_convert_flag (type, (union csc_union*)dst, setflag);
 		return;
 	}
 	//Handles short names for values: e.g: {"-aHello", "-a", "Hello"}:
@@ -149,7 +149,7 @@ again:
 		//Check if the value exist in the next argument:
 		else if (argv[1]) {s = argv[1];}
 		else {goto again;}
-		csc_argv_convert_value (type, dst, s);
+		csc_argv_convert_value (type, (union csc_union*)dst, s);
 		return;
 	}
 	goto again;
@@ -177,7 +177,7 @@ struct csc_argv_option
 	enum csc_type t;
 	void * v;
 	uint64_t f;
-	char * d;
+	char const * d;
 };
 
 
