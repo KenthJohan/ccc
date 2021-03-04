@@ -17,7 +17,7 @@ static void GLAPIENTRY csc_sdlglew_gldebug_callback
 	fprintf (stderr, "[OPENGL_DEBUG] %s\n", message);
 	if (severity == GL_DEBUG_SEVERITY_HIGH)
 	{
-		fprintf (stderr, "Aborting...\n");
+		fprintf (stderr, "[CRITICAL] Aborting...\n");
 		abort();
 	}
 }
@@ -29,21 +29,21 @@ void csc_sdlglew_create_window (SDL_Window ** window, SDL_GLContext * context, c
 {
 	if (SDL_Init (SDL_INIT_VIDEO) != 0)
 	{
-		fprintf (stderr, "There was an error initializing the SDL library: %s\n", SDL_GetError());
+		fprintf (stderr, "[ERROR] There was an error initializing the SDL library: %s\n", SDL_GetError());
 		exit (1);
 	}
 
 	(*window) = SDL_CreateWindow (title, x, y, w, h, flags);
 	if ((*window) == NULL)
 	{
-		fprintf (stderr, "Could not create SDL_Window: %s\n", SDL_GetError());
+		fprintf (stderr, "[ERROR] Could not create SDL_Window: %s\n", SDL_GetError());
 		exit (1);
 	}
 
 	(*context) = SDL_GL_CreateContext (*window);
 	if ((*context) == NULL)
 	{
-		fprintf (stderr, "Could not create SDL_GLContext: %s\n", SDL_GetError());
+		fprintf (stderr, "[ERROR] Could not create SDL_GLContext: %s\n", SDL_GetError());
 		exit (1);
 	}
 
@@ -52,10 +52,10 @@ void csc_sdlglew_create_window (SDL_Window ** window, SDL_GLContext * context, c
 		GLenum err = glewInit();
 		if (GLEW_OK != err)
 		{
-			fprintf(stderr, "Error: %s\n", glewGetErrorString (err));
+			fprintf(stderr, "[ERROR] %s\n", glewGetErrorString (err));
 			exit (1);
 		}
-		fprintf(stdout, "Status: Using GLEW %s\n", glewGetString (GLEW_VERSION));
+		fprintf(stdout, "[INFO] Using GLEW %s\n", glewGetString (GLEW_VERSION));
 	}
 
 	// Enable the debug callback
@@ -80,11 +80,27 @@ void csc_sdlglew_create_window (SDL_Window ** window, SDL_GLContext * context, c
 
 #define CSC_SDLGLEW_RUNNING    UINT32_C (0x00000001)
 #define CSC_SDLGLEW_FULLSCREEN UINT32_C (0x00000002)
+#define CSC_SDLGLEW_FULLSCREEN UINT32_C (0x00000002)
 
 void csc_sdlglew_event_loop (SDL_Window * window, SDL_Event * event, uint32_t * flags, struct csc_gcam * gcam)
 {
-	if (event->type == SDL_KEYDOWN)
+	switch (event->type)
 	{
+	case SDL_QUIT:
+		(*flags) &= ~CSC_SDLGLEW_RUNNING;
+		break;
+	case SDL_WINDOWEVENT:
+		if (event->window.event == SDL_WINDOWEVENT_RESIZED)
+		{
+			int w;
+			int h;
+			SDL_GetWindowSize (window, &w, &h);
+			gcam->w = w;
+			gcam->h = h;
+			glViewport (0, 0, w, h);
+			printf ("[INFO] SDL_WINDOWEVENT_RESIZED: %i %i\n", w, h);
+		}
+	case SDL_KEYDOWN:
 		switch (event->key.keysym.sym)
 		{
 		case SDLK_ESCAPE:
@@ -101,24 +117,11 @@ void csc_sdlglew_event_loop (SDL_Window * window, SDL_Event * event, uint32_t * 
 			{
 				SDL_SetWindowFullscreen (window, SDL_WINDOW_OPENGL);
 			}
-			if(1)
-			{
-				int w;
-				int h;
-				SDL_GetWindowSize (window, &w, &h);
-				gcam->w = w;
-				gcam->h = h;
-				glViewport (0, 0, w, h);
-			}
-			break;
 			break;
 
 		default:
 			break;
 		}
-	}
-	else if (event->type == SDL_QUIT)
-	{
-		(*flags) &= ~CSC_SDLGLEW_RUNNING;
+		break;
 	}
 }
