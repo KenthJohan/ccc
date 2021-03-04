@@ -37,6 +37,16 @@ static void v3f32_cross (v3f32 r, v3f32 const a, v3f32 const b)
 }
 
 
+float v3f32_dot (v3f32 const a, v3f32 const b)
+{
+	float sum = 0;
+	sum += a[0] * b[0];
+	sum += a[1] * b[1];
+	sum += a[2] * b[2];
+	return sum;
+}
+
+
 static void v3f32_crossacc (v3f32 r, v3f32 const a, v3f32 const b)
 {
 	r[0] += a[1] * b[2] - a[2] * b[1];
