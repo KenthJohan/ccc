@@ -12,17 +12,20 @@ static uint64_t csc_base64set_fromchar (char a)
 	uint64_t o = 0;
 	if ('a' <= a && a <= 'z')
 	{
-		o = a - 'a' + 0;
+		o -= 'a';
+		o += 0;
 		o = UINT64_C(1) << o;
 	}
 	if ('A' <= a && a <= 'Z')
 	{
-		o = a - 'A' + 26;
+		o -= 'A';
+		o += 26;
 		o = UINT64_C(1) << o;
 	}
 	if ('0' <= a && a <= '9')
 	{
-		o = a - 'A' + 26 + 26;
+		o -= '0';
+		o += 26+26;
 		o = UINT64_C(1) << o;
 	}
 	return o;
