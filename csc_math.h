@@ -716,7 +716,13 @@ uint32_t vf32_skip_zero (float q[], uint32_t qn, uint32_t * qi)
 }
 
 
-
+/**
+ * @brief Find peaks.
+ * @param q[in,out] The array
+ * @param qn[in]    Number of elements in \p q
+ * @param g[out]    The index where the peak is located
+ * @param gn[in]    Number of elements in \p g
+ */
 void vf32_find_peaks (float q[], uint32_t qn, uint32_t g[], uint32_t gn, uint32_t r, uint32_t margin)
 {
 	for (uint32_t gi = 0; gi < gn; ++gi)
@@ -740,6 +746,14 @@ void vf32_find_peaks (float q[], uint32_t qn, uint32_t g[], uint32_t gn, uint32_
 		}
 	}
 }
+
+
+
+
+
+
+
+
 
 
 
