@@ -9,26 +9,25 @@
 
 static uint64_t csc_base64set_fromchar (char a)
 {
-	uint64_t o = 0;
 	if ('a' <= a && a <= 'z')
 	{
-		o -= 'a';
-		o += 0;
-		o = UINT64_C(1) << o;
+		a -= 'a';
+		a += 0;
+		return UINT64_C(1) << a;
 	}
 	if ('A' <= a && a <= 'Z')
 	{
-		o -= 'A';
-		o += 26;
-		o = UINT64_C(1) << o;
+		a -= 'A';
+		a += 26;
+		return UINT64_C(1) << a;
 	}
 	if ('0' <= a && a <= '9')
 	{
-		o -= '0';
-		o += 26+26;
-		o = UINT64_C(1) << o;
+		a -= '0';
+		a += 26+26;
+		return UINT64_C(1) << a;
 	}
-	return o;
+	return 0;
 }
 
 

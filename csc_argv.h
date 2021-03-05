@@ -137,7 +137,8 @@ again:
 		uint64_t a = csc_base64set_fromstr (s+1);
 		if ((a & flags) == 0) {goto again;}
 		//Check if this flag matches a character in the argument:
-		if ((csc_base64set_fromchar (name_char) & a) == 0) {goto again;}
+		uint64_t b = csc_base64set_fromchar (name_char);
+		if ((b & a) == 0) {goto again;}
 		csc_argv_convert_flag (type, (union csc_union*)dst, setflag);
 		return;
 	}
