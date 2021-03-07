@@ -1,4 +1,7 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/*
+SPDX-License-Identifier: GPL-2.0
+SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@gmail.com>
+*/
 #pragma once
 
 //Matrix can be stored in column major or row major.
