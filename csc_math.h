@@ -797,7 +797,7 @@ void mf32_symmetric_xxt (uint32_t dim, float m[], uint32_t m_stride, float x[], 
 }
 
 
-void vf32_move_center_to_zero (uint32_t dim, float x[], uint32_t ldx, float y[], uint32_t ldy, uint32_t n, float mean[3])
+void vf32_move_center_to_zero (uint32_t dim, float const x[], uint32_t ldx, float y[], uint32_t ldy, uint32_t n, float mean[3])
 {
 	memset (mean, 0, sizeof (float)*dim);
 	//Calculate the (mean) coordinate from (v):
