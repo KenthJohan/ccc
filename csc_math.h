@@ -818,5 +818,15 @@ void mf32_get_covariance (uint32_t dim, float v[], uint32_t v_stride, uint32_t n
 
 
 
+static float f32_lerp1 (float a, float b, float t)
+{
+	return a + t * (b - a);
+}
+
+
+static float f32_lerp2 (float a, float b, float t)
+{
+	return (1 - t) * a + t * b;
+}
 
 
