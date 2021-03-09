@@ -225,5 +225,6 @@ pacman -S mingw-w64-x86_64-cmake
 mingw32-make -j4
 mingw32-make test
 mingw32-make install
+cp libmosquitto.dll.a C:\msys64\mingw64\lib\libmosquitto.dll.a
 ```
 
