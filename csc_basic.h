@@ -6,7 +6,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <stddef.h> //offsetof
 #include <stdint.h> //offsetof
 
-
+#define UNUSED(x) (void)(x)
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
 //#define INSIDE(x, a, b) ((a) <= (x) && (x) <= (b))

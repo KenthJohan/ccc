@@ -170,8 +170,8 @@ enum csc_argv_type
 {
 	CSC_ARGV_GROUP = CSC_TYPE_RESERVED0
 };
-#define CSC_ARGV_END {0, NULL, CSC_TYPE_NONE, NULL, 0, NULL}
-#define CSC_ARGV_DEFINE_GROUP(x) {0, NULL, (enum csc_type)CSC_ARGV_GROUP, NULL, 0, (x)}
+#define CSC_ARGV_END 0, NULL, CSC_TYPE_NONE, NULL, 0, NULL
+#define CSC_ARGV_DEFINE_GROUP(x) 0, NULL, (enum csc_type)CSC_ARGV_GROUP, NULL, 0, (x)
 
 
 struct csc_argv_option
