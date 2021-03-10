@@ -221,3 +221,26 @@ static void qf32_ypr (qf32 q, float yaw, float pitch, float roll) // yaw (Z), pi
 	q[3] = cr * cp * cy + sr * sp * sy;
 }
 
+
+//http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+static uint32_t qf32_from_m4 (qf32 q, m4f32 m)
+{
+	q[3] = sqrtf(1.0f + m[M4_00] + m[M4_11] + m[M4_22]) / 2.0f;
+	float w4 = (4.0f * q[3]);
+	q[0] = (m[M4_21] - m[M4_12]) / w4;
+	q[1] = (m[M4_02] - m[M4_20]) / w4;
+	q[2] = (m[M4_10] - m[M4_01]) / w4;
+}
+
+
+//http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+static uint32_t qf32_from_m3 (qf32 q, m3f32 m)
+{
+	q[3] = sqrtf(1.0f + m[M3_00] + m[M3_11] + m[M3_22]) / 2.0f;
+	float w4 = (4.0f * q[3]);
+	q[0] = (m[M3_21] - m[M3_12]) / w4;
+	q[1] = (m[M3_02] - m[M3_20]) / w4;
+	q[2] = (m[M3_10] - m[M3_01]) / w4;
+}
+
+

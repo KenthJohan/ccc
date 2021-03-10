@@ -11,6 +11,19 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include "csc_basic.h"
 
 
+//Column 0
+#define M3_00 0
+#define M3_10 1
+#define M3_20 2
+//Column 1
+#define M3_01 3
+#define M3_11 4
+#define M3_21 5
+//Column 2
+#define M3_02 6
+#define M3_12 7
+#define M3_22 8
+
 typedef float m4f32[16];
 typedef float m3f32[9];
 typedef float v2f32[2];
@@ -828,5 +841,21 @@ static float f32_lerp2 (float a, float b, float t)
 {
 	return (1 - t) * a + t * b;
 }
+
+
+
+static float vf32_avg (uint32_t n, float v[])
+{
+	ASSERT (n > 0);
+	float sum = 0.0f;
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		sum += v[i];
+	}
+	return sum / n;
+}
+
+
+
 
 
