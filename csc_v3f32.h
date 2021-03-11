@@ -124,3 +124,4 @@ static void mv3f32_mul (v3f32 y, m3f32 const a, v3f32 const b)
 	mvf32_macc (r, a, b, 3, 3);
 	memcpy (y, r, sizeof (r));
 }
+

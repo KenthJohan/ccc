@@ -156,7 +156,7 @@ static float vvf32_dot (unsigned n, float const a [], float const b [])
 }
 
 
-static void vsf32_macc (float vy[], float const vx[], float sb, unsigned n)
+static void vsf32_macc (unsigned n, float vy[], float const vx[], float sb)
 {
 	for (unsigned i = 0; i < n; ++i)
 	{
@@ -169,7 +169,7 @@ static void mvf32_macc (float vy[], float const ma[], float const vx[], unsigned
 {
 	for (unsigned i = 0; i < cn; ++i)
 	{
-		vsf32_macc (vy, ma, vx [i], rn);
+		vsf32_macc (rn, vy, ma, vx [i]);
 		ma += rn;
 	}
 }
@@ -786,7 +786,7 @@ void mf32_symmetric_xxt (uint32_t dim, float m[], uint32_t m_stride, float x[], 
 	{
 		for (uint32_t j = 0; j < dim; ++j)
 		{
-			vsf32_macc (m + m_stride*j, x, x[j], dim);
+			vsf32_macc (dim, m + m_stride*j, x, x[j]);
 		}
 
 
