@@ -362,3 +362,5 @@ static float m4f32_glu_inv (m4f32 r, m4f32 const m)
 
 	return det;
 }
+
+
