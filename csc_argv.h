@@ -208,7 +208,7 @@ static void csc_argv_parseall (char const * argv[], struct csc_argv_option * opt
 	//Go through all options:
 	for (struct csc_argv_option * o = options; o->t != CSC_TYPE_NONE; ++o)
 	{
-		if (o->t != CSC_ARGV_GROUP)
+		if (o->t != (enum csc_type)CSC_ARGV_GROUP)
 		{
 			csc_argv_parse (argv, o->c, o->s, o->t, o->v, o->f, flagmask);
 		}
