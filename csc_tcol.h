@@ -13,8 +13,10 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 //ANSI text color escape string formatter
 #define TCOL(text, foreground, background) \
-"\x1B[" TCOL_STR (text) ";3" TCOL_STR (foreground) ";4" TCOL_STR (background) "m"
+"\e[" TCOL_STR (text) ";3" TCOL_STR (foreground) ";4" TCOL_STR (background) "m"
 
+#define TCOLF(x) "\e[38;5;" x "m"
+#define TCOLB(x) "\e[48;5;" x "m"
 
 //Used for text attributes
 #define TCOL_NORMAL       0
@@ -39,4 +41,4 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 //Default text color used in terminals
 //#define TCOL_DEFAULT TCOL (TCOL_NORMAL, TCOL_DEFAULT, TCOL_DEFAULT)
-#define TCOL_RST "\x1B[0m"
+#define TCOL_RST "\e[0m"

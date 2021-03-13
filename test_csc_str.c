@@ -1,51 +1,27 @@
-#include "csc_str.h"
+#include "csc_basic.h"
+#include "csc_tcol.h"
+#include "csc_crossos.h"
 
+#include <stdio.h>
 
 
 int main (int argc, char * argv [])
 {
-	ASSERT (argc);
-	ASSERT (argv);
+	UNUSED (argc);
+	UNUSED (argv);
+	csc_crossos_enable_ansi_color();
 
+	for (int i = 0; i < 0xFF; ++i)
 	{
-		char * a = "2Hello";
-		char * p = a;
-		intmax_t i = str_to_imax (&p, 10);
-		ASSERT (i == 2);
-		ASSERT ((p - a) == 1);
+		if ((i % 0xF) == 0) {printf ("\n");}
+		printf (TCOLF("%i") "%02x" TCOL_RST, i, i);
 	}
-
+	printf ("\n");
+	for (int i = 0; i < 0xFF; ++i)
 	{
-		char * a = "ABC123XYX";
-		char * p = a;
-		intmax_t i = str_to_imax (&p, 10);
-		ASSERT (i == 0);
-		ASSERT ((p - a) == 0);
+		if ((i % 0xF) == 0) {printf ("\n");}
+		printf (TCOLB("%i") "%02x" TCOL_RST, i, i);
 	}
-
-	{
-		char * a = "ABC123XYX";
-		char * p = a;
-		intmax_t i = str_to_imax (&p, 16);
-		ASSERT (i == 0xABC123);
-		ASSERT ((p - a) == 6);
-	}
-
-	{
-		char * a = "-123-";
-		char * p = a;
-		intmax_t i = str_to_imax (&p, 10);
-		ASSERT (i == -123);
-		ASSERT ((p - a) == 4);
-	}
-
-	{
-		char * a = "+123-";
-		char * p = a;
-		intmax_t i = str_to_imax (&p, 10);
-		ASSERT (i == 123);
-		ASSERT ((p - a) == 4);
-	}
-
-	return EXIT_SUCCESS;
+	printf ("\n");
+	return 0;
 }
