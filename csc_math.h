@@ -6,6 +6,8 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 #include <stdio.h>
 #include <stdint.h>
+#include <float.h>
+#include <limits.h>
 #include <math.h>
 #include "csc_debug.h"
 #include "csc_basic.h"
@@ -915,5 +917,33 @@ static float vf32_avg (uint32_t n, float v[])
 
 
 
+static float vf32_max (uint32_t n, float v[])
+{
+	ASSERT (n >= 1);
+	float max = v[0];
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		if (v[i] > max)
+		{
+			max = v[i];
+		}
+	}
+	return max;
+}
 
+
+static float vf32_maxabs (uint32_t n, float v[])
+{
+	ASSERT (n >= 1);
+	float max = v[0];
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		float x = fabs(v[i]);
+		if (x > max)
+		{
+			max = x;
+		}
+	}
+	return max;
+}
 

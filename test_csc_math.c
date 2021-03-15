@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <assert.h>
+#include <float.h>
 #include "csc_math.h"
 
 
@@ -17,6 +18,8 @@
 
 int main(int argc, char * argv[])
 {
+	UNUSED (argc);
+	UNUSED (argv);
 	float a[ARN*ACN] =
 	{
 	1.0f, 2.0f, 3.0f, 4.0f,

@@ -24,6 +24,12 @@ static void m3f32_mul (m3f32 y, m3f32 const a, m3f32 const b)
 }
 
 
+static void m3f32_sub (m3f32 y, m3f32 const a, m3f32 const b)
+{
+	vvf32_sub (3*3, y, a, b);
+}
+
+
 static void m3f32_rotate_z (m3f32 r, float angle)
 {
 	float s = sinf (angle);
