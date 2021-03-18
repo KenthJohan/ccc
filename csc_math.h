@@ -211,6 +211,15 @@ static void vf32_cpy (unsigned n, float des [], float const src [])
 }
 
 
+static void vu32_cpy (unsigned n, uint32_t des [], uint32_t const src [])
+{
+	while (n--)
+	{
+		des [n] = src [n];
+	}
+}
+
+
 // r := a + b
 static void vvf32_add (unsigned n, float r [], float const a [], float const b [])
 {
