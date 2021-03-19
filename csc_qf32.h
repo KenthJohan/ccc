@@ -143,7 +143,7 @@ static void qf32_rotate_vector_fixthis (qf32 u, v3f32 y)
 {
 	v3f32 v;
 	v3f32_cpy (v, y);
-	float uv = vvf32_dot (3, u, v);
+	float uv = vf32_dot (3, u, v);
 	float ww = u[3] * u[3];
 	vf32_set1 (3, y, 0.0f);
 	vsf32_macc (3, y, u, 2.0f * uv);

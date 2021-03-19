@@ -6,6 +6,8 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 #include <stdint.h>
 #include "csc_math.h"
+#include "csc_vf32.h"
+#include "csc_mf32.h"
 
 #define V4F32_FORMAT "(%f %f %f %f)\n"
 #define V4F32_ARGS(x) (x)[0], (x)[1], (x)[2], (x)[3]
@@ -54,7 +56,7 @@ static void v4f32_normalize (v4f32 r, v4f32 const a)
 
 static float v4f32_norm2 (v4f32 const a)
 {
-	return vvf32_dot (4, a, a);
+	return vf32_dot (4, a, a);
 }
 
 

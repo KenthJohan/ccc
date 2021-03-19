@@ -87,9 +87,9 @@ static int v3f32_ray_sphere_intersect (v3f32 p, v3f32 d, v3f32 sc, float sr, flo
 	float m [3];
 	vvf32_sub (3, p, sc, m);
 	//float b = Dot(m, d);
-	float b = vvf32_dot (3, m, d);
+	float b = vf32_dot (3, m, d);
 	//float c = Dot(m, m) - s.r * s.r;
-	float c = vvf32_dot (3, m, m) - (sr * sr);
+	float c = vf32_dot (3, m, m) - (sr * sr);
 
 	// Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0)
 	if (c > 0.0f && b > 0.0f) {return 0;}
