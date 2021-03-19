@@ -64,21 +64,21 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define M4_23 14
 #define M4_33 15
 
-static void m4f32_mul (m4f32 y, m4f32 const a, m4f32 const b)
+static void m4f32_mul (struct m4f32 * y, struct m4f32 const * a, struct m4f32 const * b)
 {
-	m4f32 r = {0.0f};
-	mmf32_macc (r, a, b, 4, 4, 4);
-	memcpy (y, r, sizeof (r));
+	struct m4f32 r = {0.0f};
+	mmf32_macc (&r, a, b, 4, 4, 4);
+	memcpy (y, &r, sizeof (r));
 }
 
 
-static void m4f32_print (m4f32 m, FILE * f)
+static void m4f32_print (struct m4f32 const * m, FILE * f)
 {
 	mf32_print (m, 4, 4, f);
 }
 
 
-static void m4f32_set (m4f32 m, float c)
+static void m4f32_set (struct m4f32 * m, float c)
 {
 	mf32_set (m, c, 16);
 }
@@ -86,122 +86,136 @@ static void m4f32_set (m4f32 m, float c)
 
 // 4x4 matrix identity
 // M := I
-static void m4f32_identity (m4f32 m)
+static void m4f32_identity (struct m4f32 * m)
 {
 	m4f32_set (m, 0);
-	m [M4_00] = 1.0f;
-	m [M4_11] = 1.0f;
-	m [M4_22] = 1.0f;
-	m [M4_33] = 1.0f;
+	m->m11 = 1.0f;
+	m->m22 = 1.0f;
+	m->m33 = 1.0f;
+	m->m44 = 1.0f;
 }
 
 
-static void m4f32_translation (m4f32 m, v3f32 const t)
+static void m4f32_translation (struct m4f32 * m, v3f32 const t)
 {
 	//Translation vector in 4th column
-	m [M4_03] = t [0];
-	m [M4_13] = t [1];
-	m [M4_23] = t [2];
+	m->m14 = t [0];
+	m->m24 = t [1];
+	m->m34 = t [2];
 }
 
 
-static void m4f32_set_columns (m4f32 m, v4f32 const x, v4f32 const y, v4f32 const z, v4f32 const w)
+static void m4f32_set_columns (struct m4f32 * m, v4f32 const x, v4f32 const y, v4f32 const z, v4f32 const w)
 {
-	m [M4_00] = x [0];
-	m [M4_10] = x [1];
-	m [M4_20] = x [2];
-	m [M4_20] = x [3];
-
-	m [M4_01] = y [0];
-	m [M4_11] = y [1];
-	m [M4_21] = y [2];
-	m [M4_21] = y [3];
-
-	m [M4_02] = z [0];
-	m [M4_12] = z [1];
-	m [M4_22] = z [2];
-	m [M4_22] = z [3];
-
-	m [M4_03] = w [0];
-	m [M4_13] = w [1];
-	m [M4_23] = w [2];
-	m [M4_23] = w [3];
+	m->m11 = x [0];
+	m->m21 = x [1];
+	m->m31 = x [2];
+	m->m41 = x [3];
+	m->m12 = y [0];
+	m->m22 = y [1];
+	m->m32 = y [2];
+	m->m42 = y [3];
+	m->m13 = z [0];
+	m->m23 = z [1];
+	m->m33 = z [2];
+	m->m43 = z [3];
+	m->m14 = w [0];
+	m->m24 = w [1];
+	m->m34 = w [2];
+	m->m44 = w [3];
 }
 
 
-static void m4f32_translation_xyz (m4f32 m, float x, float y, float z)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static void m4f32_translation_xyz (struct m4f32 * m, float x, float y, float z)
 {
 	//Translation vector in 4th column
-	m [M4_03] = x;
-	m [M4_13] = y;
-	m [M4_23] = z;
+	m->m14 = x;
+	m->m24 = y;
+	m->m34 = z;
 }
 
 
-static void m4f32_scale_xyz (m4f32 m, float x, float y, float z)
+static void m4f32_scale_xyz (struct m4f32 * m, float x, float y, float z)
 {
-	m [M4_00] = x;
-	m [M4_11] = y;
-	m [M4_22] = z;
+	m->m11 = x;
+	m->m22 = y;
+	m->m33 = z;
 }
 
 
-static void m4f32_scale (m4f32 m, v3f32 s)
+static void m4f32_scale (struct m4f32 * m, v3f32 s)
 {
-	m [M4_00] = s[0];
-	m [M4_11] = s[1];
-	m [M4_22] = s[2];
+	m->m11 = s[0];
+	m->m22 = s[1];
+	m->m33 = s[2];
 }
 
 
-static void m4f32_frustum (m4f32 m, float l, float r, float b, float t, float n, float f)
+static void m4f32_frustum (struct m4f32 * m, float l, float r, float b, float t, float n, float f)
 {
 	//Column vector 1:
-	m [0] = (2.0f * n) / (r - l);
-	m [1] = 0.0f;
-	m [2] = 0.0f;
-	m [3] = 0.0f;
+	m->m11 = (2.0f * n) / (r - l);
+	m->m21 = 0.0f;
+	m->m31 = 0.0f;
+	m->m41 = 0.0f;
 	//Column vector 2:
-	m [4] = 0.0f;
-	m [5] = (2 * n) / (t - b);
-	m [6] = 0.0f;
-	m [7] = 0.0f;
+	m->m12 = 0.0f;
+	m->m22 = (2 * n) / (t - b);
+	m->m32 = 0.0f;
+	m->m42 = 0.0f;
 	//Column vector 3:
-	m [8] = (r + l) / (r - l);
-	m [9] = (t + b) / (t - b);
-	m [10] = (-f - n) / (f - n);
-	m [11] = -1.0f;
+	m->m13 = (r + l) / (r - l);
+	m->m23 = (t + b) / (t - b);
+	m->m33 = (-f - n) / (f - n);
+	m->m43 = -1.0f;
 	//Column vector 4:
-	m [12] = 0.0f;
-	m [13] = 0.0f;
-	m [14] = (-2 * f * n) / (f - n);
-	m [15] = 0.0f;
+	m->m14 = 0.0f;
+	m->m24 = 0.0f;
+	m->m34 = (-2 * f * n) / (f - n);
+	m->m44 = 0.0f;
 }
 
 
-static void m4f32_perspective1 (m4f32 m, float fov, float aspect, float n, float f)
+static void m4f32_perspective1 (struct m4f32 * m, float fov, float aspect, float n, float f)
 {
 	float a = 1.0f / tan (fov / 2.0f);
 	//Column vector 1:
-	m[0] = a / aspect;
-	m[1] = 0.0f;
-	m[2] = 0.0f;
-	m[3] = 0.0f;
+	m->m11 = a / aspect;
+	m->m21 = 0.0f;
+	m->m31 = 0.0f;
+	m->m41 = 0.0f;
 	//Column vector 2:
-	m[4] = 0.0f;
-	m[5] = a;
-	m[6] = 0.0f;
-	m[7] = 0.0f;
+	m->m12 = 0.0f;
+	m->m22 = a;
+	m->m32 = 0.0f;
+	m->m42 = 0.0f;
 	//Column vector 3:
-	m[8] = 0.0f;
-	m[9] = 0.0f;
-	m[10] = -((f + n) / (f - n));
-	m[11] = -1.0f;
+	m->m13 = 0.0f;
+	m->m23 = 0.0f;
+	m->m33 = -((f + n) / (f - n));
+	m->m43 = -1.0f;
 	//Column vector 4:
-	m[12] = 0.0f;
-	m[13] = 0.0f;
-	m[14] = -((2.0f * f * n) / (f - n));
-	m[15] = 0.0f;
+	m->m14 = 0.0f;
+	m->m24 = 0.0f;
+	m->m34 = -((2.0f * f * n) / (f - n));
+	m->m44 = 0.0f;
 }
 
 
@@ -213,9 +227,9 @@ static void m4f32_ortho ()
 
 // 4x4 matrix inversion (glu version)
 // R := M^(-1)
-static float m4f32_glu_inv (m4f32 r, m4f32 const m)
+static float m4f32_glu_inv (float r[16], float m[16])
 {
-	m4f32 t;
+	float t[16];
 
 	t[0] =
 	m[5]  * m[10] * m[15] -

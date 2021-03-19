@@ -78,13 +78,13 @@ static void v4f32_set_xyzw (v4f32 v, float x, float y, float z, float w)
 
 
 
-static void mv4f32_macc (v4f32 y, m4f32 const a, v4f32 const b)
+static void mv4f32_macc (v4f32 y, struct m4f32 const * a, v4f32 const b)
 {
 	mvf32_macc (y, a, b, 4, 4);
 }
 
 
-static void mv4f32_mul (v4f32 y, m4f32 const a, v4f32 const b)
+static void mv4f32_mul (v4f32 y, struct m4f32 const * a, v4f32 const b)
 {
 	float r[4] = {0.0f};
 	mvf32_macc (r, a, b, 4, 4);
@@ -92,7 +92,7 @@ static void mv4f32_mul (v4f32 y, m4f32 const a, v4f32 const b)
 }
 
 
-static void mv4f32_macc_transposed (v4f32 y, m4f32 const a, v4f32 const b)
+static void mv4f32_macc_transposed (v4f32 y, struct m4f32 const * a, v4f32 const b)
 {
 	mvf32_macc_transposed (y, a, b, 4, 4);
 }

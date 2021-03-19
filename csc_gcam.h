@@ -13,6 +13,8 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 
 
+
+
 struct csc_gcam
 {
 	v4f32 d;//Delta
@@ -24,10 +26,10 @@ struct csc_gcam
 	float f;//Far
 	v3f32 pyrd; //Euler angles
 	qf32 q;//Quaternion rotation
-	m4f32 mr;//Rotation matrix
-	m4f32 mt;//Translation matrix
-	m4f32 mp;//Projection matrix
-	m4f32 mvp;//View-Projection matrix
+	struct m4f32 mr;//Rotation matrix
+	struct m4f32 mt;//Translation matrix
+	struct m4f32 mp;//Projection matrix
+	struct m4f32 mvp;//View-Projection matrix
 };
 
 
@@ -47,10 +49,10 @@ void csc_gcam_init (struct csc_gcam * cam)
 	cam->n = 0.1f;
 	cam->f = 10000.0f;
 	qf32_identity (cam->q);
-	m4f32_identity (cam->mp);
-	m4f32_identity (cam->mt);
-	m4f32_identity (cam->mp);
-	m4f32_identity (cam->mvp);
+	m4f32_identity (&cam->mp);
+	m4f32_identity (&cam->mt);
+	m4f32_identity (&cam->mp);
+	m4f32_identity (&cam->mvp);
 }
 
 
@@ -59,8 +61,8 @@ void csc_gcam_update (struct csc_gcam * cam)
 	qf32 q_pitch;//Quaternion pitch rotation
 	qf32 q_yaw;//Quaternion yaw rotation
 	qf32 q_roll;//Quaternion roll rotation
-	m4f32_identity (cam->mvp);
-	m4f32_identity (cam->mt);
+	m4f32_identity (&cam->mvp);
+	m4f32_identity (&cam->mt);
 	//qf32_identity (cam->q);
 	//cam->pitch += cam->pitchd;
 	//cam->yaw += cam->yawd;
@@ -86,16 +88,19 @@ void csc_gcam_update (struct csc_gcam * cam)
 	//qf32_mul (cam->q, cam->q, q);
 
 	qf32_normalize (cam->q, cam->q); //Normalize quaternion against floating point error
-	m4f32_identity (cam->mr);
-	qf32_m4 (cam->mr, cam->q); //Convert quaternion to rotation matrix
-	mv4f32_macc_transposed (cam->p, cam->mr, cam->d); //Accumulate the position in the direction relative to the rotation
-	m4f32_translation (cam->mt, cam->p); //Create translation matrix
-	m4f32_perspective1 (cam->mp, cam->fov, cam->w/cam->h, cam->n, cam->f); //Create perspective matrix
+	m4f32_identity (&cam->mr);
+	qf32_m4 (&cam->mr, cam->q); //Convert quaternion to rotation matrix
+	mv4f32_macc_transposed (cam->p, &cam->mr, cam->d); //Accumulate the position in the direction relative to the rotation
+	m4f32_translation (&cam->mt, cam->p); //Create translation matrix
+	m4f32_perspective1 (&cam->mp, cam->fov, cam->w/cam->h, cam->n, cam->f); //Create perspective matrix
 
-	m4f32_mul (cam->mvp, cam->mt, cam->mvp); //Apply translation
-	m4f32_mul (cam->mvp, cam->mr, cam->mvp); //Apply rotation
-	m4f32_mul (cam->mvp, cam->mp, cam->mvp); //Apply perspective
-	//mf32_print (view, 4, 4, stdout);
+	m4f32_mul (&cam->mvp, &cam->mt, &cam->mvp); //Apply translation
+	m4f32_mul (&cam->mvp, &cam->mr, &cam->mvp); //Apply rotation
+	m4f32_mul (&cam->mvp, &cam->mp, &cam->mvp); //Apply perspective
+	//printf("\e[1;1H\e[2J");
+	//mf32_print (&cam->mt, 4, 4, stdout);
+	//mf32_print (&cam->mr, 4, 4, stdout);
+	//mf32_print (&cam->mp, 4, 4, stdout);
 }
 
 
