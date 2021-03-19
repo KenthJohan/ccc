@@ -118,10 +118,10 @@ static int v3f32_ray_sphere_intersect (v3f32 p, v3f32 d, v3f32 sc, float sr, flo
 
 
 
-static void mv3f32_mul (v3f32 y, m3f32 const a, v3f32 const b)
+static void mv3f32_mul (v3f32 y, struct m3f32 const * a, v3f32 const b)
 {
 	float r[3] = {0.0f};
-	mvf32_macc (r, a, b, 3, 3);
+	mvf32_macc (r, (float const*)a, (float const*)b, 3, 3);
 	memcpy (y, r, sizeof (r));
 }
 

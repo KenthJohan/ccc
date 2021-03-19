@@ -67,20 +67,20 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 static void m4f32_mul (struct m4f32 * y, struct m4f32 const * a, struct m4f32 const * b)
 {
 	struct m4f32 r = {0.0f};
-	mmf32_macc (&r, a, b, 4, 4, 4);
+	mmf32_macc ((float *)&r, (float const*)a, (float const*)b, 4, 4, 4);
 	memcpy (y, &r, sizeof (r));
 }
 
 
 static void m4f32_print (struct m4f32 const * m, FILE * f)
 {
-	mf32_print (m, 4, 4, f);
+	mf32_print ((float const *)m, 4, 4, f);
 }
 
 
 static void m4f32_set (struct m4f32 * m, float c)
 {
-	mf32_set (m, c, 16);
+	mf32_set ((float*)m, c, 16);
 }
 
 

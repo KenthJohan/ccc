@@ -104,6 +104,7 @@ void csc_sdlglew_event_loop (SDL_Window * window, SDL_Event * event, uint32_t * 
 			glViewport (0, 0, w, h);
 			printf ("[INFO] SDL_WINDOWEVENT_RESIZED: %i %i\n", w, h);
 		}
+		break;
 	case SDL_KEYDOWN:
 		switch (event->key.keysym.sym)
 		{

@@ -9,6 +9,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include "csc_v3f32.h"
 #include "csc_v4f32.h"
 #include "csc_m4f32.h"
+#include "csc_m3f32.h"
 
 
 static void qf32_print (qf32 q, FILE * f)
@@ -234,13 +235,13 @@ static void qf32_from_m4 (qf32 q, struct m4f32 * m)
 
 
 //http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
-static void qf32_from_m3 (qf32 q, m3f32 m)
+static void qf32_from_m3 (qf32 q, struct m3f32 * m)
 {
-	q[3] = sqrtf(1.0f + m[M3_00] + m[M3_11] + m[M3_22]) / 2.0f;
+	q[3] = sqrtf(1.0f + m->m11 + m->m22 + m->m33) / 2.0f;
 	float w4 = (4.0f * q[3]);
-	q[0] = (m[M3_21] - m[M3_12]) / w4;
-	q[1] = (m[M3_02] - m[M3_20]) / w4;
-	q[2] = (m[M3_10] - m[M3_01]) / w4;
+	q[0] = (m->m32 - m->m21) / w4;
+	q[1] = (m->m13 - m->m31) / w4;
+	q[2] = (m->m21 - m->m12) / w4;
 }
 
 
