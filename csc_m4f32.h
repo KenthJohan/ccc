@@ -6,67 +6,64 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 #include <stdint.h>
 #include "csc_math.h"
-
-
-
-//Translation vector
-//Independent from row/col major
-#define M4_TX 12
-#define M4_TY 13
-#define M4_TZ 14
-#define M4_TW 15
-
-#define M4_T0 12
-#define M4_T1 13
-#define M4_T2 14
-#define M4_T3 15
-
-
-//Column vectors
-//Independent from row/col major
-#define M4_V0 0
-#define M4_V1 4
-#define M4_V2 8
-#define M4_V3 12
-
-#define M4_VX 0
-#define M4_VY 4
-#define M4_VZ 8
-#define M4_VT 12
-
-
-//Scale scalars
-//Independent from row/col major
-#define M4_S0 0
-#define M4_S1 5
-#define M4_S2 10
-#define M4_S3 15
+#include "csc_mf32.h"
 
 
 //Column 0
-#define M4_00 0
-#define M4_10 1
-#define M4_20 2
-#define M4_30 3
+#define M4_11 0
+#define M4_21 1
+#define M4_31 2
+#define M4_41 3
 //Column 1
-#define M4_01 4
-#define M4_11 5
-#define M4_21 6
-#define M4_31 7
+#define M4_12 4
+#define M4_22 5
+#define M4_32 6
+#define M4_42 7
 //Column 2
-#define M4_02 8
-#define M4_12 9
-#define M4_22 10
-#define M4_32 11
+#define M4_13 8
+#define M4_23 9
+#define M4_33 10
+#define M4_43 11
 //Column 3
-#define M4_03 12
-#define M4_13 13
-#define M4_23 14
-#define M4_33 15
+#define M4_14 12
+#define M4_24 13
+#define M4_34 14
+#define M4_44 15
+
+//                                 |--------Column1--------|--------Column2--------|--------Column2--------|--------Column3--------|
+#define M3F32_ZERO                 {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
+#define M3F32_IDENTITY             {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f}
+#define M3F32_DIAGONAL(x)          { (x), 0.0f, 0.0f, 0.0f, 0.0f,  (x), 0.0f, 0.0f, 0.0f, 0.0f,  (x), 0.0f, 0.0f, 0.0f, 0.0f,  (x)}
+#define M3F32_SCALE(x,y,z,w)       { (x), 0.0f, 0.0f, 0.0f, 0.0f,  (y), 0.0f, 0.0f, 0.0f, 0.0f,  (z), 0.0f, 0.0f, 0.0f, 0.0f,  (w)}
+#define M3F32_TRANSLATION(x,y,z)   {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  (x),  (y),  (z), 1.0f}
+
+
+struct m4f32
+{
+	float m11;
+	float m21;
+	float m31;
+	float m41;
+	float m12;
+	float m22;
+	float m32;
+	float m42;
+	float m13;
+	float m23;
+	float m33;
+	float m43;
+	float m14;
+	float m24;
+	float m34;
+	float m44;
+};
+
+
+
 
 static void m4f32_mul (struct m4f32 * y, struct m4f32 const * a, struct m4f32 const * b)
 {
-	struct m4f32 r = {0.0f};
+	struct m4f32 r = M3F32_ZERO;
 	mmf32_macc ((float *)&r, (float const*)a, (float const*)b, 4, 4, 4);
 	memcpy (y, &r, sizeof (r));
 }
