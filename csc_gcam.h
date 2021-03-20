@@ -24,7 +24,7 @@ struct csc_gcam
 	float h;//Height
 	float n;//Near
 	float f;//Far
-	v3f32 pyrd; //Euler angles
+	struct v3f32 pyrd; //Euler angles
 	qf32 q;//Quaternion rotation
 	struct m4f32 mr;//Rotation matrix
 	struct m4f32 mt;//Translation matrix
@@ -41,7 +41,9 @@ void csc_gcam_set_fov360(struct csc_gcam * cam, float angle360)
 
 void csc_gcam_init (struct csc_gcam * cam)
 {
-	v3f32_set_xyz (cam->pyrd, 0.0f, 0.0f, 0.0f);
+	cam->pyrd.x = 0.0f;
+	cam->pyrd.y = 0.0f;
+	cam->pyrd.z = 0.0f;
 	v4f32_set_xyzw (cam->p, 0.0f, 0.0f, 0.0f, 1.0f);
 	csc_gcam_set_fov360 (cam, 45.0f);
 	cam->w = 100.0f;
@@ -69,9 +71,9 @@ void csc_gcam_update (struct csc_gcam * cam)
 	//cam->roll += cam->rolld;
 	//qf32_ypr (cam->q, cam->yaw, cam->pitch, cam->roll);
 
-	qf32_xyza (q_pitch, 1.0f, 0.0f, 0.0f, cam->pyrd[0]);
-	qf32_xyza (q_yaw,   0.0f, 1.0f, 0.0f, cam->pyrd[1]);
-	qf32_xyza (q_roll,  0.0f, 0.0f, 1.0f, cam->pyrd[2]);
+	qf32_xyza (q_pitch, 1.0f, 0.0f, 0.0f, cam->pyrd.x);
+	qf32_xyza (q_yaw,   0.0f, 1.0f, 0.0f, cam->pyrd.y);
+	qf32_xyza (q_roll,  0.0f, 0.0f, 1.0f, cam->pyrd.z);
 	/*
 	qf32_mul (cam->q, q_pitch, cam->q); //Apply pitch rotation
 	qf32_mul (cam->q, q_roll, cam->q); //Apply roll rotation

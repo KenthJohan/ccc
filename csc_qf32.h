@@ -64,9 +64,9 @@ static void qf32_xyza (qf32 q, float x, float y, float z, float a)
 }
 
 
-static void qf32_axis_angle (qf32 q, v3f32 const v, float angle)
+static void qf32_axis_angle (qf32 q, struct v3f32 const * v, float angle)
 {
-	qf32_xyza (q, v[0], v[1], v[2], angle);
+	qf32_xyza (q, v->x, v->y, v->z, angle);
 }
 
 
@@ -138,11 +138,11 @@ void rotate_vector_by_quaternion(const Vector3& v, const Quaternion& q, Vector3&
 		  + (s*s - dot(u, u)) * v
 		  + 2.0f * s * cross(u, v);
 }
-*/
-static void qf32_rotate_vector_fixthis (qf32 u, v3f32 y)
+
+static void qf32_rotate_vector_fixthis (qf32 u, struct v3f32 y)
 {
-	v3f32 v;
-	v3f32_cpy (v, y);
+	struct v3f32 v;
+	v3f32_cpy (&v, y);
 	float uv = vf32_dot (3, u, v);
 	float ww = u[3] * u[3];
 	vf32_set1 (3, y, 0.0f);
@@ -150,7 +150,7 @@ static void qf32_rotate_vector_fixthis (qf32 u, v3f32 y)
 	vsf32_macc (3, y, v, ww - uv);
 	v3f32_crossacc_scalar (y, 2.0f * ww, u, v);
 }
-
+*/
 
 
 /*
@@ -159,25 +159,25 @@ Method by Fabian 'ryg' Giessen (of Farbrausch)
 t = 2 * cross(q.xyz, v)
 v' = v + q.w * t + cross(q.xyz, t)
 */
-static void qf32_rotate_vector (qf32 q, v3f32 const v, v3f32 r)
+static void qf32_rotate_vector (qf32 const q, struct v3f32 const * v, struct v3f32 * r)
 {
 	ASSERT (v != r);
-	v3f32 t;
-	v3f32 u = {q[0], q[1], q[2]};
-	v3f32_cross (t, q, v);
-	vsf32_mul (3, t, t, 2.0f);
-	v3f32_cross (u, q, t);
-	vsf32_mul (3, t, t, q[3]);
-	vvf32_add (3, r, v, t);
-	vvf32_add (3, r, r, u);
+	struct v3f32 t;
+	struct v3f32 u = {q[0], q[1], q[2]};
+	v3f32_cross (&t, (struct v3f32 *)q, v);
+	v3f32_mul (&t, &t, 2.0f);
+	v3f32_cross (&u, (struct v3f32 *)q, &t);
+	v3f32_mul (&t, &t, q[3]);
+	v3f32_add (r, v, &t);
+	v3f32_add (r, r, &u);
 }
 
 
-static void qf32_rotate_vector1 (qf32 q, v3f32 v)
+static void qf32_rotate_vector1 (qf32 q, struct v3f32 * v)
 {
-	float r[3];
-	qf32_rotate_vector (q, v, r);
-	vf32_cpy (3, v, r);
+	struct v3f32 r;
+	qf32_rotate_vector (q, v, &r);
+	v3f32_cpy (v, &r);
 }
 
 
