@@ -48,7 +48,15 @@ static void m4f32_identity (struct m4f32 * m)
 }
 
 
-static void m4f32_translation (struct m4f32 * m, struct v3f32 const * t)
+static void m4f32_translation3 (struct m4f32 * m, struct v3f32 const * t)
+{
+	//Translation vector in 4th column
+	m->m14 = t->x;
+	m->m24 = t->y;
+	m->m34 = t->z;
+}
+
+static void m4f32_translation4 (struct m4f32 * m, struct v4f32 const * t)
 {
 	//Translation vector in 4th column
 	m->m14 = t->x;

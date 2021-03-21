@@ -17,8 +17,8 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 struct csc_gcam
 {
-	struct v4f32 d;//Delta
-	struct v4f32 p;//Position
+	struct v3f32 d;//Delta
+	struct v3f32 p;//Position
 	float fov;//Field Of View
 	float w;//Width
 	float h;//Height
@@ -47,7 +47,6 @@ void csc_gcam_init (struct csc_gcam * cam)
 	cam->p.x = 0.0f;
 	cam->p.y = 0.0f;
 	cam->p.z = 0.0f;
-	cam->p.w = 0.0f;
 	csc_gcam_set_fov360 (cam, 45.0f);
 	cam->w = 100.0f;
 	cam->h = 100.0f;
@@ -95,8 +94,8 @@ void csc_gcam_update (struct csc_gcam * cam)
 	qf32_normalize (&cam->q, &cam->q); //Normalize quaternion against floating point error
 	m4f32_identity (&cam->mr);
 	qf32_m4 (&cam->mr, &cam->q); //Convert quaternion to rotation matrix
-	mv4f32_macc_transposed (&cam->p, &cam->mr, &cam->d); //Accumulate the position in the direction relative to the rotation
-	m4f32_translation (&cam->mt, &cam->p); //Create translation matrix
+	mv4f32_macc_transposed3 (&cam->p, &cam->mr, &cam->d); //Accumulate the position in the direction relative to the rotation
+	m4f32_translation3 (&cam->mt, &cam->p); //Create translation matrix
 	m4f32_perspective1 (&cam->mp, cam->fov, cam->w/cam->h, cam->n, cam->f); //Create perspective matrix
 
 	m4f32_mul (&cam->mvp, &cam->mt, &cam->mvp); //Apply translation

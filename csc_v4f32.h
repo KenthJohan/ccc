@@ -166,6 +166,14 @@ static void mv4f32_macc_transposed (struct v4f32 * y, struct m4f32 const * a, st
 }
 
 
+static void mv4f32_macc_transposed3 (struct v3f32 * y, struct m4f32 const * a, struct v3f32 * const b)
+{
+	y->x += (a->m11 * b->x) + (a->m21 * b->y) + (a->m31 * b->z);
+	y->y += (a->m12 * b->x) + (a->m22 * b->y) + (a->m32 * b->z);
+	y->z += (a->m13 * b->x) + (a->m23 * b->y) + (a->m33 * b->z);
+}
+
+
 
 
 
