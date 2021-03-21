@@ -19,8 +19,30 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 //typedef float m3f32[9];
 typedef float v2f32[2];
 //typedef float v3f32[3];
-typedef float v4f32[4];
-typedef float qf32[4];
+//typedef float v4f32[4];
+//typedef float qf32[4];
+
+#define QF32_ZERO {0.0f, 0.0f, 0.0f, 0.0f}
+#define QF32_REPEAT(x) {(x), (x), (x), (x)}
+struct qf32
+{
+	float x;
+	float y;
+	float z;
+	float w;
+};
+
+
+#define V4F32_ZERO {0.0f, 0.0f, 0.0f, 0.0f}
+#define V4F32_REPEAT(x) {(x), (x), (x), (x)}
+struct v4f32
+{
+	float x;
+	float y;
+	float z;
+	float w;
+};
+
 
 
 #define V3F32_ZERO {0.0f, 0.0f, 0.0f}

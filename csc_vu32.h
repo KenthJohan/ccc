@@ -96,3 +96,14 @@ static void vu32_linespace (uint32_t n, uint32_t x [], uint32_t x1, uint32_t x2)
 		a += d;
 	}
 }
+
+
+static void vu32_repeat_random_mask (unsigned n, uint32_t r [], uint32_t mask)
+{
+	for (unsigned i = 0; i < n; ++i)
+	{
+		uint32_t g = rand ();
+		g *= (UINT32_MAX / RAND_MAX);
+		r[i] = g & mask;
+	}
+}

@@ -10,12 +10,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <errno.h>
 #include "csc_tcol.h"
 
-//https://stackoverflow.com/questions/8487986/file-macro-shows-full-path
-#ifdef _WIN32
-#define CSC_RELATIVE_FILE (strrchr("\\" __FILE__, '\\') + 1)
-#else
-#define CSC_RELATIVE_FILE (strrchr("/" __FILE__, '/') + 1)
-#endif
+
 
 #define TRACE_TCOL_INFO0 TCOL (TCOL_NORMAL, TCOL_YELLOW, TCOL_DEFAULT)
 #define TRACE_TCOL_INFO1 TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT)
@@ -33,15 +28,30 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define ASSERT_TCOL6 TCOL (TCOL_BOLD, TCOL_RED, TCOL_DEFAULT)
 #define ASSERT_TCOLID TCOL (TCOL_NORMAL, TCOL_GREEN, TCOL_DEFAULT)
 
+
+/*
+	//https://stackoverflow.com/questions/8487986/file-macro-shows-full-path
+	#ifdef _WIN32
+	#define CSC_RELATIVE_FILE (strrchr("\\" __FILE__, '\\') + 1)
+	#else
+	#define CSC_RELATIVE_FILE (strrchr("/" __FILE__, '/') + 1)
+	#endif
+*/
+
+
 //https://gcc.gnu.org/onlinedocs/gcc/Variadic-Macros.html
 //http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2153.htm
-#define ASSERT_CARGS __COUNTER__, CSC_RELATIVE_FILE, __LINE__, __func__
+#define ASSERT_CARGS __COUNTER__, __FILE__, __LINE__, __func__
 
 #define ASSERT(A)               do{if(!(A)){assert_format(ASSERT_CARGS, #A, (NULL)             );}}while(0)
 #define ASSERTF(A, F, ...)      do{if(!(A)){assert_format(ASSERT_CARGS, #A, (F), ## __VA_ARGS__);}}while(0)
-#define ASSERT_NOTNULL(A) do{if((A)==NULL){assert_format(ASSERT_CARGS, NULL, "variable " ASSERT_TCOLID "%s" TCOL_RST " can not be NULL", #A, __func__);}}while(0)
-#define ASSERT_FALSE(A) do{if((A)==0){assert_format(ASSERT_CARGS, NULL, "variable " ASSERT_TCOLID "%s" TCOL_RST " can not be false", #A, __func__);}}while(0)
-#define ASSERT_PARAM_NOTNULL(A) do{if((A)==NULL){assert_format(ASSERT_CARGS, NULL, "parameter " ASSERT_TCOLID "%s" TCOL_RST " can not be NULL", #A, __func__);}}while(0)
+#define ASSERT_NOTNULL(A)       do{if((A)==NULL){assert_format(ASSERT_CARGS, NULL, "variable " ASSERT_TCOLID "%s" TCOL_RST " can not be NULL", #A);}}while(0)
+#define ASSERT_PTR_NEQ(A,B)     do{if((char*)(A)!=(char*)(b)){assert_format(ASSERT_CARGS, NULL, "pointer " ASSERT_TCOLID "%s" TCOL_RST " must not be equal " ASSERT_TCOLID "%s" TCOL_RST, #A);}}while(0)
+#define ASSERT_PTR_EQ(A,B)      do{if((char*)(A)==(char*)(b)){assert_format(ASSERT_CARGS, NULL, "pointer " ASSERT_TCOLID "%s" TCOL_RST " must be equal " ASSERT_TCOLID "%s" TCOL_RST, #A);}}while(0)
+#define ASSERT_PTR_LT(A,B)      do{if((char*)(A)<(char*)(b)){assert_format(ASSERT_CARGS, NULL, "pointer " ASSERT_TCOLID "%s" TCOL_RST " must be less than " ASSERT_TCOLID "%s" TCOL_RST, #A);}}while(0)
+#define ASSERT_PTR_GT(A,B)      do{if((char*)(A)>(char*)(b)){assert_format(ASSERT_CARGS, NULL, "pointer " ASSERT_TCOLID "%s" TCOL_RST " must be greater than " ASSERT_TCOLID "%s" TCOL_RST, #A);}}while(0)
+#define ASSERT_FALSE(A)         do{if((A)==0){assert_format(ASSERT_CARGS, NULL, "variable " ASSERT_TCOLID "%s" TCOL_RST " can not be false", #A);}}while(0)
+#define ASSERT_PARAM_NOTNULL(A) do{if((A)==NULL){assert_format(ASSERT_CARGS, NULL, "parameter " ASSERT_TCOLID "%s" TCOL_RST " can not be NULL", #A);}}while(0)
 #define ASSERT_ISPOW2(x)        ASSERTF((x & (x-1)) == 0, "The number %i must be a positive integer power of two", (int)(x))
 #define ASSERT_ISALIGN(x,a)     ASSERTF(((uintptr_t)(void const*)(x) % (a)) == 0, "The address %p must be align to %i, %u", (void const *)(x), (int)(a), (uintptr_t)(void const*)(x) % (a))
 
@@ -94,6 +104,11 @@ char const * fmt,
 ...
 )
 {
+#ifdef _WIN32
+	file = strrchr(file, '\\') + 1;
+#else
+	file = strrchr(file, '/') + 1;
+#endif
 	va_list va;
 	va_start (va, fmt);
 	assert_format_va (id, file, line, fn, exp, fmt, va);

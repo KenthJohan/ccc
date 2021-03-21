@@ -57,24 +57,24 @@ static void m4f32_translation (struct m4f32 * m, struct v3f32 const * t)
 }
 
 
-static void m4f32_set_columns (struct m4f32 * m, v4f32 const x, v4f32 const y, v4f32 const z, v4f32 const w)
+static void m4f32_set_columns (struct m4f32 * m, struct v4f32 const * x, struct v4f32 const * y, struct v4f32 const * z, struct v4f32 const * w)
 {
-	m->m11 = x [0];
-	m->m21 = x [1];
-	m->m31 = x [2];
-	m->m41 = x [3];
-	m->m12 = y [0];
-	m->m22 = y [1];
-	m->m32 = y [2];
-	m->m42 = y [3];
-	m->m13 = z [0];
-	m->m23 = z [1];
-	m->m33 = z [2];
-	m->m43 = z [3];
-	m->m14 = w [0];
-	m->m24 = w [1];
-	m->m34 = w [2];
-	m->m44 = w [3];
+	m->m11 = x->x;
+	m->m21 = x->y;
+	m->m31 = x->x;
+	m->m41 = x->w;
+	m->m12 = y->x;
+	m->m22 = y->y;
+	m->m32 = y->x;
+	m->m42 = y->w;
+	m->m13 = z->x;
+	m->m23 = z->y;
+	m->m33 = z->x;
+	m->m43 = z->w;
+	m->m14 = w->x;
+	m->m24 = w->y;
+	m->m34 = w->x;
+	m->m44 = w->w;
 }
 
 
@@ -112,11 +112,12 @@ static void m4f32_scale_xyz (struct m4f32 * m, float x, float y, float z)
 }
 
 
-static void m4f32_scale (struct m4f32 * m, struct v3f32 * s)
+static void m4f32_scale (struct m4f32 * m, struct v4f32 * s)
 {
 	m->m11 = s->x;
 	m->m22 = s->y;
 	m->m33 = s->z;
+	m->m44 = s->w;
 }
 
 
