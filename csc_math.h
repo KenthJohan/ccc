@@ -22,8 +22,7 @@ typedef float v2f32[2];
 //typedef float v4f32[4];
 //typedef float qf32[4];
 
-#define QF32_ZERO {0.0f, 0.0f, 0.0f, 0.0f}
-#define QF32_REPEAT(x) {(x), (x), (x), (x)}
+#define QF32_IDENTITY  {0.0f, 0.0f, 0.0f, 1.0f}
 struct qf32
 {
 	float x;

@@ -108,23 +108,23 @@ static void vf32_set4 (float v[], float v0, float v1, float v2, float v3)
 
 
 // r := a . b
-static float vf32_dot (unsigned n, float const a [], float const b [])
+static float vf32_dot (uint32_t n, float const a [], float const b [])
 {
 	float r = 0.0f;
-	while (n--)
+	for (uint32_t i = 0; i < n; ++i)
 	{
-		r += a [n] * b [n];
+		r += a[i] * b[i];
 	}
 	return r;
 }
 
 
 
-static void vf32_cpy (unsigned n, float des [], float const src [])
+static void vf32_cpy (uint32_t n, float des[], float const src[])
 {
 	for (uint32_t i = 0; i < n; ++i)
 	{
-		des [i] = src [i];
+		des[i] = src[i];
 	}
 }
 
@@ -152,11 +152,11 @@ static void vf32_decc (unsigned n, float r [], float const a [])
 
 
 // ret a > b
-static int vf32_gt (unsigned n, float const a [], float const b [])
+static int vf32_gt (uint32_t n, float const a [], float const b [])
 {
-	while (n--)
+	for (uint32_t i = 0; i < n; ++i)
 	{
-		if (a [n] <= b [n])
+		if (a[i] < b[i])
 		{
 			return 0;
 		}
@@ -166,11 +166,11 @@ static int vf32_gt (unsigned n, float const a [], float const b [])
 
 
 // ret a < b
-static int vf32_lt (unsigned n, float const a [], float const b [])
+static int vf32_lt (unsigned n, float const a[], float const b[])
 {
-	while (n--)
+	for (uint32_t i = 0; i < n; ++i)
 	{
-		if (a [n] <= b [n]) {return 0;}
+		if (a[i] < b[i]) {return 0;}
 	}
 	return 1;
 }
@@ -194,17 +194,17 @@ static void vf32_set1 (uint32_t n, float r [], float const b)
 {
 	for (uint32_t i = 0; i < n; ++i)
 	{
-		r [i] = b;
+		r[i] = b;
 	}
 }
 
 
 // r := a * b
-static void vvf32_hadamard (unsigned n, float r [], float const a [], float const b [])
+static void vvf32_hadamard (unsigned n, float r[], float const a[], float const b[])
 {
 	for (uint32_t i = 0; i < n; ++i)
 	{
-		r [i] = a [i] * b [i];
+		r[i] = a[i] * b[i];
 	}
 }
 
@@ -214,7 +214,7 @@ static void vvf32_macc (uint32_t n, float r [], float const a [], float const b 
 {
 	for (uint32_t i = 0; i < n; ++i)
 	{
-		r [i] += a [i] * b [i];
+		r[i] += a[i] * b[i];
 	}
 }
 
@@ -224,7 +224,7 @@ static float vf32_sum (uint32_t n, float const v [])
 	float sum = 0;
 	for (uint32_t i = 0; i < n; ++i)
 	{
-		sum += v [i];
+		sum += v[i];
 	}
 	return sum;
 }
@@ -238,36 +238,34 @@ static float vf32_sum (uint32_t n, float const v [])
 
 
 
-static void vf32_linespace (uint32_t n, float x [], float x1, float x2)
+static void vf32_linespace (uint32_t n, float x[], float x1, float x2)
 {
 	float const d = (x2 - x1) / n;
 	float a = x1;
-	while (n--)
+	for (uint32_t i = 0; i < n; ++i)
 	{
-		x [n] = a;
+		x[i] = a;
 		a += d;
 	}
 }
 
 
-static void vf32_repeat (uint32_t n, float v [], float value, uint32_t offset, uint32_t stride)
+static void vf32_repeat (uint32_t n, float v[], float value, uint32_t stride)
 {
-	v += offset;
-	while (n--)
+	for (uint32_t i = 0; i < n; ++i)
 	{
-		v [0] = value;
-		v += stride;
+		v[i*stride] = value;
 	}
 }
 
 
-static void vf32_weight_ab (uint32_t n, float y [], float a [], float b [], float k)
+static void vf32_weight_ab (uint32_t n, float y[], float a[], float b[], float k)
 {
 	float A = k;
 	float B = 1.0f - k;
-	while (n--)
+	for (uint32_t i = 0; i < n; ++i)
 	{
-		y [n] = A * a [n] + B * b [n];
+		y[i] = A * a[i] + B * b[i];
 	}
 }
 
@@ -278,7 +276,7 @@ static void vf32_setl (float r [], uint32_t n, ...)
 	va_start (ap, n);
 	for (uint32_t i = 0; i < n; ++i)
 	{
-		r [i] = va_arg (ap, double);
+		r[i] = va_arg (ap, double);
 	}
 	va_end (ap);
 }
@@ -318,7 +316,7 @@ static float vf32_maxabs (uint32_t n, float v[])
 	float max = v[0];
 	for (uint32_t i = 0; i < n; ++i)
 	{
-		float x = fabs(v[i]);
+		float x = fabs (v[i]);
 		if (x > max)
 		{
 			max = x;
@@ -391,9 +389,9 @@ static void vsf32_add_max (uint32_t n, float r [], float const a [], float const
 // r := a * b
 static void vsf32_mul (uint32_t n, float r [], float const a [], float const b)
 {
-	while (n--)
+	for (uint32_t i = 0; i < n; ++i)
 	{
-		r [n] = a [n] * b;
+		r [i] = a [i] * b;
 	}
 }
 

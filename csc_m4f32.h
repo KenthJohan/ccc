@@ -40,10 +40,21 @@ static void m4f32_set (struct m4f32 * m, float c)
 // M := I
 static void m4f32_identity (struct m4f32 * m)
 {
-	m4f32_set (m, 0);
 	m->m11 = 1.0f;
+	m->m21 = 0.0f;
+	m->m31 = 0.0f;
+	m->m41 = 0.0f;
+	m->m12 = 0.0f;
 	m->m22 = 1.0f;
+	m->m32 = 0.0f;
+	m->m42 = 0.0f;
+	m->m13 = 0.0f;
+	m->m23 = 0.0f;
 	m->m33 = 1.0f;
+	m->m43 = 0.0f;
+	m->m14 = 0.0f;
+	m->m24 = 0.0f;
+	m->m34 = 0.0f;
 	m->m44 = 1.0f;
 }
 

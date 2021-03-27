@@ -9,6 +9,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include "csc_v4f32.h"
 #include "csc_qf32.h"
 #include "csc_m4f32.h"
+#include "csc_f32.h"
 
 
 
@@ -24,7 +25,7 @@ struct csc_gcam
 	float h;//Height
 	float n;//Near
 	float f;//Far
-	struct v3f32 pyrd; //Euler angles
+	struct v3f32 pyr_delta; //Euler angles
 	struct qf32 q;//Quaternion rotation
 	struct m4f32 mr;//Rotation matrix
 	struct m4f32 mt;//Translation matrix
@@ -33,21 +34,15 @@ struct csc_gcam
 };
 
 
-void csc_gcam_set_fov360(struct csc_gcam * cam, float angle360)
-{
-	cam->fov = angle360 * (M_PI/180.0f);
-}
-
-
 void csc_gcam_init (struct csc_gcam * cam)
 {
-	cam->pyrd.x = 0.0f;
-	cam->pyrd.y = 0.0f;
-	cam->pyrd.z = 0.0f;
+	cam->pyr_delta.x = 0.0f;
+	cam->pyr_delta.y = 0.0f;
+	cam->pyr_delta.z = 0.0f;
 	cam->p.x = 0.0f;
 	cam->p.y = 0.0f;
 	cam->p.z = 0.0f;
-	csc_gcam_set_fov360 (cam, 45.0f);
+	cam->fov = f32_deg_to_rad (45.0f);
 	cam->w = 100.0f;
 	cam->h = 100.0f;
 	cam->n = 0.1f;
@@ -67,23 +62,26 @@ void csc_gcam_update (struct csc_gcam * cam)
 	struct qf32 q_roll;//Quaternion roll rotation
 	m4f32_identity (&cam->mvp);
 	m4f32_identity (&cam->mt);
+	m4f32_identity (&cam->mr);
 	//qf32_identity (cam->q);
 	//cam->pitch += cam->pitchd;
 	//cam->yaw += cam->yawd;
 	//cam->roll += cam->rolld;
 	//qf32_ypr (cam->q, cam->yaw, cam->pitch, cam->roll);
 
-	qf32_xyza (&q_pitch, 1.0f, 0.0f, 0.0f, cam->pyrd.x);
-	qf32_xyza (&q_yaw,   0.0f, 1.0f, 0.0f, cam->pyrd.y);
-	qf32_xyza (&q_roll,  0.0f, 0.0f, 1.0f, cam->pyrd.z);
+	qf32_xyza (&q_pitch, 1.0f, 0.0f, 0.0f, cam->pyr_delta.x);
+	qf32_xyza (&q_yaw,   0.0f, 1.0f, 0.0f, cam->pyr_delta.y);
+	qf32_xyza (&q_roll,  0.0f, 0.0f, 1.0f, cam->pyr_delta.z);
 	/*
 	qf32_mul (cam->q, q_pitch, cam->q); //Apply pitch rotation
 	qf32_mul (cam->q, q_roll, cam->q); //Apply roll rotation
 	qf32_mul (cam->q, cam->q, q_yaw); //Apply yaw rotation
 	*/
 	qf32_mul (&cam->q, &q_roll, &cam->q); //Apply roll rotation
-	qf32_mul (&cam->q, &q_pitch, &cam->q); //Apply pitch rotation
 	qf32_mul (&cam->q, &q_yaw, &cam->q); //Apply yaw rotation
+	qf32_mul (&cam->q, &q_pitch, &cam->q); //Apply pitch rotation
+	//qf32_mul2 (&cam->q, &q_pitch, &q_yaw, &q_roll); //Apply roll rotation
+
 
 
 	//float q[4];
@@ -92,7 +90,6 @@ void csc_gcam_update (struct csc_gcam * cam)
 	//qf32_mul (cam->q, cam->q, q);
 
 	qf32_normalize (&cam->q, &cam->q); //Normalize quaternion against floating point error
-	m4f32_identity (&cam->mr);
 	qf32_m4 (&cam->mr, &cam->q); //Convert quaternion to rotation matrix
 	mv4f32_macc_transposed3 (&cam->p, &cam->mr, &cam->d); //Accumulate the position in the direction relative to the rotation
 	m4f32_translation3 (&cam->mt, &cam->p); //Create translation matrix

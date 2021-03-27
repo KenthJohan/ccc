@@ -21,24 +21,34 @@ static float f32_lerp2 (float a, float b, float t)
 
 
 //Linearly map (x) value from (A0 .. A1) to (B0 .. B1)
-static float sf32_linmap (float X, float A0, float A1, float B0, float B1)
+static float f32_linmap (float x, float a0, float a1, float b0, float b1)
 {
 	//cropping
-	if (X < A0) {return B0;}
-	if (X > A1) {return B1;}
+	if (x < a0) {return b0;}
+	if (x > a1) {return b1;}
 	//calculate delta
-	float DA;
-	float DB;
-	DA = A1 - A0;
-	DB = B1 - B0;
-	//move to zero
-	X = X - A0;
+	float da = a1 - a0;
+	float db = b1 - b0;
 	//zero division protection
-	if (DA == 0) {return B1;};
-	X = X / DA;
-	//new scale
-	X = X * DB;
+	if (da == 0) {return b1;};
+	//move to zero
+	x = x - a0;
+	x = x * db / da;
 	//new offset
-	X = X + B0;
-	return X;
+	x = x + b0;
+	return x;
+}
+
+
+
+
+static float f32_deg_to_rad (float angle360)
+{
+	return angle360 * (M_PI/180.0f);
+}
+
+
+static float f32_rad_to_deg (float rad)
+{
+	return rad * (180.0f/M_PI);
 }

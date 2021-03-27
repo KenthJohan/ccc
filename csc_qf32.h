@@ -22,6 +22,17 @@ static void qf32_print (struct qf32 * q, FILE * f)
 }
 */
 
+
+static void qf32_cpy (struct qf32 * r, struct qf32 const * a)
+{
+	r->x = a->x;
+	r->y = a->y;
+	r->z = a->z;
+	r->w = a->w;
+}
+
+
+
 static void qf32_identity (struct qf32 * q)
 {
 	q->x = 0.0f;
@@ -81,15 +92,114 @@ static void qf32_mul1 (struct qf32 * r, struct qf32 const * p, struct qf32 const
 }
 
 
+/*
+static void qf32_mul2 (struct qf32 * r, struct qf32 const * p, struct qf32 const * q)
+{
+	r->x = p->w * q->x + p->x * q->w;
+	r->y = p->w * q->y - p->x * q->z;
+	r->z = p->w * q->z + p->x * q->y;
+	r->w = p->w * q->w - p->x * q->x;
+}
+*/
+
+
 static void qf32_mul (struct qf32 * r, struct qf32 const * p, struct qf32 const * q)
 {
 	struct qf32 t;
 	qf32_mul1 (&t, p, q);
-	memcpy (r, &t, sizeof (t));
+	qf32_cpy (r, &t);
+}
+
+
+
+static void qf32_unit_m4 (struct m4f32 * r, struct qf32 const * q)
+{
+	float a = q->w;
+	float b = q->x;
+	float c = q->y;
+	float d = q->z;
+	float a2 = a * a;
+	float b2 = b * b;
+	float c2 = c * c;
+	float d2 = d * d;
+
+	r->m11 = a2 + b2 - c2 - d2;
+	r->m21 = 2.0f * (b*c + a*d);
+	r->m31 = 2.0f * (b*d - a*c);
+
+	r->m12 = 2.0f * (b*c - a*d);
+	r->m22 = a2 - b2 + c2 - d2;
+	r->m32 = 2.0f * (c*d + a*b);
+
+	r->m13 = 2.0f * (b*d + a*c);
+	r->m23 = 2.0f * (c*d - a*b);
+	r->m33 = a2 - b2 - c2 + d2;
+}
+
+
+static void qf32_unit_m3 (struct m3f32 * r, struct qf32 const * q)
+{
+	float a = q->w;
+	float b = q->x;
+	float c = q->y;
+	float d = q->z;
+	float a2 = a * a;
+	float b2 = b * b;
+	float c2 = c * c;
+	float d2 = d * d;
+
+	r->m11 = a2 + b2 - c2 - d2;
+	r->m21 = 2.0f * (b*c + a*d);
+	r->m31 = 2.0f * (b*d - a*c);
+
+	r->m12 = 2.0f * (b*c - a*d);
+	r->m22 = a2 - b2 + c2 - d2;
+	r->m32 = 2.0f * (c*d + a*b);
+
+	r->m13 = 2.0f * (b*d + a*c);
+	r->m23 = 2.0f * (c*d - a*b);
+	r->m33 = a2 - b2 - c2 + d2;
 }
 
 
 static void qf32_m4 (struct m4f32 * r, struct qf32 const * q)
+{
+	float const l = qf32_norm (q);
+	float const s = (l > 0.0f) ? (2.0f / l) : 0.0f;
+
+	float const x = q->x;
+	float const y = q->y;
+	float const z = q->z;
+	float const w = q->w;
+
+	float const xx = s * x * x;
+	float const xy = s * x * y;
+	float const xz = s * x * z;
+	float const xw = s * x * w;
+
+	float const yy = s * y * y;
+	float const yz = s * y * z;
+	float const yw = s * y * w;
+
+	float const zz = s * z * z;
+	float const zw = s * z * w;
+
+	r->m11 = 1.0f - yy - zz;
+	r->m22 = 1.0f - xx - zz;
+	r->m33 = 1.0f - xx - yy;
+
+	r->m12 = xy - zw;
+	r->m21 = xy + zw;
+
+	r->m23 = yz - xw;
+	r->m32 = yz + xw;
+
+	r->m31 = xz - yw;
+	r->m13 = xz + yw;
+}
+
+
+static void qf32_m3 (struct m3f32 * r, struct qf32 const * q)
 {
 	float const l = qf32_norm (q);
 	float const s = (l > 0.0f) ? (2.0f / l) : 0.0f;
