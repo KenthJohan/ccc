@@ -20,7 +20,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 	TCOLF("2")"%+5.3E"\
 	TCOLF("4")"%+5.3E"
 
-static void csc_m3f32_print_rgb (FILE * f, m3f32 m)
+static void csc_m3f32_print_rgb (FILE * f, struct m3f32 * m)
 {
 	char const * fmt = CSC_M3F32_PRINT_RGB"\n"TCOL_RST;
 	fprintf (f, fmt, M3_ARGST(m));

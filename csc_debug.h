@@ -104,11 +104,13 @@ char const * fmt,
 ...
 )
 {
+/*
 #ifdef _WIN32
 	file = strrchr(file, '\\') + 1;
 #else
 	file = strrchr(file, '/') + 1;
 #endif
+*/
 	va_list va;
 	va_start (va, fmt);
 	assert_format_va (id, file, line, fn, exp, fmt, va);
