@@ -97,6 +97,16 @@ static void v3f32_sum (struct v3f32 * y, struct v3f32 x[], uint32_t x_stride, ui
 }
 
 
+static float v3f32_norm2 (struct v3f32 const * a)
+{
+	return v3f32_dot (a, a);
+}
+
+static float v3f32_norm (struct v3f32 const * a)
+{
+	return sqrtf (v3f32_norm2 (a));
+}
+
 
 
 
