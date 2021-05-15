@@ -142,15 +142,18 @@ static int v3f32_ray_sphere_intersect (struct v3f32 * p, struct v3f32 * d, struc
 }
 
 
-
-
-
-
-
-static void mv3f32_mul (struct v3f32 * y, struct m3f32 const * a, struct v3f32 const * b)
+static void v3f32_m4_mul (struct v3f32 * y, struct m4f32 const * a, struct v3f32 * const b)
 {
-	struct v3f32 r = V3F32_ZERO;
-	mvf32_macc ((float *)&r, (float const*)a, (float const*)b, 3, 3);
-	memcpy (y, &r, sizeof (r));
+	y->x += (a->m11 * b->x) + (a->m21 * b->y) + (a->m31 * b->z);
+	y->y += (a->m12 * b->x) + (a->m22 * b->y) + (a->m32 * b->z);
+	y->z += (a->m13 * b->x) + (a->m23 * b->y) + (a->m33 * b->z);
+}
+
+
+static void v3f32_m3_mul (struct v3f32 * y, struct m3f32 const * a, struct v3f32 * const b)
+{
+	y->x += (a->m11 * b->x) + (a->m21 * b->y) + (a->m31 * b->z);
+	y->y += (a->m12 * b->x) + (a->m22 * b->y) + (a->m32 * b->z);
+	y->z += (a->m13 * b->x) + (a->m23 * b->y) + (a->m33 * b->z);
 }
 

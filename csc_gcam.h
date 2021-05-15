@@ -90,8 +90,9 @@ void csc_gcam_update (struct csc_gcam * cam)
 	//qf32_mul (cam->q, cam->q, q);
 
 	qf32_normalize (&cam->q, &cam->q); //Normalize quaternion against floating point error
-	qf32_m4 (&cam->mr, &cam->q); //Convert quaternion to rotation matrix
-	mv4f32_macc_transposed3 (&cam->p, &cam->mr, &cam->d); //Accumulate the position in the direction relative to the rotation
+	qf32_unit_m4 (&cam->mr, &cam->q); //Convert quaternion to rotation matrix
+	v3f32_m4_mul (&cam->p, &cam->mr, &cam->d); //Accumulate the position in the direction relative to the rotation
+	//mv4f32_macc_transposed3 (&cam->p, (struct m4f32[])M4F32_IDENTITY, &cam->d); //Accumulate the position in the direction relative to the rotation
 	m4f32_translation3 (&cam->mt, &cam->p); //Create translation matrix
 	m4f32_perspective1 (&cam->mp, cam->fov, cam->w/cam->h, cam->n, cam->f); //Create perspective matrix
 

@@ -132,23 +132,8 @@ static void v4f32_dotv (struct v4f32 r[], uint32_t inc_r, struct v4f32 a[], uint
 
 
 
-
-
-static void mv4f32_macc (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
+static void v4f32_m4_macc_unsafe (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
 {
-	y->x += (a->m11 * b->x) + (a->m12 * b->y) + (a->m13 * b->z) + (a->m14 * b->w);
-	y->y += (a->m21 * b->x) + (a->m22 * b->y) + (a->m23 * b->z) + (a->m24 * b->w);
-	y->z += (a->m31 * b->x) + (a->m32 * b->y) + (a->m33 * b->z) + (a->m34 * b->w);
-	y->w += (a->m41 * b->x) + (a->m42 * b->y) + (a->m43 * b->z) + (a->m44 * b->w);
-}
-
-
-static void mv4f32_mul (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
-{
-	ASSERT_PTR_NEQ (y, &a->m11);
-	ASSERT_PTR_NEQ (y, &a->m12);
-	ASSERT_PTR_NEQ (y, &a->m13);
-	ASSERT_PTR_NEQ (y, &a->m14);
 	ASSERT_PTR_NEQ (y, b);
 	y->x += (a->m11 * b->x) + (a->m12 * b->y) + (a->m13 * b->z) + (a->m14 * b->w);
 	y->y += (a->m21 * b->x) + (a->m22 * b->y) + (a->m23 * b->z) + (a->m24 * b->w);
@@ -156,22 +141,63 @@ static void mv4f32_mul (struct v4f32 * y, struct m4f32 const * a, struct v4f32 *
 	y->w += (a->m41 * b->x) + (a->m42 * b->y) + (a->m43 * b->z) + (a->m44 * b->w);
 }
 
-
-static void mv4f32_macc_transposed (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
+static void v4f32_m4_macc (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
 {
+	struct v4f32 t;
+	v4f32_cpy (&t, y);
+	t.x += (a->m11 * b->x) + (a->m12 * b->y) + (a->m13 * b->z) + (a->m14 * b->w);
+	t.y += (a->m21 * b->x) + (a->m22 * b->y) + (a->m23 * b->z) + (a->m24 * b->w);
+	t.z += (a->m31 * b->x) + (a->m32 * b->y) + (a->m33 * b->z) + (a->m34 * b->w);
+	t.w += (a->m41 * b->x) + (a->m42 * b->y) + (a->m43 * b->z) + (a->m44 * b->w);
+	v4f32_cpy (y, &t);
+}
+
+
+
+static void v4f32_m4_macct_unsafe (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
+{
+	ASSERT_PTR_NEQ (y, b);
 	y->x += (a->m11 * b->x) + (a->m21 * b->y) + (a->m31 * b->z) + (a->m41 * b->w);
 	y->y += (a->m12 * b->x) + (a->m22 * b->y) + (a->m32 * b->z) + (a->m42 * b->w);
 	y->z += (a->m13 * b->x) + (a->m23 * b->y) + (a->m33 * b->z) + (a->m43 * b->w);
 	y->w += (a->m14 * b->x) + (a->m24 * b->y) + (a->m34 * b->z) + (a->m44 * b->w);
 }
 
-
-static void mv4f32_macc_transposed3 (struct v3f32 * y, struct m4f32 const * a, struct v3f32 * const b)
+static void v4f32_m4_macct (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
 {
-	y->x += (a->m11 * b->x) + (a->m21 * b->y) + (a->m31 * b->z);
-	y->y += (a->m12 * b->x) + (a->m22 * b->y) + (a->m32 * b->z);
-	y->z += (a->m13 * b->x) + (a->m23 * b->y) + (a->m33 * b->z);
+	struct v4f32 t;
+	v4f32_cpy (&t, y);
+	t.x += (a->m11 * b->x) + (a->m21 * b->y) + (a->m31 * b->z) + (a->m41 * b->w);
+	t.y += (a->m12 * b->x) + (a->m22 * b->y) + (a->m32 * b->z) + (a->m42 * b->w);
+	t.z += (a->m13 * b->x) + (a->m23 * b->y) + (a->m33 * b->z) + (a->m43 * b->w);
+	t.w += (a->m14 * b->x) + (a->m24 * b->y) + (a->m34 * b->z) + (a->m44 * b->w);
+	v4f32_cpy (y, &t);
 }
+
+static void v4f32_m4_mul_unsafe (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
+{
+	ASSERT_PTR_NEQ (y, b);
+	y->x = (a->m11 * b->x) + (a->m12 * b->y) + (a->m13 * b->z) + (a->m14 * b->w);
+	y->y = (a->m21 * b->x) + (a->m22 * b->y) + (a->m23 * b->z) + (a->m24 * b->w);
+	y->z = (a->m31 * b->x) + (a->m32 * b->y) + (a->m33 * b->z) + (a->m34 * b->w);
+	y->w = (a->m41 * b->x) + (a->m42 * b->y) + (a->m43 * b->z) + (a->m44 * b->w);
+}
+
+static void v4f32_m4_mul (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
+{
+	struct v4f32 t;
+	t.x = (a->m11 * b->x) + (a->m12 * b->y) + (a->m13 * b->z) + (a->m14 * b->w);
+	t.y = (a->m21 * b->x) + (a->m22 * b->y) + (a->m23 * b->z) + (a->m24 * b->w);
+	t.z = (a->m31 * b->x) + (a->m32 * b->y) + (a->m33 * b->z) + (a->m34 * b->w);
+	t.w = (a->m41 * b->x) + (a->m42 * b->y) + (a->m43 * b->z) + (a->m44 * b->w);
+	v4f32_cpy (y, &t);
+}
+
+
+
+
+
+
 
 
 
