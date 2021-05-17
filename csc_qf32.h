@@ -12,7 +12,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include "csc_m3f32.h"
 
 /*
-static void qf32_print (struct qf32 * q, FILE * f)
+static void qf32_print (qf32 * q, FILE * f)
 {
 	for (size_t i = 0; i < 4; ++ i)
 	{
@@ -23,7 +23,7 @@ static void qf32_print (struct qf32 * q, FILE * f)
 */
 
 
-static void qf32_cpy (struct qf32 * r, struct qf32 const * a)
+static void qf32_cpy (qf32 * r, qf32 const * a)
 {
 	r->x = a->x;
 	r->y = a->y;
@@ -33,7 +33,7 @@ static void qf32_cpy (struct qf32 * r, struct qf32 const * a)
 
 
 
-static void qf32_identity (struct qf32 * q)
+static void qf32_identity (qf32 * q)
 {
 	q->x = 0.0f;
 	q->y = 0.0f;
@@ -42,25 +42,25 @@ static void qf32_identity (struct qf32 * q)
 }
 
 
-static float qf32_norm2 (struct qf32 * q)
+static float qf32_norm2 (qf32 * q)
 {
-	return v4f32_norm2 ((struct v4f32 *)q);
+	return v4f32_norm2 ((v4f32 *)q);
 }
 
 
-static float qf32_norm (struct qf32 const * q)
+static float qf32_norm (qf32 const * q)
 {
-	return v4f32_norm ((struct v4f32 *)q);
+	return v4f32_norm ((v4f32 *)q);
 }
 
 
-static void qf32_normalize (struct qf32 * r, struct qf32 const * q)
+static void qf32_normalize (qf32 * r, qf32 const * q)
 {
-	v4f32_normalize ((struct v4f32 *)r, (struct v4f32 const *)q);
+	v4f32_normalize ((v4f32 *)r, (v4f32 const *)q);
 }
 
 
-static void qf32_xyza (struct qf32 * q, float x, float y, float z, float a)
+static void qf32_xyza (qf32 * q, float x, float y, float z, float a)
 {
 	float const c = cosf (a * 0.5f);
 	float const s = sinf (a * 0.5f);
@@ -75,13 +75,13 @@ static void qf32_xyza (struct qf32 * q, float x, float y, float z, float a)
 }
 
 
-static void qf32_axis_angle (struct qf32 * q, struct v3f32 const * v, float angle)
+static void qf32_axis_angle (qf32 * q, v3f32 const * v, float angle)
 {
 	qf32_xyza (q, v->x, v->y, v->z, angle);
 }
 
 
-static void qf32_mul1 (struct qf32 * r, struct qf32 const * p, struct qf32 const * q)
+static void qf32_mul1 (qf32 * r, qf32 const * p, qf32 const * q)
 {
 	ASSERT (r != p);
 	ASSERT (r != q);
@@ -93,7 +93,7 @@ static void qf32_mul1 (struct qf32 * r, struct qf32 const * p, struct qf32 const
 
 
 /*
-static void qf32_mul2 (struct qf32 * r, struct qf32 const * p, struct qf32 const * q)
+static void qf32_mul2 (qf32 * r, qf32 const * p, qf32 const * q)
 {
 	r->x = p->w * q->x + p->x * q->w;
 	r->y = p->w * q->y - p->x * q->z;
@@ -103,16 +103,16 @@ static void qf32_mul2 (struct qf32 * r, struct qf32 const * p, struct qf32 const
 */
 
 
-static void qf32_mul (struct qf32 * r, struct qf32 const * p, struct qf32 const * q)
+static void qf32_mul (qf32 * r, qf32 const * p, qf32 const * q)
 {
-	struct qf32 t;
+	qf32 t;
 	qf32_mul1 (&t, p, q);
 	qf32_cpy (r, &t);
 }
 
 
 
-static void qf32_unit_m4 (struct m4f32 * r, struct qf32 const * q)
+static void qf32_unit_m4 (m4f32 * r, qf32 const * q)
 {
 	float a = q->w;
 	float b = q->x;
@@ -137,7 +137,7 @@ static void qf32_unit_m4 (struct m4f32 * r, struct qf32 const * q)
 }
 
 
-static void qf32_unit_m3 (struct m3f32 * r, struct qf32 const * q)
+static void qf32_unit_m3 (m3f32 * r, qf32 const * q)
 {
 	float a = q->w;
 	float b = q->x;
@@ -162,7 +162,7 @@ static void qf32_unit_m3 (struct m3f32 * r, struct qf32 const * q)
 }
 
 
-static void qf32_m4 (struct m4f32 * r, struct qf32 const * q)
+static void qf32_m4 (m4f32 * r, qf32 const * q)
 {
 	float const l = qf32_norm (q);
 	float const s = (l > 0.0f) ? (2.0f / l) : 0.0f;
@@ -199,7 +199,7 @@ static void qf32_m4 (struct m4f32 * r, struct qf32 const * q)
 }
 
 
-static void qf32_m3 (struct m3f32 * r, struct qf32 const * q)
+static void qf32_m3 (m3f32 * r, qf32 const * q)
 {
 	float const l = qf32_norm (q);
 	float const s = (l > 0.0f) ? (2.0f / l) : 0.0f;
@@ -254,9 +254,9 @@ void rotate_vector_by_quaternion(const Vector3& v, const Quaternion& q, Vector3&
 		  + 2.0f * s * cross(u, v);
 }
 
-static void qf32_rotate_vector_fixthis (qf32 u, struct v3f32 y)
+static void qf32_rotate_vector_fixthis (qf32 u, v3f32 y)
 {
-	struct v3f32 v;
+	v3f32 v;
 	v3f32_cpy (&v, y);
 	float uv = vf32_dot (3, u, v);
 	float ww = u[3] * u[3];
@@ -274,29 +274,29 @@ Method by Fabian 'ryg' Giessen (of Farbrausch)
 t = 2 * cross(q.xyz, v)
 v' = v + q.w * t + cross(q.xyz, t)
 */
-static void qf32_rotate_vector (struct qf32 const * q, struct v3f32 const * v, struct v3f32 * r)
+static void qf32_rotate_vector (qf32 const * q, v3f32 const * v, v3f32 * r)
 {
 	ASSERT (v != r);
-	struct v3f32 t;
-	struct v3f32 u = {q->x, q->y, q->z};
-	v3f32_cross (&t, (struct v3f32 *)q, v);
+	v3f32 t;
+	v3f32 u = {{q->x, q->y, q->z}};
+	v3f32_cross (&t, (v3f32 *)q, v);
 	v3f32_mul (&t, &t, 2.0f);
-	v3f32_cross (&u, (struct v3f32 *)q, &t);
+	v3f32_cross (&u, (v3f32 *)q, &t);
 	v3f32_mul (&t, &t, q->w);
 	v3f32_add (r, v, &t);
 	v3f32_add (r, r, &u);
 }
 
 
-static void qf32_rotate_v3f32 (struct qf32 * q, struct v3f32 * v)
+static void qf32_rotate_v3f32 (qf32 * q, v3f32 * v)
 {
-	struct v3f32 r;
+	v3f32 r;
 	qf32_rotate_vector (q, v, &r);
 	v3f32_cpy (v, &r);
 }
 
 
-static void qf32_rotate_v3f32_array (struct qf32 * q, struct v3f32 v[], uint32_t n)
+static void qf32_rotate_v3f32_array (qf32 * q, v3f32 v[], uint32_t n)
 {
 	for (uint32_t i = 0; i < n; ++i)
 	{
@@ -305,16 +305,16 @@ static void qf32_rotate_v3f32_array (struct qf32 * q, struct v3f32 v[], uint32_t
 }
 
 
-static void qf32_rotate1_xyza (struct qf32 * q, float x, float y, float z, float a)
+static void qf32_rotate1_xyza (qf32 * q, float x, float y, float z, float a)
 {
-	struct qf32 u;
+	qf32 u;
 	qf32_xyza (&u, x, y, z, a);
 	qf32_mul (q, &u, q);
 }
 
-static void qf32_rotate2_xyza (struct qf32 * q, float x, float y, float z, float a)
+static void qf32_rotate2_xyza (qf32 * q, float x, float y, float z, float a)
 {
-	struct qf32 u;
+	qf32 u;
 	qf32_xyza (&u, x, y, z, a);
 	qf32_mul (q, q, &u); // q = q * u
 }
@@ -322,7 +322,7 @@ static void qf32_rotate2_xyza (struct qf32 * q, float x, float y, float z, float
 
 
 // yaw (Z), pitch (Y), roll (X)
-static void qf32_ypr (struct qf32 * q, float yaw, float pitch, float roll)
+static void qf32_ypr (qf32 * q, float yaw, float pitch, float roll)
 {
 	// Abbreviations for the various angular functions
 	float cy = cos(yaw * 0.5);
@@ -339,7 +339,7 @@ static void qf32_ypr (struct qf32 * q, float yaw, float pitch, float roll)
 
 
 //http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
-static void qf32_from_m4 (struct qf32 * q, struct m4f32 * m)
+static void qf32_from_m4 (qf32 * q, m4f32 * m)
 {
 	q->w = sqrtf (1.0f + m->m11 + m->m22 + m->m33) / 2.0f;
 	float w4 = (4.0f * q->w);
@@ -350,7 +350,7 @@ static void qf32_from_m4 (struct qf32 * q, struct m4f32 * m)
 
 
 //http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
-static void qf32_from_m3 (struct qf32 * q, struct m3f32 * m)
+static void qf32_from_m3 (qf32 * q, m3f32 * m)
 {
 	q->w = sqrtf (1.0f + m->m11 + m->m22 + m->m33) / 2.0f;
 	float w4 = (4.0f * q->w);

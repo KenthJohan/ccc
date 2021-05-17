@@ -16,21 +16,21 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 
 
-static void m4f32_mul (struct m4f32 * y, struct m4f32 const * a, struct m4f32 const * b)
+static void m4f32_mul (m4f32 * y, m4f32 const * a, m4f32 const * b)
 {
-	struct m4f32 r = M4F32_ZERO;
+	m4f32 r = M4F32_ZERO;
 	mmf32_macc ((float *)&r, (float const*)a, (float const*)b, 4, 4, 4);
 	memcpy (y, &r, sizeof (r));
 }
 
 
-static void m4f32_print (struct m4f32 const * m, FILE * f)
+static void m4f32_print (m4f32 const * m, FILE * f)
 {
 	mf32_print ((float const *)m, 4, 4, f);
 }
 
 
-static void m4f32_set (struct m4f32 * m, float c)
+static void m4f32_set (m4f32 * m, float c)
 {
 	mf32_set ((float*)m, c, 16);
 }
@@ -38,7 +38,7 @@ static void m4f32_set (struct m4f32 * m, float c)
 
 // 4x4 matrix identity
 // M := I
-static void m4f32_identity (struct m4f32 * m)
+static void m4f32_identity (m4f32 * m)
 {
 	m->m11 = 1.0f;
 	m->m21 = 0.0f;
@@ -59,7 +59,7 @@ static void m4f32_identity (struct m4f32 * m)
 }
 
 
-static void m4f32_translation3 (struct m4f32 * m, struct v3f32 const * t)
+static void m4f32_translation3 (m4f32 * m, v3f32 const * t)
 {
 	//Translation vector in 4th column
 	m->m14 = t->x;
@@ -67,7 +67,7 @@ static void m4f32_translation3 (struct m4f32 * m, struct v3f32 const * t)
 	m->m34 = t->z;
 }
 
-static void m4f32_translation4 (struct m4f32 * m, struct v4f32 const * t)
+static void m4f32_translation4 (m4f32 * m, v4f32 const * t)
 {
 	//Translation vector in 4th column
 	m->m14 = t->x;
@@ -76,7 +76,7 @@ static void m4f32_translation4 (struct m4f32 * m, struct v4f32 const * t)
 }
 
 
-static void m4f32_set_columns (struct m4f32 * m, struct v4f32 const * x, struct v4f32 const * y, struct v4f32 const * z, struct v4f32 const * w)
+static void m4f32_set_columns (m4f32 * m, v4f32 const * x, v4f32 const * y, v4f32 const * z, v4f32 const * w)
 {
 	m->m11 = x->x;
 	m->m21 = x->y;
@@ -114,7 +114,7 @@ static void m4f32_set_columns (struct m4f32 * m, struct v4f32 const * x, struct 
 
 
 
-static void m4f32_translation_xyz (struct m4f32 * m, float x, float y, float z)
+static void m4f32_translation_xyz (m4f32 * m, float x, float y, float z)
 {
 	//Translation vector in 4th column
 	m->m14 = x;
@@ -123,7 +123,7 @@ static void m4f32_translation_xyz (struct m4f32 * m, float x, float y, float z)
 }
 
 
-static void m4f32_scale_xyz (struct m4f32 * m, float x, float y, float z)
+static void m4f32_scale_xyz (m4f32 * m, float x, float y, float z)
 {
 	m->m11 = x;
 	m->m22 = y;
@@ -131,7 +131,7 @@ static void m4f32_scale_xyz (struct m4f32 * m, float x, float y, float z)
 }
 
 
-static void m4f32_scale (struct m4f32 * m, struct v4f32 * s)
+static void m4f32_scale (m4f32 * m, v4f32 * s)
 {
 	m->m11 = s->x;
 	m->m22 = s->y;
@@ -140,7 +140,7 @@ static void m4f32_scale (struct m4f32 * m, struct v4f32 * s)
 }
 
 
-static void m4f32_frustum (struct m4f32 * m, float l, float r, float b, float t, float n, float f)
+static void m4f32_frustum (m4f32 * m, float l, float r, float b, float t, float n, float f)
 {
 	//Column vector 1:
 	m->m11 = (2.0f * n) / (r - l);
@@ -165,7 +165,7 @@ static void m4f32_frustum (struct m4f32 * m, float l, float r, float b, float t,
 }
 
 
-static void m4f32_perspective1 (struct m4f32 * m, float fov, float aspect, float n, float f)
+static void m4f32_perspective1 (m4f32 * m, float fov, float aspect, float n, float f)
 {
 	float a = 1.0f / tan (fov / 2.0f);
 	//Column vector 1:

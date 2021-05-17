@@ -11,7 +11,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 
 
-static void v3f32_set_xyz (struct v3f32 * r, float x, float y, float z)
+static void v3f32_set_xyz (v3f32 * r, float x, float y, float z)
 {
 	r->x = x;
 	r->y = y;
@@ -19,7 +19,7 @@ static void v3f32_set_xyz (struct v3f32 * r, float x, float y, float z)
 }
 
 
-static void v3f32_cpy (struct v3f32 * r, struct v3f32 const * a)
+static void v3f32_cpy (v3f32 * r, v3f32 const * a)
 {
 	r->x = a->x;
 	r->y = a->y;
@@ -27,7 +27,7 @@ static void v3f32_cpy (struct v3f32 * r, struct v3f32 const * a)
 }
 
 
-static void v3f32_mul (struct v3f32 * r, struct v3f32 const * a, float b)
+static void v3f32_mul (v3f32 * r, v3f32 const * a, float b)
 {
 	r->x = a->x * b;
 	r->y = a->y * b;
@@ -35,7 +35,7 @@ static void v3f32_mul (struct v3f32 * r, struct v3f32 const * a, float b)
 }
 
 
-static void v3f32_sub (struct v3f32 * r, struct v3f32 const * a, struct v3f32 const * b)
+static void v3f32_sub (v3f32 * r, v3f32 const * a, v3f32 const * b)
 {
 	r->x = a->x - b->x;
 	r->y = a->y - b->y;
@@ -43,7 +43,7 @@ static void v3f32_sub (struct v3f32 * r, struct v3f32 const * a, struct v3f32 co
 }
 
 
-static void v3f32_add (struct v3f32 * r, struct v3f32 const * a, struct v3f32 const * b)
+static void v3f32_add (v3f32 * r, v3f32 const * a, v3f32 const * b)
 {
 	r->x = a->x + b->x;
 	r->y = a->y + b->y;
@@ -51,7 +51,15 @@ static void v3f32_add (struct v3f32 * r, struct v3f32 const * a, struct v3f32 co
 }
 
 
-static void v3f32_cross (struct v3f32 * r, struct v3f32 const * a, struct v3f32 const * b)
+static void v3f32_add_mul (v3f32 * r, v3f32 const * a, v3f32 const * b, float alpha, float beta)
+{
+	r->x = a->x * alpha + b->x * beta;
+	r->y = a->y * alpha + b->y * beta;
+	r->z = a->z * alpha + b->z * beta;
+}
+
+
+static void v3f32_cross (v3f32 * r, v3f32 const * a, v3f32 const * b)
 {
 	r->x = a->y * b->z - a->z * b->y;
 	r->y = a->z * b->x - a->x * b->z;
@@ -59,7 +67,7 @@ static void v3f32_cross (struct v3f32 * r, struct v3f32 const * a, struct v3f32 
 }
 
 
-float v3f32_dot (struct v3f32 const * a, struct v3f32 const * b)
+float v3f32_dot (v3f32 const * a, v3f32 const * b)
 {
 	float sum = 0;
 	sum += a->x * b->x;
@@ -69,7 +77,7 @@ float v3f32_dot (struct v3f32 const * a, struct v3f32 const * b)
 }
 
 
-static void v3f32_crossacc (struct v3f32 * r, struct v3f32 const * a, struct v3f32 const * b)
+static void v3f32_crossacc (v3f32 * r, v3f32 const * a, v3f32 const * b)
 {
 	r->x += a->y * b->z - a->z * b->y;
 	r->y += a->z * b->x - a->x * b->z;
@@ -77,7 +85,7 @@ static void v3f32_crossacc (struct v3f32 * r, struct v3f32 const * a, struct v3f
 }
 
 
-static void v3f32_crossacc_scalar (struct v3f32 * r, float s, struct v3f32 const * a, struct v3f32 const * b)
+static void v3f32_crossacc_scalar (v3f32 * r, float s, v3f32 const * a, v3f32 const * b)
 {
 	r->x += s * (a->y * b->z - a->z * b->y);
 	r->y += s * (a->z * b->x - a->x * b->z);
@@ -85,7 +93,7 @@ static void v3f32_crossacc_scalar (struct v3f32 * r, float s, struct v3f32 const
 }
 
 
-static void v3f32_sum (struct v3f32 * y, struct v3f32 x[], uint32_t x_stride, uint32_t x_count)
+static void v3f32_sum (v3f32 * y, v3f32 x[], uint32_t x_stride, uint32_t x_count)
 {
 	for (uint32_t i = 0; i < x_count; ++i)
 	{
@@ -97,12 +105,12 @@ static void v3f32_sum (struct v3f32 * y, struct v3f32 x[], uint32_t x_stride, ui
 }
 
 
-static float v3f32_norm2 (struct v3f32 const * a)
+static float v3f32_norm2 (v3f32 const * a)
 {
 	return v3f32_dot (a, a);
 }
 
-static float v3f32_norm (struct v3f32 const * a)
+static float v3f32_norm (v3f32 const * a)
 {
 	return sqrtf (v3f32_norm2 (a));
 }
@@ -110,10 +118,10 @@ static float v3f32_norm (struct v3f32 const * a)
 
 
 
-static int v3f32_ray_sphere_intersect (struct v3f32 * p, struct v3f32 * d, struct v3f32 * sc, float sr, float *t, struct v3f32 * q)
+static int v3f32_ray_sphere_intersect (v3f32 * p, v3f32 * d, v3f32 * sc, float sr, float *t, v3f32 * q)
 {
 	//Vector m = p - s.c;
-	struct v3f32 m;
+	v3f32 m;
 	v3f32_sub (&m, p, sc);
 	//float b = Dot(m, d);
 	float b = v3f32_dot (&m, d);
@@ -142,7 +150,7 @@ static int v3f32_ray_sphere_intersect (struct v3f32 * p, struct v3f32 * d, struc
 }
 
 
-static void v3f32_m4_mul (struct v3f32 * y, struct m4f32 const * a, struct v3f32 * const b)
+static void v3f32_m4_mul (v3f32 * y, m4f32 const * a, v3f32 * const b)
 {
 	y->x += (a->m11 * b->x) + (a->m21 * b->y) + (a->m31 * b->z);
 	y->y += (a->m12 * b->x) + (a->m22 * b->y) + (a->m32 * b->z);
@@ -150,7 +158,7 @@ static void v3f32_m4_mul (struct v3f32 * y, struct m4f32 const * a, struct v3f32
 }
 
 
-static void v3f32_m3_mul (struct v3f32 * y, struct m3f32 const * a, struct v3f32 * const b)
+static void v3f32_m3_mul (v3f32 * y, m3f32 const * a, v3f32 * const b)
 {
 	y->x += (a->m11 * b->x) + (a->m21 * b->y) + (a->m31 * b->z);
 	y->y += (a->m12 * b->x) + (a->m22 * b->y) + (a->m32 * b->z);

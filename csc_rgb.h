@@ -28,10 +28,15 @@ struct csc_f32rgba
 };
 
 
-struct csc_u8rgba
+typedef union u8rgba
 {
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-	uint8_t a;
-};
+	uint8_t data[4];
+	struct
+	{
+		uint8_t r;
+		uint8_t g;
+		uint8_t b;
+		uint8_t a;
+	};
+} u8rgba;
+

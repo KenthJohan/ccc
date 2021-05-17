@@ -12,7 +12,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define V4F32_FORMAT "(%f %f %f %f)\n"
 #define V4F32_ARGS(x) (x)[0], (x)[1], (x)[2], (x)[3]
 
-static void v4f32_cpy (struct v4f32 * r, struct v4f32 const * a)
+static void v4f32_cpy (v4f32 * r, v4f32 const * a)
 {
 	r->x = a->x;
 	r->y = a->y;
@@ -21,7 +21,7 @@ static void v4f32_cpy (struct v4f32 * r, struct v4f32 const * a)
 }
 
 
-static void v4f32_add (struct v4f32 * r, struct v4f32 const * a, struct v4f32 const * b)
+static void v4f32_add (v4f32 * r, v4f32 const * a, v4f32 const * b)
 {
 	r->x = a->x + b->x;
 	r->y = a->y + b->y;
@@ -30,7 +30,7 @@ static void v4f32_add (struct v4f32 * r, struct v4f32 const * a, struct v4f32 co
 }
 
 
-static void v4f32_acc (struct v4f32 * r, struct v4f32 const * a)
+static void v4f32_acc (v4f32 * r, v4f32 const * a)
 {
 	r->x += a->x;
 	r->y += a->y;
@@ -39,7 +39,7 @@ static void v4f32_acc (struct v4f32 * r, struct v4f32 const * a)
 }
 
 
-static void v4f32_sub (struct v4f32 * r, struct v4f32 const * a, struct v4f32 const * b)
+static void v4f32_sub (v4f32 * r, v4f32 const * a, v4f32 const * b)
 {
 	r->x = a->x - b->x;
 	r->y = a->y - b->y;
@@ -48,7 +48,7 @@ static void v4f32_sub (struct v4f32 * r, struct v4f32 const * a, struct v4f32 co
 }
 
 
-static void v4f32_set1 (struct v4f32 * r, float b)
+static void v4f32_set1 (v4f32 * r, float b)
 {
 	r->x = b;
 	r->y = b;
@@ -57,7 +57,7 @@ static void v4f32_set1 (struct v4f32 * r, float b)
 }
 
 
-static void v4f32_mul (struct v4f32 * r, struct v4f32 const * a, float b)
+static void v4f32_mul (v4f32 * r, v4f32 const * a, float b)
 {
 	r->x = a->x * b;
 	r->y = a->y * b;
@@ -66,7 +66,7 @@ static void v4f32_mul (struct v4f32 * r, struct v4f32 const * a, float b)
 }
 
 
-static void v4f32_div (struct v4f32 * r, struct v4f32 const * a, float b)
+static void v4f32_div (v4f32 * r, v4f32 const * a, float b)
 {
 	r->x = a->x / b;
 	r->y = a->y / b;
@@ -75,7 +75,7 @@ static void v4f32_div (struct v4f32 * r, struct v4f32 const * a, float b)
 }
 
 
-float v4f32_dot (struct v4f32 const * a, struct v4f32 const * b)
+float v4f32_dot (v4f32 const * a, v4f32 const * b)
 {
 	float sum = 0;
 	sum += a->x * b->x;
@@ -86,26 +86,26 @@ float v4f32_dot (struct v4f32 const * a, struct v4f32 const * b)
 }
 
 
-static float v4f32_norm2 (struct v4f32 const * a)
+static float v4f32_norm2 (v4f32 const * a)
 {
 	return v4f32_dot (a, a);
 }
 
 
-static float v4f32_norm (struct v4f32 const * a)
+static float v4f32_norm (v4f32 const * a)
 {
 	return sqrtf (v4f32_norm2 (a));
 }
 
 
-static void v4f32_normalize (struct v4f32 * r, struct v4f32 const * a)
+static void v4f32_normalize (v4f32 * r, v4f32 const * a)
 {
 	float l = v4f32_norm (a);
 	v4f32_div (r, a, l);
 }
 
 
-static void v4f32_set_xyzw (struct v4f32 * v, float x, float y, float z, float w)
+static void v4f32_set_xyzw (v4f32 * v, float x, float y, float z, float w)
 {
 	v->x = x;
 	v->y = y;
@@ -116,7 +116,7 @@ static void v4f32_set_xyzw (struct v4f32 * v, float x, float y, float z, float w
 
 
 
-static void v4f32_dotv (struct v4f32 r[], uint32_t inc_r, struct v4f32 a[], uint32_t inc_a, struct v4f32 b[], uint32_t inc_b, uint32_t n)
+static void v4f32_dotv (v4f32 r[], uint32_t inc_r, v4f32 a[], uint32_t inc_a, v4f32 b[], uint32_t inc_b, uint32_t n)
 {
 	for (uint32_t i = 0; i < n; ++i)
 	{
@@ -132,7 +132,7 @@ static void v4f32_dotv (struct v4f32 r[], uint32_t inc_r, struct v4f32 a[], uint
 
 
 
-static void v4f32_m4_macc_unsafe (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
+static void v4f32_m4_macc_unsafe (v4f32 * y, m4f32 const * a, v4f32 * const b)
 {
 	ASSERT_PTR_NEQ (y, b);
 	y->x += (a->m11 * b->x) + (a->m12 * b->y) + (a->m13 * b->z) + (a->m14 * b->w);
@@ -141,9 +141,9 @@ static void v4f32_m4_macc_unsafe (struct v4f32 * y, struct m4f32 const * a, stru
 	y->w += (a->m41 * b->x) + (a->m42 * b->y) + (a->m43 * b->z) + (a->m44 * b->w);
 }
 
-static void v4f32_m4_macc (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
+static void v4f32_m4_macc (v4f32 * y, m4f32 const * a, v4f32 * const b)
 {
-	struct v4f32 t;
+	v4f32 t;
 	v4f32_cpy (&t, y);
 	t.x += (a->m11 * b->x) + (a->m12 * b->y) + (a->m13 * b->z) + (a->m14 * b->w);
 	t.y += (a->m21 * b->x) + (a->m22 * b->y) + (a->m23 * b->z) + (a->m24 * b->w);
@@ -154,7 +154,7 @@ static void v4f32_m4_macc (struct v4f32 * y, struct m4f32 const * a, struct v4f3
 
 
 
-static void v4f32_m4_macct_unsafe (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
+static void v4f32_m4_macct_unsafe (v4f32 * y, m4f32 const * a, v4f32 * const b)
 {
 	ASSERT_PTR_NEQ (y, b);
 	y->x += (a->m11 * b->x) + (a->m21 * b->y) + (a->m31 * b->z) + (a->m41 * b->w);
@@ -163,9 +163,9 @@ static void v4f32_m4_macct_unsafe (struct v4f32 * y, struct m4f32 const * a, str
 	y->w += (a->m14 * b->x) + (a->m24 * b->y) + (a->m34 * b->z) + (a->m44 * b->w);
 }
 
-static void v4f32_m4_macct (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
+static void v4f32_m4_macct (v4f32 * y, m4f32 const * a, v4f32 * const b)
 {
-	struct v4f32 t;
+	v4f32 t;
 	v4f32_cpy (&t, y);
 	t.x += (a->m11 * b->x) + (a->m21 * b->y) + (a->m31 * b->z) + (a->m41 * b->w);
 	t.y += (a->m12 * b->x) + (a->m22 * b->y) + (a->m32 * b->z) + (a->m42 * b->w);
@@ -174,7 +174,7 @@ static void v4f32_m4_macct (struct v4f32 * y, struct m4f32 const * a, struct v4f
 	v4f32_cpy (y, &t);
 }
 
-static void v4f32_m4_mul_unsafe (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
+static void v4f32_m4_mul_unsafe (v4f32 * y, m4f32 const * a, v4f32 * const b)
 {
 	ASSERT_PTR_NEQ (y, b);
 	y->x = (a->m11 * b->x) + (a->m12 * b->y) + (a->m13 * b->z) + (a->m14 * b->w);
@@ -183,9 +183,9 @@ static void v4f32_m4_mul_unsafe (struct v4f32 * y, struct m4f32 const * a, struc
 	y->w = (a->m41 * b->x) + (a->m42 * b->y) + (a->m43 * b->z) + (a->m44 * b->w);
 }
 
-static void v4f32_m4_mul (struct v4f32 * y, struct m4f32 const * a, struct v4f32 * const b)
+static void v4f32_m4_mul (v4f32 * y, m4f32 const * a, v4f32 * const b)
 {
-	struct v4f32 t;
+	v4f32 t;
 	t.x = (a->m11 * b->x) + (a->m12 * b->y) + (a->m13 * b->z) + (a->m14 * b->w);
 	t.y = (a->m21 * b->x) + (a->m22 * b->y) + (a->m23 * b->z) + (a->m24 * b->w);
 	t.z = (a->m31 * b->x) + (a->m32 * b->y) + (a->m33 * b->z) + (a->m34 * b->w);

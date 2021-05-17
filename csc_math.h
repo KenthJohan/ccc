@@ -33,36 +33,49 @@ struct v2f32
 
 
 #define QF32_IDENTITY  {0.0f, 0.0f, 0.0f, 1.0f}
-struct qf32
+typedef union qf32
 {
-	float x;
-	float y;
-	float z;
-	float w;
-};
+	struct
+	{
+		float x;
+		float y;
+		float z;
+		float w;
+	};
+} qf32;
 
 
 #define V4F32_ZERO {0.0f, 0.0f, 0.0f, 0.0f}
 #define V4F32_REPEAT(x) {(x), (x), (x), (x)}
-struct v4f32
+#define V4F32_V3(v) (v4f32){{(v).x, (v).y, (v).z, 0.0f}}
+typedef union v4f32
 {
-	float x;
-	float y;
-	float z;
-	float w;
-};
+	float e[4];
+	struct
+	{
+		float x;
+		float y;
+		float z;
+		float w;
+	};
+} v4f32;
 
 
 
 
 #define V3F32_ZERO {0.0f, 0.0f, 0.0f}
 #define V3F32_REPEAT(x) {(x), (x), (x)}
-struct v3f32
+#define V3F32_V4F32(x) {(x).x, (x).y, (x).z}
+typedef union v3f32
 {
-	float x;
-	float y;
-	float z;
-};
+	float e[3];
+	struct
+	{
+		float x;
+		float y;
+		float z;
+	};
+} v3f32;
 
 
 #define M3_11 0
@@ -77,23 +90,28 @@ struct v3f32
 #define M3_ARGS(m) m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8]
 #define M3_ARGST(m) m[0],m[3],m[6],m[1],m[4],m[7],m[2],m[5],m[8]
 //                         |----Column1-----|-----Column2-----|-----Column3-----|
-#define M3F32_ZERO         {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
-#define M3F32_REPEAT(x)    { (x),  (x),  (x),  (x),  (x),  (x),  (x),  (x),  (x)}
-#define M3F32_IDENTITY     {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f}
-#define M3F32_DIAGONAL(x)  { (x), 0.0f, 0.0f, 0.0f,  (x), 0.0f, 0.0f, 0.0f,  (x)}
-#define M3F32_SCALE(x,y,z) { (x), 0.0f, 0.0f, 0.0f,  (y), 0.0f, 0.0f, 0.0f,  (z)}
-struct m3f32
+#define M3F32_ZERO         {{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}}
+#define M3F32_REPEAT(x)    {{ (x),  (x),  (x),  (x),  (x),  (x),  (x),  (x),  (x)}}
+#define M3F32_IDENTITY     {{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f}}
+#define M3F32_DIAGONAL(x)  {{ (x), 0.0f, 0.0f, 0.0f,  (x), 0.0f, 0.0f, 0.0f,  (x)}}
+#define M3F32_SCALE(x,y,z) {{ (x), 0.0f, 0.0f, 0.0f,  (y), 0.0f, 0.0f, 0.0f,  (z)}}
+typedef union m3f32
 {
-	float m11;
-	float m21;
-	float m31;
-	float m12;
-	float m22;
-	float m32;
-	float m13;
-	float m23;
-	float m33;
-};
+	float m[9];
+	struct
+	{
+		float m11;
+		float m21;
+		float m31;
+		float m12;
+		float m22;
+		float m32;
+		float m13;
+		float m23;
+		float m33;
+	};
+	v3f32 c[3];
+} m3f32;
 
 
 
@@ -119,30 +137,34 @@ struct m3f32
 #define M4_34 14
 #define M4_44 15
 //                                 |-------Column1--------|--------Column2--------|--------Column2--------|--------Column3--------|
-#define M4F32_ZERO                 {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
-#define M4F32_IDENTITY             {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f}
-#define M4F32_DIAGONAL(x)          { (x), 0.0f, 0.0f, 0.0f, 0.0f,  (x), 0.0f, 0.0f, 0.0f, 0.0f,  (x), 0.0f, 0.0f, 0.0f, 0.0f,  (x)}
-#define M4F32_SCALE(x,y,z,w)       { (x), 0.0f, 0.0f, 0.0f, 0.0f,  (y), 0.0f, 0.0f, 0.0f, 0.0f,  (z), 0.0f, 0.0f, 0.0f, 0.0f,  (w)}
-#define M4F32_TRANSLATION(x,y,z)   {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  (x),  (y),  (z), 1.0f}
-struct m4f32
+#define M4F32_ZERO                 {{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}}
+#define M4F32_IDENTITY             {{1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f}}
+#define M4F32_DIAGONAL(x)          {{ (x), 0.0f, 0.0f, 0.0f, 0.0f,  (x), 0.0f, 0.0f, 0.0f, 0.0f,  (x), 0.0f, 0.0f, 0.0f, 0.0f,  (x)}}
+#define M4F32_SCALE(x,y,z,w)       {{ (x), 0.0f, 0.0f, 0.0f, 0.0f,  (y), 0.0f, 0.0f, 0.0f, 0.0f,  (z), 0.0f, 0.0f, 0.0f, 0.0f,  (w)}}
+#define M4F32_TRANSLATION(x,y,z)   {{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  (x),  (y),  (z), 1.0f}}
+typedef union m4f32
 {
-	float m11;
-	float m21;
-	float m31;
-	float m41;
-	float m12;
-	float m22;
-	float m32;
-	float m42;
-	float m13;
-	float m23;
-	float m33;
-	float m43;
-	float m14;
-	float m24;
-	float m34;
-	float m44;
-};
+	float m[16];
+	struct
+	{
+		float m11;
+		float m21;
+		float m31;
+		float m41;
+		float m12;
+		float m22;
+		float m32;
+		float m42;
+		float m13;
+		float m23;
+		float m33;
+		float m43;
+		float m14;
+		float m24;
+		float m34;
+		float m44;
+	};
+} m4f32;
 
 
 
