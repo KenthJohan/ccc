@@ -18,19 +18,19 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 struct csc_gcam
 {
-	struct v3f32 d;//Delta
-	struct v3f32 p;//Position
+	v3f32 d;//Delta
+	v3f32 p;//Position
 	float fov;//Field Of View
 	float w;//Width
 	float h;//Height
 	float n;//Near
 	float f;//Far
-	struct v3f32 pyr_delta; //Euler angles
-	struct qf32 q;//Quaternion rotation
-	struct m4f32 mr;//Rotation matrix
-	struct m4f32 mt;//Translation matrix
-	struct m4f32 mp;//Projection matrix
-	struct m4f32 mvp;//View-Projection matrix
+	v3f32 pyr_delta; //Euler angles
+	qf32 q;//Quaternion rotation
+	m4f32 mr;//Rotation matrix
+	m4f32 mt;//Translation matrix
+	m4f32 mp;//Projection matrix
+	m4f32 mvp;//View-Projection matrix
 };
 
 
@@ -57,9 +57,9 @@ void csc_gcam_init (struct csc_gcam * cam)
 
 void csc_gcam_update (struct csc_gcam * cam)
 {
-	struct qf32 q_pitch;//Quaternion pitch rotation
-	struct qf32 q_yaw;//Quaternion yaw rotation
-	struct qf32 q_roll;//Quaternion roll rotation
+	qf32 q_pitch;//Quaternion pitch rotation
+	qf32 q_yaw;//Quaternion yaw rotation
+	qf32 q_roll;//Quaternion roll rotation
 	m4f32_identity (&cam->mvp);
 	m4f32_identity (&cam->mt);
 	m4f32_identity (&cam->mr);

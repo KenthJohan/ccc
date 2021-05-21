@@ -25,11 +25,15 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 #define V2F32_ZERO {0.0f, 0.0f}
 #define V2F32_REPEAT(x) {(x), (x)}
-struct v2f32
+typedef union v2f32
 {
-	float x;
-	float y;
-};
+	float e[2];
+	struct
+	{
+		float x;
+		float y;
+	};
+} v2f32;
 
 
 #define QF32_IDENTITY  {0.0f, 0.0f, 0.0f, 1.0f}

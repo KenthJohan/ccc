@@ -8,7 +8,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include "csc_math.h"
 #include "csc_v3f32.h"
 
-void csc_sdl_motion_wasd (const Uint8 * keyboard, struct v3f32 * d)
+void csc_sdl_motion_wasd (const Uint8 * keyboard, v3f32 * d)
 {
 	d->x = (keyboard [SDL_SCANCODE_A] - keyboard [SDL_SCANCODE_D]);
 	d->y = (keyboard [SDL_SCANCODE_LCTRL] - keyboard [SDL_SCANCODE_SPACE]);
@@ -16,7 +16,7 @@ void csc_sdl_motion_wasd (const Uint8 * keyboard, struct v3f32 * d)
 }
 
 
-void csc_sdl_motion_pyr (const Uint8 * keyboard, struct v3f32 * pyr)
+void csc_sdl_motion_pyr (const Uint8 * keyboard, v3f32 * pyr)
 {
 	pyr->x = (keyboard [SDL_SCANCODE_DOWN] - keyboard [SDL_SCANCODE_UP]);
 	pyr->y = (keyboard [SDL_SCANCODE_RIGHT] - keyboard [SDL_SCANCODE_LEFT]);
