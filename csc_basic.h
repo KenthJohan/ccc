@@ -18,8 +18,10 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define U8_U32_BE(d, c, b, a) ((uint32_t)((a) | (b) << 8 | (c) << 16 | (d) << 24))
 #define STR4_U32_LE(s) U8_U32_LE(s[0],s[1],s[2],s[3])
 #define STR4_U32_BE(s) U8_U32_BE(s[0],s[1],s[2],s[3])
-#define STRINGIFY0(x) #x
-#define STRINGIFY(x)  STRINGIFY0(x)
+//#define STRINGIFY0(x) #x
+//#define STRINGIFY(x)  STRINGIFY0(x)
+#define XSTR(a) STR(a)
+#define STR(a) #a
 
 #define container_of(ptr, type, member) ((type *)(void *)((char *)(ptr) - offsetof(type, member)))
 #define container_of_const(ptr, type, member) ((type *)(void const *)((char const *)(ptr) - offsetof(type, member)))

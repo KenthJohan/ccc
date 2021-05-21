@@ -3,7 +3,7 @@ SPDX-License-Identifier: GPL-2.0
 SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@gmail.com>
 */
 #pragma once
-
+#include "csc_basic.h"
 //https://misc.flogisoft.com/bash/tip_colors_and_formatting
 
 //Stringyfier for c preproccessor
@@ -42,3 +42,9 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 //Default text color used in terminals
 //#define TCOL_DEFAULT TCOL (TCOL_NORMAL, TCOL_DEFAULT, TCOL_DEFAULT)
 #define TCOL_RST "\e[0m"
+
+
+
+#define TFG(r,g,b) "\e[38;2;"XSTR(r)";"XSTR(g)";"XSTR(b)"m" //Select RGB foreground color
+#define TBG(r,g,b) "\e[48;2;"XSTR(r)";"XSTR(g)";"XSTR(b)"m" //Select RGB background color
+
