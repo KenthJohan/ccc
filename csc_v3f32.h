@@ -11,6 +11,14 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 
 
+static void v3f32_set1 (v3f32 * r, float b)
+{
+	r->x = b;
+	r->y = b;
+	r->z = b;
+}
+
+
 static void v3f32_set_xyz (v3f32 * r, float x, float y, float z)
 {
 	r->x = x;
@@ -195,3 +203,25 @@ uint32_t v3f32_ball (v3f32 const x[], uint32_t n, v3f32 const * c, v3f32 y[], fl
 	}
 	return m;
 }
+
+
+
+
+
+
+
+static void v3f32_meanacc (v3f32 * y, v3f32 const x[], uint32_t n)
+{
+	ASSERT (n > 0); //Divide by zero protection
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		y->x += x[i].x;
+		y->y += x[i].y;
+		y->z += x[i].z;
+	}
+	float s = 1.0f / n;
+	y->x *= s;
+	y->y *= s;
+	y->z *= s;
+}
+

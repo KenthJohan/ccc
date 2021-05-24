@@ -67,7 +67,7 @@ typedef union v4f32
 
 
 
-#define V3F32_ZERO {0.0f, 0.0f, 0.0f}
+#define V3F32_ZERO {{0.0f, 0.0f, 0.0f}}
 #define V3F32_REPEAT(x) {(x), (x), (x)}
 #define V3F32_V4F32(x) {(x).x, (x).y, (x).z}
 typedef union v3f32
