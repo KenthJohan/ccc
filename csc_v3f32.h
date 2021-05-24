@@ -42,6 +42,17 @@ static void v3f32_sub (v3f32 * r, v3f32 const * a, v3f32 const * b)
 	r->z = a->z - b->z;
 }
 
+static void v3f32_subv (v3f32 r[], v3f32 const a[], v3f32 const b[], uint32_t incr, uint32_t inca, uint32_t incb, uint32_t n)
+{
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		v3f32_sub (r, a, b);
+		r += incr;
+		a += inca;
+		b += incb;
+	}
+}
+
 
 static void v3f32_add (v3f32 * r, v3f32 const * a, v3f32 const * b)
 {
@@ -165,3 +176,22 @@ static void v3f32_m3_mul (v3f32 * y, m3f32 const * a, v3f32 * const b)
 	y->z += (a->m13 * b->x) + (a->m23 * b->y) + (a->m33 * b->z);
 }
 
+
+
+
+//Copy all points inside the ball
+uint32_t v3f32_ball (v3f32 const x[], uint32_t n, v3f32 const * c, v3f32 y[], float r)
+{
+	uint32_t m = 0;
+	for(uint32_t i = 0; i < n; ++i)
+	{
+		v3f32 d;
+		v3f32_sub (&d, x + i, c);
+		if (v3f32_norm2 (&d) < (r*r))
+		{
+			y[m] = x[i];
+			m++;
+		}
+	}
+	return m;
+}

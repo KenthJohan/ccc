@@ -47,6 +47,17 @@ static void v4f32_sub (v4f32 * r, v4f32 const * a, v4f32 const * b)
 	r->w = a->w - b->w;
 }
 
+static void v4f32_subv (v4f32 r[], v4f32 const a[], v4f32 const b[], uint32_t incr, uint32_t inca, uint32_t incb, uint32_t n)
+{
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		v4f32_sub (r, a, b);
+		r += incr;
+		a += inca;
+		b += incb;
+	}
+}
+
 
 static void v4f32_set1 (v4f32 * r, float b)
 {
