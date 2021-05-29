@@ -23,133 +23,11 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define STR_ALIGN_MIDDLE (1 << 4)
 
 
-__attribute__ ((unused))
-static inline
-intmax_t str_to_imax (char const ** f, int base)
-{
-	intmax_t a = 0;
-	int c;
-	int neg = 0;
-	c = (**f);
-	if (c == '-') {neg = 1; (*f) ++;}
-	else if (c == '+') {neg = 0; (*f) ++;}
-	while (1)
-	{
-		c = (**f);
-		if (c == '\0') {break;}
-		else if (STR_INB (c, '0', '9', abs(base))) {c -= '0';}
-		else if (abs(base) > 10 && STR_INB (c, 'a', 'z', abs(base))) {c -= ('a' - 10);}
-		else if (abs(base) > 10 && STR_INB (c, 'A', 'Z', abs(base))) {c -= ('A' - 10);}
-		else {break;}
-		a *= (intmax_t) base;
-		a += (intmax_t) c;
-		(*f) ++;
-	}
-	if (neg) {return -a;}
-	else {return a;}
-}
 
 
-__attribute__ ((unused))
-static inline
-uintmax_t str_to_umax (char ** f, int base)
-{
-	uintmax_t a = 0;
-	int c;
-	while (1)
-	{
-		c = (**f);
-		if (c == '\0') {break;}
-		else if (STR_INB (c, '0', '9', abs (base))) {c -= '0';}
-		else if (abs (base) > 10 && STR_INB (c, 'a', 'z', abs (base))) {c -= ('a' - 10);}
-		else if (abs (base) > 10 && STR_INB (c, 'A', 'Z', abs (base))) {c -= ('A' - 10);}
-		else {break;}
-		a *= (uintmax_t) base;
-		a += (uintmax_t) c;
-		(*f) ++;
-	}
-	return a;
-}
 
 
-//TODO: base is not correct
-__attribute__ ((unused))
-static inline
-uintmax_t str_to_umax_ab (char const * a, char const * b, int base)
-{
-	uintmax_t v = 0;
-	int c;
-	while (1)
-	{
-		c = a [0];
-		if (a == b) {break;}
-		if (c == '\0') {break;}
-		else if (STR_INB (c, '0', '9', abs (base))) {c -= '0';}
-		else if (abs (base) > 10 && STR_INB (c, 'a', 'z', abs (base))) {c -= ('a' - 10);}
-		else if (abs (base) > 10 && STR_INB (c, 'A', 'Z', abs (base))) {c -= ('A' - 10);}
-		else {break;}
-		v *= (uintmax_t) base;
-		v += (uintmax_t) c;
-		a ++;
-	}
-	return v;
-}
-
-
-__attribute__ ((unused))
-static inline
-uintmax_t str_to_umax_ab_adabase (char const * a, char const * b)
-{
-	char const * aa = a;
-	int base = (int)str_to_imax (&aa, 10);
-	if (aa[0] == '#')
-	{
-		aa++;
-		return str_to_umax_ab (aa, b, base);
-	}
-	return str_to_umax_ab (a, b, 10);
-}
-
-
-__attribute__ ((unused))
-static inline
-uint32_t str_to_u32 (char ** f, int base)
-{
-	uintmax_t v = str_to_umax (f, base);
-	return (uint32_t) v;
-}
-
-
-__attribute__ ((unused))
-static inline
-int32_t str_to_i32 (char const ** f, int base)
-{
-	intmax_t v = str_to_imax (f, base);
-	return (int8_t) v;
-}
-
-
-__attribute__ ((unused))
-static inline
-int8_t str_to_i8 (char const ** f, int base)
-{
-	intmax_t v = str_to_imax (f, base);
-	return (int8_t) v;
-}
-
-
-__attribute__ ((unused))
-static inline
-uint8_t str_to_u8 (char ** f, int base)
-{
-	uintmax_t v = str_to_umax (f, base);
-	return (uint8_t) v;
-}
-
-
-__attribute__ ((unused))
-static inline
-void str_rev (char * o, uint32_t n)
+static inline void str_rev (char * o, uint32_t n)
 {
 	char * e = o + n;
 	n /= 2;
@@ -162,9 +40,8 @@ void str_rev (char * o, uint32_t n)
 }
 
 
-__attribute__ ((unused))
-static inline
-void str_rep (char * o, uint32_t n, char pad)
+
+static inline void str_rep (char * o, uint32_t n, char pad)
 {
 	while (n--)
 	{
@@ -174,95 +51,6 @@ void str_rep (char * o, uint32_t n, char pad)
 }
 
 
-__attribute__ ((unused))
-static inline
-void str_from_imax (char * o, uint32_t n, intmax_t value, int base, char pad)
-{
-	ASSERT_PARAM_NOTNULL (o);
-	ASSERT (base != 0);
-	ASSERT (base < (int8_t)sizeof (STR_SET_0Z));
-	int rem;
-	int negative = 0;
-	if (n == 0) {return;}
-	o += n;
-	if (value < 0)
-	{
-		value = -value;
-		negative = 1;
-	}
-	while (1)
-	{
-		if (n == 0) {break;}
-		rem = value % base;
-		value /= base;
-		if (rem < 0)
-		{
-			rem += abs (base);
-			value += 1;
-		}
-		o --;
-		n --;
-		*o = STR_SET_0Z [rem];
-		if (value == 0) {break;}
-	}
-	if (n > 0 && negative)
-	{
-		o --;
-		n --;
-		*o = '-';
-	}
-	while (1)
-	{
-		if (n == 0) {break;}
-		o --;
-		n --;
-		*o = pad;
-	}
-	return;
-}
-
-
-__attribute__ ((unused))
-static inline
-uint32_t str_from_imax2 (char * o, uint32_t n, intmax_t value, int base)
-{
-	ASSERT_PARAM_NOTNULL (o);
-	ASSERT (base != 0);
-	ASSERT (base < (int8_t)sizeof (STR_SET_0Z));
-	int rem;
-	uint32_t m = 0;
-	if (m >= n) {return m;}
-	if (value < 0)
-	{
-		value = -value;
-		*o = '-';
-		o ++;
-		m ++;
-	}
-	else
-	{
-		*o = '+';
-		o ++;
-		m ++;
-	}
-	while (1)
-	{
-		if (m >= n) {break;}
-		rem = value % base;
-		value /= base;
-		if (rem < 0)
-		{
-			rem += abs (base);
-			value += 1;
-		}
-		*o = STR_SET_0Z [rem];
-		o ++;
-		m ++;
-		if (value == 0) {break;}
-	}
-	str_rev (o-m+1, m-1);
-	return m;
-}
 
 
 /*
@@ -272,9 +60,8 @@ eg:
 	char * ext = strrchr (filename, '.');
 	size_t n = csc_str_contains1 (ext, ".txt, .png ,.json", ", ");
 */
-__attribute__ ((unused))
-static inline
-size_t csc_str_contains1 (char const * str1, char const * str2, char const * delimiters)
+static inline size_t csc_str_contains1
+(char const * str1, char const * str2, char const * delimiters)
 {
 	if (str1 == NULL) {return 0;}
 	if (str2 == NULL) {return 0;}
@@ -305,9 +92,8 @@ eg:
 	char * ext1 = strrchr ("C:/docs/hello.txt", '.');
 	char * ext0 = strrchr ("C:/docs/hello.txt", '/');
 */
-__attribute__ ((unused))
-static inline
-int csc_str_next_cmp (char const ** p, int * col, char const * str)
+static inline int csc_str_next_cmp
+(char const ** p, int * col, char const * str)
 {
 	size_t l = strlen (str);
 	int diff = strncmp (*p, str, l);
@@ -321,24 +107,24 @@ int csc_str_next_cmp (char const ** p, int * col, char const * str)
 }
 
 
-__attribute__ ((unused))
-static inline
-void csc_str_skip (char const ** p, int (*f)(int))
+
+static inline void csc_str_skip (char const ** p, int (*f)(int))
 {
 	while (f (**p)) {(*p)++;}
 }
 
 
-int csc_isindentifer (int a)
+static inline int csc_isindentifer (int a)
 {
 	return isalnum (a) || (a == '_');
 }
 
 
-__attribute__ ((unused))
-static inline
-int csc_next_indentifer (char const ** p, int * col)
+
+static inline int csc_next_indentifer (char const ** p, int * col)
 {
+	ASSERT_PARAM_NOTNULL (p);
+	ASSERT_PARAM_NOTNULL (col);
 	char const * q = (*p);
 	csc_str_skip (p, csc_isindentifer);
 	ptrdiff_t n = (*p) - q;
@@ -347,10 +133,11 @@ int csc_next_indentifer (char const ** p, int * col)
 }
 
 
-__attribute__ ((unused))
-static inline
-int csc_next_literal (char const ** p, int * col)
+
+static inline int csc_next_literal (char const ** p, int * col)
 {
+	ASSERT_PARAM_NOTNULL (p);
+	ASSERT_PARAM_NOTNULL (col);
 	char const * q = (*p);
 	csc_str_skip (p, isdigit);
 	ptrdiff_t n = (*p) - q;
@@ -359,10 +146,13 @@ int csc_next_literal (char const ** p, int * col)
 }
 
 
-__attribute__ ((unused))
-static inline
-void csc_str_print_hex_array (char * s, size_t sn, uint8_t * v, size_t vn, char const * format, size_t step)
+
+static inline void csc_str_print_hex_array
+(char * s, size_t sn, uint8_t * v, size_t vn, char const * format, size_t step)
 {
+	ASSERT_PARAM_NOTNULL (s);
+	ASSERT_PARAM_NOTNULL (v);
+	ASSERT_PARAM_NOTNULL (format);
 	while (vn--)
 	{
 		if (sn < step) {break;}
@@ -373,10 +163,10 @@ void csc_str_print_hex_array (char * s, size_t sn, uint8_t * v, size_t vn, char 
 }
 
 
-__attribute__ ((unused))
-static inline
-void str_skip_space (char ** p)
+
+static inline void str_skip_space (char ** p)
 {
+	ASSERT_PARAM_NOTNULL (p);
 	while (isspace (**p))
 	{
 		(*p)++;
@@ -384,10 +174,10 @@ void str_skip_space (char ** p)
 }
 
 
-__attribute__ ((unused))
-static inline
-void str_skip_alnum (char ** p)
+
+static inline void str_skip_alnum (char ** p)
 {
+	ASSERT_PARAM_NOTNULL (p);
 	while (isalnum (**p))
 	{
 		(*p)++;
@@ -395,10 +185,11 @@ void str_skip_alnum (char ** p)
 }
 
 
-__attribute__ ((unused))
-static inline
-void str_skip_until (char ** p, char * needles)
+
+static inline void str_skip_until (char ** p, char * needles)
 {
+	ASSERT_PARAM_NOTNULL (p);
+	ASSERT_PARAM_NOTNULL (needles);
 	while ((**p) && strchr (needles, **p) == NULL)
 	{
 		(*p)++;
@@ -406,10 +197,11 @@ void str_skip_until (char ** p, char * needles)
 }
 
 
-__attribute__ ((unused))
-static inline
-void str_skip_after (char ** p, char * needles)
+
+static inline void str_skip_after (char ** p, char * needles)
 {
+	ASSERT_PARAM_NOTNULL (p);
+	ASSERT_PARAM_NOTNULL (needles);
 	while ((**p) && strchr (needles, **p) != NULL)
 	{
 		(*p)++;
@@ -425,8 +217,8 @@ void str_skip_after (char ** p, char * needles)
  * @param s2_end End of second string. Can be NULL.
  * @return
  */
-static inline int
-csc_str_cmp (char const * s1, char const * s2, char const * s1_end, char const * s2_end)
+static inline int csc_str_cmp
+(char const * s1, char const * s2, char const * s1_end, char const * s2_end)
 {
 	ASSERT_PARAM_NOTNULL (s1);
 	ASSERT_PARAM_NOTNULL (s2);

@@ -1,5 +1,4 @@
-#include "csc_str.h"
-
+#include "csc_strto.h"
 
 
 int main (int argc, char * argv [])
@@ -10,7 +9,7 @@ int main (int argc, char * argv [])
 	{
 		char const * a = "2Hello";
 		char const * p = a;
-		intmax_t i = str_to_imax (&p, 10);
+		intmax_t i = strto_imax (&p, 10);
 		ASSERT (i == 2);
 		ASSERT ((p - a) == 1);
 	}
@@ -18,7 +17,7 @@ int main (int argc, char * argv [])
 	{
 		char const * a = "ABC123XYX";
 		char const * p = a;
-		intmax_t i = str_to_imax (&p, 10);
+		intmax_t i = strto_imax (&p, 10);
 		ASSERT (i == 0);
 		ASSERT ((p - a) == 0);
 	}
@@ -26,7 +25,7 @@ int main (int argc, char * argv [])
 	{
 		char const * a = "ABC123XYX";
 		char const * p = a;
-		intmax_t i = str_to_imax (&p, 16);
+		intmax_t i = strto_imax (&p, 16);
 		ASSERT (i == 0xABC123);
 		ASSERT ((p - a) == 6);
 	}
@@ -34,7 +33,7 @@ int main (int argc, char * argv [])
 	{
 		char const * a = "-123-";
 		char const * p = a;
-		intmax_t i = str_to_imax (&p, 10);
+		intmax_t i = strto_imax (&p, 10);
 		ASSERT (i == -123);
 		ASSERT ((p - a) == 4);
 	}
@@ -42,7 +41,7 @@ int main (int argc, char * argv [])
 	{
 		char const * a = "+123-";
 		char const * p = a;
-		intmax_t i = str_to_imax (&p, 10);
+		intmax_t i = strto_imax (&p, 10);
 		ASSERT (i == 123);
 		ASSERT ((p - a) == 4);
 	}
