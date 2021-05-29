@@ -186,7 +186,7 @@ static inline void str_skip_alnum (char ** p)
 
 
 
-static inline void str_skip_until (char ** p, char * needles)
+static inline void str_skip_until (char const ** p, char * needles)
 {
 	ASSERT_PARAM_NOTNULL (p);
 	ASSERT_PARAM_NOTNULL (needles);
@@ -198,7 +198,7 @@ static inline void str_skip_until (char ** p, char * needles)
 
 
 
-static inline void str_skip_after (char ** p, char * needles)
+static inline void str_skip_after (char const ** p, char * needles)
 {
 	ASSERT_PARAM_NOTNULL (p);
 	ASSERT_PARAM_NOTNULL (needles);
