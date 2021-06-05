@@ -4,15 +4,25 @@
 #include <stdarg.h>
 #include "csc_tcol.h"
 
+
+
 enum xloglvl
 {
 	XLOG_ERR,
 	XLOG_WRN,
-	XLOG_INF,
+	XLOG_INF
+};
 
-	XLOG_GLERR,
-	XLOG_GLWRN,
-	XLOG_GLINF,
+
+enum xlogcategory
+{
+	XLOG_GENERAL,
+	XLOG_SDL,
+	XLOG_OPENGL,
+	XLOG_ECS,
+	XLOG_ECS_ONSET,
+	XLOG_ECS_ONADD,
+	XLOG_ECS_ONUPDATE,
 };
 
 static char const * xloglvl_tostr(enum xloglvl level)
@@ -28,30 +38,49 @@ static char const * xloglvl_tostr(enum xloglvl level)
 	case XLOG_INF:
 		return TFG(180,180,255) "INF" TCOL_RST;
 		break;
+	}
+	return "";
+}
 
-
-	case XLOG_GLERR:
-		return TFG(255,50,50) "GLERR" TCOL_RST;
+static char const * xlogcategory_tostr(enum xlogcategory category)
+{
+	switch (category)
+	{
+	case XLOG_GENERAL:
+		return TFG(152,90,133) "GENERAL  " TCOL_RST;
 		break;
-	case XLOG_GLWRN:
-		return TFG(200,200,50) "GLWRN" TCOL_RST;
+	case XLOG_OPENGL:
+		return TFG(152,90,133) "OPENGL   " TCOL_RST;
 		break;
-	case XLOG_GLINF:
-		return TFG(180,180,255) "GLINF" TCOL_RST;
+	case XLOG_ECS:
+		return TFG(152,90,133) "ECS      " TCOL_RST;
+		break;
+	case XLOG_SDL:
+		return TFG(152,90,133) "SDL      " TCOL_RST;
+		break;
+	case XLOG_ECS_ONSET:
+		return TFG(152,90,133) "ECS_ONSET" TCOL_RST;
+		break;
+	case XLOG_ECS_ONADD:
+		return TFG(152,90,133) "ECS_ONADD" TCOL_RST;
+		break;
+	case XLOG_ECS_ONUPDATE:
+		return TFG(152,90,133) "ECS_ONUP " TCOL_RST;
 		break;
 	}
 	return "";
 }
 
-#define XLOG(level, format, ...) xlog(__COUNTER__, __FILE__, __LINE__, __func__, level, (format), ## __VA_ARGS__)
+#define XLOG(level, category, format, ...) xlog(__COUNTER__, __FILE__, __LINE__, __func__, level, category, (format), ## __VA_ARGS__)
 
-void xlog(int counter, char const * file, int line, char const * func, enum xloglvl level, char * format, ...)
+void xlog(int counter, char const * file, int line, char const * func, enum xloglvl level, enum xlogcategory category, char * format, ...)
 {
 	va_list args;
 	va_start (args, format);
 	char * w = TFG(100,100,100);
-	printf ("%s%s [%i] %s:%i "TFG(130, 110, 60)"%s() "TCOL_RST, xloglvl_tostr(level), w, counter, file, line, func);
+	printf ("%s %s%s [%i] %s:%i "TFG(130, 110, 60)"%s() "TCOL_RST, xloglvl_tostr(level), xlogcategory_tostr(category), w, counter, file, line, func);
 	vprintf (format, args);
+	putc ('\n', stdout);
 	va_end (args);
 }
 

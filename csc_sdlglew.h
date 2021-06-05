@@ -22,22 +22,22 @@ static void GLAPIENTRY csc_sdlglew_gldebug_callback
 	switch (severity)
 	{
 	case GL_DEBUG_SEVERITY_HIGH:
-		XLOG (XLOG_GLERR, "%s [%x]\n", message, severity);
+		XLOG (XLOG_ERR, XLOG_OPENGL, "%s [%x]\n", message, severity);
 		abort();
 		break;
 	case GL_DEBUG_SEVERITY_MEDIUM:
-		XLOG (XLOG_GLERR, "%s [%x]\n", message, severity);
+		XLOG (XLOG_ERR, XLOG_OPENGL, "%s [%x]\n", message, severity);
 		abort();
 		break;
 	case GL_DEBUG_SEVERITY_LOW:
-		XLOG (XLOG_GLERR, "%s [%x]\n", message, severity);
+		XLOG (XLOG_ERR, XLOG_OPENGL, "%s [%x]\n", message, severity);
 		abort();
 		break;
 	case GL_DEBUG_SEVERITY_NOTIFICATION:
-		XLOG (XLOG_GLINF, "%s [%x]\n", message, severity);
+		XLOG (XLOG_INF, XLOG_OPENGL, "%s [%x]\n", message, severity);
 		break;
 	default:
-		XLOG (XLOG_GLINF, "%s [%x]\n", message, severity);
+		XLOG (XLOG_INF, XLOG_OPENGL, "%s [%x]\n", message, severity);
 		break;
 	}
 }
@@ -49,21 +49,21 @@ void csc_sdlglew_create_window (SDL_Window ** window, SDL_GLContext * context, c
 {
 	if (SDL_Init (SDL_INIT_VIDEO) != 0)
 	{
-		XLOG (XLOG_ERR, "There was an error initializing the SDL library: %s\n", SDL_GetError());
+		XLOG (XLOG_ERR, XLOG_SDL, "There was an error initializing the SDL library: %s", SDL_GetError());
 		exit (1);
 	}
 
 	(*window) = SDL_CreateWindow (title, x, y, w, h, flags);
 	if ((*window) == NULL)
 	{
-		XLOG (XLOG_ERR, " Could not create SDL_Window: %s\n", SDL_GetError());
+		XLOG (XLOG_ERR, XLOG_SDL, " Could not create SDL_Window: %s", SDL_GetError());
 		exit (1);
 	}
 
 	(*context) = SDL_GL_CreateContext (*window);
 	if ((*context) == NULL)
 	{
-		XLOG (XLOG_ERR, " Could not create SDL_GLContext: %s\n", SDL_GetError());
+		XLOG (XLOG_ERR, XLOG_SDL, " Could not create SDL_GLContext: %s", SDL_GetError());
 		exit (1);
 	}
 
@@ -72,10 +72,10 @@ void csc_sdlglew_create_window (SDL_Window ** window, SDL_GLContext * context, c
 		GLenum err = glewInit();
 		if (GLEW_OK != err)
 		{
-			XLOG (XLOG_ERR, " %s\n", glewGetErrorString (err));
+			XLOG (XLOG_ERR, XLOG_SDL, " %s", glewGetErrorString (err));
 			exit (1);
 		}
-		XLOG (XLOG_INF, " Using GLEW %s\n", glewGetString (GLEW_VERSION));
+		XLOG (XLOG_INF, XLOG_SDL, " Using GLEW %s", glewGetString (GLEW_VERSION));
 	}
 
 	// Enable the debug callback
@@ -118,7 +118,7 @@ void csc_sdlglew_event_loop (SDL_Window * window, SDL_Event * event, uint32_t * 
 			gcam->w = w;
 			gcam->h = h;
 			glViewport (0, 0, w, h);
-			XLOG (XLOG_INF, " SDL_WINDOWEVENT_RESIZED: %i %i\n", w, h);
+			XLOG (XLOG_INF, XLOG_SDL, " SDL_WINDOWEVENT_RESIZED: %i %i\n", w, h);
 		}
 		break;
 	case SDL_KEYDOWN:
