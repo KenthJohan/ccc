@@ -34,24 +34,8 @@ struct gatlas
 
 
 static int gtext_init
-(char const * fontname, struct gchar c[], int height, struct gatlas * atlas)
+(FT_Face face, struct gchar c[], struct gatlas * atlas)
 {
-	FT_Library ft;
-	// All functions return a value different than 0 whenever an error occurred
-	if (FT_Init_FreeType(&ft))
-	{
-		XLOG (XLOG_ERR, XLOG_GENERAL, "Could not init FreeType Library");
-		return -1;
-	}
-
-	FT_Face face;
-	if (FT_New_Face(ft, fontname, 0, &face))
-	{
-		XLOG (XLOG_ERR, XLOG_GENERAL, "Failed to load font");
-		return -1;
-	}
-
-	FT_Set_Pixel_Sizes (face, 0, height);
 	FT_GlyphSlot g = face->glyph;
 	unsigned int w = 0;
 	unsigned int h = 0;
@@ -89,8 +73,10 @@ static int gtext_init
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	/* Linear filtering usually looks best for text */
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	/* Paste all glyph bitmaps into the texture, remembering the offset */
 	int ox = 0;
@@ -116,16 +102,12 @@ static int gtext_init
 		glTexSubImage2D(GL_TEXTURE_2D, 0, ox, oy, g->bitmap.width, g->bitmap.rows, GL_ALPHA, GL_UNSIGNED_BYTE, g->bitmap.buffer);
 		c[i].ax = g->advance.x >> 6;
 		c[i].ay = g->advance.y >> 6;
-
 		c[i].bw = g->bitmap.width;
 		c[i].bh = g->bitmap.rows;
-
 		c[i].bl = g->bitmap_left;
 		c[i].bt = g->bitmap_top;
-
 		c[i].tx = ox / (float)w;
 		c[i].ty = oy / (float)h;
-
 		rowh = MAX(rowh, g->bitmap.rows);
 		ox += g->bitmap.width + 1;
 	}
@@ -244,41 +226,47 @@ struct gtext_context
 	GLuint program;
 	struct gchar c[128];
 	struct gatlas atlas;
+	FT_Face face;
 };
 
 
-static void gtext_context_init(struct gtext_context * ctx, char const * fontname, GLuint program)
+static void gtext_context_init(struct gtext_context * ctx, GLuint program)
 {
 	glUseProgram (program);
 	ctx->uniform_tex = glGetUniformLocation (program, "tex0");
 	ctx->uniform_mvp = glGetUniformLocation (program, "mvp");
 	ctx->program = program;
 	// Create a texture that will be used to hold all ASCII glyphs
-	glActiveTexture(GL_TEXTURE0);
-	glGenTextures(1, &ctx->tex);
-	glBindTexture(GL_TEXTURE_2D, ctx->tex);
-	glUniform1i(ctx->uniform_tex, 0);
-	gtext_init (fontname, ctx->c, 24, &ctx->atlas);
-	// Set up the VBO for our vertex data
+	unsigned unit = 0;
+	glActiveTexture (GL_TEXTURE0 + unit);
+	glGenTextures (1, &ctx->tex);
+	glBindTexture (GL_TEXTURE_2D, ctx->tex);
+	glUniform1i (ctx->uniform_tex, unit);
+	gtext_init (ctx->face, ctx->c, &ctx->atlas);
 
-	glGenBuffers(1, &ctx->vbo_pos);
-	glGenBuffers(1, &ctx->vbo_uv);
+	// Set up the VBO for our vertex data
+	enum attr
+	{
+		ATTRIBUTE_POS = 0, // vertex shader: "layout (location = 0)"
+		ATTRIBUTE_UV = 1,  // vertex shader: "layout (location = 1)"
+	};
+	glGenBuffers (1, &ctx->vbo_pos);
+	glGenBuffers (1, &ctx->vbo_uv);
 	glGenVertexArrays (1, &ctx->vao);
 	glBindVertexArray (ctx->vao);
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, ctx->vbo_pos);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, ctx->vbo_uv);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-	/**/
+	glEnableVertexAttribArray (ATTRIBUTE_POS);
+	glEnableVertexAttribArray (ATTRIBUTE_UV);
+	glBindBuffer (GL_ARRAY_BUFFER, ctx->vbo_pos);
+	glVertexAttribPointer (ATTRIBUTE_POS, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer (GL_ARRAY_BUFFER, ctx->vbo_uv);
+	glVertexAttribPointer (ATTRIBUTE_UV, 2, GL_FLOAT, GL_FALSE, 0, 0);
 }
+
 
 static void gtext_context_draw(struct gtext_context * ctx, char const * text, float x, float y, float z, float sx, float sy, float mvp[4*4])
 {
 	glBindVertexArray (ctx->vao);
-	glUseProgram(ctx->program);
+	glUseProgram (ctx->program);
 	/* Use the texture containing the atlas */
 	glBindTexture (GL_TEXTURE_2D, ctx->tex);
 	glUniform1i (ctx->uniform_tex, 0);
