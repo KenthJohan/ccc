@@ -112,6 +112,25 @@ GLint csc_gl_program_from_files1 (char const * filenames)
 			break;
 		}
 	}
+	GLint logLength;
+	GLint status;
+	glLinkProgram (program);
+
+
+	glGetProgramiv (program, GL_INFO_LOG_LENGTH, &logLength);
+	if (logLength > 0)
+	{
+		GLchar *log = (GLchar *)malloc(logLength);
+		glGetProgramInfoLog(program, logLength, &logLength, log);
+		printf( "Program link log: %s", log );
+		free(log);
+	}
+
+	glGetShaderiv (shader, GL_COMPILE_STATUS, &status);
+	if (status == 0 )
+	{
+		return 0;
+	}
 	return program;
 }
 

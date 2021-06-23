@@ -88,7 +88,7 @@ static int gtext_init
 	{
 		if (FT_Load_Char(face, i, FT_LOAD_RENDER))
 		{
-			XLOG (XLOG_ERR, XLOG_GENERAL, "Loading character %c failed!\n", i);
+			XLOG (XLOG_ERR, XLOG_GENERAL, "Loading character %c failed!", i);
 			continue;
 		}
 
@@ -142,12 +142,12 @@ static void gtext_gen_uv (v2f32 uv[6], float x, float y, float w, float h)
 
 static void make_trianglemesh2 (float *v[], uint32_t stride, float x, float y, float w, float h)
 {
-	*v[0] = x + 0;    *v[1] = y + 0;    v += stride;
-	*v[0] = x + w;    *v[1] = y + 0;    v += stride;
-	*v[0] = x + 0;    *v[1] = y + h;    v += stride;
-	*v[0] = x + w;    *v[1] = y + 0;    v += stride;
-	*v[0] = x + 0;    *v[1] = y + h;    v += stride;
-	*v[0] = x + w;    *v[1] = y + h;    v += stride;
+	(*v)[0] = x + 0;    (*v)[1] = y + h;    (*v) += stride;
+	(*v)[0] = x + w;    (*v)[1] = y + 0;    (*v) += stride;
+	(*v)[0] = x + 0;    (*v)[1] = y + 0;    (*v) += stride;
+	(*v)[0] = x + w;    (*v)[1] = y + 0;    (*v) += stride;
+	(*v)[0] = x + 0;    (*v)[1] = y + h;    (*v) += stride;
+	(*v)[0] = x + w;    (*v)[1] = y + h;    (*v) += stride;
 }
 
 
@@ -184,7 +184,7 @@ static uint32_t gtext_gen
 
 
 static uint32_t gtext_gen1
-(float pos[], uint32_t stride, const char *text, struct gchar c[], uint32_t n, float x, float y, float sx, float sy)
+(float pos[], uint32_t n, uint32_t stride, const char *text, struct gchar c[], float x, float y, float sx, float sy)
 {
 	uint32_t i = 0;
 	const uint8_t *p;
@@ -209,7 +209,7 @@ static uint32_t gtext_gen1
 
 
 static uint32_t gtext_gen2
-(float uv[], uint32_t stride, const char *text, struct gchar c[], uint32_t n, float aw, float ah)
+(float uv[], uint32_t n, uint32_t stride, const char *text, struct gchar c[], float aw, float ah)
 {
 	uint32_t i = 0;
 	const uint8_t *p;

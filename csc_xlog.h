@@ -19,6 +19,7 @@ enum xlogcategory
 	XLOG_GENERAL,
 	XLOG_SDL,
 	XLOG_OPENGL,
+	XLOG_FT,//Freetype
 	XLOG_ECS,
 	XLOG_ECS_ONSET,
 	XLOG_ECS_ONADD,
@@ -51,6 +52,9 @@ static char const * xlogcategory_tostr(enum xlogcategory category)
 		break;
 	case XLOG_OPENGL:
 		return TFG(152,90,133) "OPENGL   " TCOL_RST;
+		break;
+	case XLOG_FT:
+		return TFG(152,90,133) "FT       " TCOL_RST;
 		break;
 	case XLOG_ECS:
 		return TFG(152,90,133) "ECS      " TCOL_RST;
