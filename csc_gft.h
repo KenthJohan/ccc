@@ -139,6 +139,18 @@ static void gtext_gen_uv (v2f32 uv[6], float x, float y, float w, float h)
 	uv[5] = (v2f32){{x + w, y + h}};
 }
 
+
+static void make_trianglemesh2 (float *v[], uint32_t stride, float x, float y, float w, float h)
+{
+	*v[0] = x + 0;    *v[1] = y + 0;    v += stride;
+	*v[0] = x + w;    *v[1] = y + 0;    v += stride;
+	*v[0] = x + 0;    *v[1] = y + h;    v += stride;
+	*v[0] = x + w;    *v[1] = y + 0;    v += stride;
+	*v[0] = x + 0;    *v[1] = y + h;    v += stride;
+	*v[0] = x + w;    *v[1] = y + h;    v += stride;
+}
+
+
 static uint32_t gtext_gen
 (v4f32 pos[], v2f32 uv[], const char *text, struct gchar c[], uint32_t n, float aw, float ah, float x, float y, float z, float sx, float sy)
 {
@@ -167,6 +179,59 @@ static uint32_t gtext_gen
 	}
 	return i;
 }
+
+
+
+
+static uint32_t gtext_gen1
+(float pos[], uint32_t stride, const char *text, struct gchar c[], uint32_t n, float x, float y, float sx, float sy)
+{
+	uint32_t i = 0;
+	const uint8_t *p;
+	for (p = (const uint8_t *)text; *p; p++)
+	{
+		if (i+6 > n) {return n;}
+		// Calculate position coordinates
+		float x2 = x + c[*p].bl * sx;
+		float y2 = y + c[*p].bt * sy;
+		float w = c[*p].bw * sx;
+		float h = c[*p].bh * -sy;
+		// Advance the cursor to the start of the next character
+		x += c[*p].ax * sx;
+		y += c[*p].ay * sy;
+		// Skip glyphs that have no pixels */
+		if (!w || !h) {continue;}
+		make_trianglemesh2 (&pos, stride, x2, y2, w, h);
+		i += 6;
+	}
+	return i;
+}
+
+
+static uint32_t gtext_gen2
+(float uv[], uint32_t stride, const char *text, struct gchar c[], uint32_t n, float aw, float ah)
+{
+	uint32_t i = 0;
+	const uint8_t *p;
+	for (p = (const uint8_t *)text; *p; p++)
+	{
+		if (i+6 > n) {return n;}
+		// Calculate texture coordinates
+		float tx = c[*p].tx;
+		float ty = c[*p].ty;
+		float tw = c[*p].bw / aw;
+		float th = c[*p].bh / ah;
+		// Skip glyphs that have no pixels */
+		if (!c[*p].bw || !c[*p].bh) {continue;}
+		make_trianglemesh2 (&uv, stride, tx, ty, tw, th);
+		i += 6;
+	}
+	return i;
+}
+
+
+
+
 
 
 /**
