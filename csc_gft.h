@@ -186,11 +186,10 @@ static uint32_t gtext_gen
 static uint32_t gtext_gen1
 (float pos[], uint32_t n, uint32_t stride, const char *text, struct gchar c[], float x, float y, float sx, float sy)
 {
-	uint32_t i = 0;
-	const uint8_t *p;
-	for (p = (const uint8_t *)text; *p; p++)
+	uint32_t i = n;
+	uint8_t const *p;
+	for (p = (const uint8_t *)text; *p && (i > 0); p++, --i)
 	{
-		if (i+6 > n) {return n;}
 		// Calculate position coordinates
 		float x2 = x + c[*p].bl * sx;
 		float y2 = y + c[*p].bt * sy;
@@ -202,20 +201,18 @@ static uint32_t gtext_gen1
 		// Skip glyphs that have no pixels */
 		if (!w || !h) {continue;}
 		make_trianglemesh2 (&pos, stride, x2, y2, w, h);
-		i += 6;
 	}
-	return i;
+	return n-i;
 }
 
 
 static uint32_t gtext_gen2
 (float uv[], uint32_t n, uint32_t stride, const char *text, struct gchar c[], float aw, float ah)
 {
-	uint32_t i = 0;
-	const uint8_t *p;
-	for (p = (const uint8_t *)text; *p; p++)
+	uint32_t i = n;
+	uint8_t const *p;
+	for (p = (const uint8_t *)text; *p && (i > 0); p++, --i)
 	{
-		if (i+6 > n) {return n;}
 		// Calculate texture coordinates
 		float tx = c[*p].tx;
 		float ty = c[*p].ty;
@@ -224,9 +221,8 @@ static uint32_t gtext_gen2
 		// Skip glyphs that have no pixels */
 		if (!c[*p].bw || !c[*p].bh) {continue;}
 		make_trianglemesh2 (&uv, stride, tx, ty, tw, th);
-		i += 6;
 	}
-	return i;
+	return n-i;
 }
 
 
