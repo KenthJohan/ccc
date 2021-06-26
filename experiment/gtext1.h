@@ -32,7 +32,7 @@ static void gtext1_setup (struct gtext1_context * ctx)
 {
 	ASSERT_PARAM_NOTNULL (ctx);
 	ctx->char_last = 0;
-	ctx->v = malloc (ctx->maxchars*4*6);
+	ctx->v = malloc (ctx->maxchars*4*6*sizeof(float));
 	ctx->strbuf = malloc (ctx->maxchars);
 	ASSERT_NOTNULL (ctx->v);
 	ASSERT_NOTNULL (ctx->strbuf);
@@ -95,12 +95,12 @@ static void gtext1_draw_format (struct gtext1_context * ctx, float x, float y, f
 }
 
 
-static void gtext1_glflush(struct gtext1_context * ctx)
+static void gtext1_glflush (struct gtext1_context * ctx)
 {
 	uint32_t const stride = 4;
 	ASSERT_PARAM_NOTNULL (ctx);
 	glBindVertexArray (ctx->vao);
-	glUseProgram (ctx->program);
+	//glUseProgram (ctx->program);
 	glBindTexture (GL_TEXTURE_2D, ctx->tex);
 	glUniform1i (ctx->uniform_tex, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, ctx->vbo);
