@@ -7,7 +7,7 @@
 #include "csc_math.h"
 
 
-struct gchar
+struct gft_char
 {
 	float ax;	// advance.x
 	float ay;	// advance.y
@@ -20,7 +20,7 @@ struct gchar
 };
 
 
-struct gatlas
+struct gft_atlas
 {
 	unsigned int w;
 	unsigned int h;
@@ -29,12 +29,12 @@ struct gatlas
 
 
 // Maximum texture width
-#define MAXWIDTH 1024
+#define GFT_MAXWIDTH 1024
 
 
 
-static int gtext_init
-(FT_Face face, struct gchar c[], struct gatlas * atlas)
+static int gft_init
+(FT_Face face, struct gft_char c[], struct gft_atlas * atlas)
 {
 	FT_GlyphSlot g = face->glyph;
 	unsigned int w = 0;
@@ -52,7 +52,7 @@ static int gtext_init
 			continue;
 		}
 
-		if (roww + g->bitmap.width + 1 >= MAXWIDTH)
+		if (roww + g->bitmap.width + 1 >= GFT_MAXWIDTH)
 		{
 			w = MAX(w, roww);
 			h += rowh;
@@ -92,7 +92,7 @@ static int gtext_init
 			continue;
 		}
 
-		if (ox + g->bitmap.width + 1 >= MAXWIDTH)
+		if (ox + g->bitmap.width + 1 >= GFT_MAXWIDTH)
 		{
 			oy += rowh;
 			rowh = 0;
@@ -119,28 +119,10 @@ static int gtext_init
 
 
 
-static void gtext_gen_pos (v4f32 pos[6], float x, float y, float z, float w, float h)
-{
-	pos[0] = (v4f32){{x + 0, y + 0, z, 0}};
-	pos[1] = (v4f32){{x + w, y + 0, z, 0}};
-	pos[2] = (v4f32){{x + 0, y + h, z, 0}};
-	pos[3] = (v4f32){{x + w, y + 0, z, 0}};
-	pos[4] = (v4f32){{x + 0, y + h, z, 0}};
-	pos[5] = (v4f32){{x + w, y + h, z, 0}};
-}
-
-static void gtext_gen_uv (v2f32 uv[6], float x, float y, float w, float h)
-{
-	uv[0] = (v2f32){{x + 0, y + 0}};
-	uv[1] = (v2f32){{x + w, y + 0}};
-	uv[2] = (v2f32){{x + 0, y + h}};
-	uv[3] = (v2f32){{x + w, y + 0}};
-	uv[4] = (v2f32){{x + 0, y + h}};
-	uv[5] = (v2f32){{x + w, y + h}};
-}
 
 
-static void make_trianglemesh2 (float *v[], uint32_t stride, float x, float y, float w, float h)
+
+static void gft_trianglemesh2 (float *v[], uint32_t stride, float x, float y, float w, float h)
 {
 	(*v)[0] = x + 0;    (*v)[1] = y + h;    (*v) += stride;
 	(*v)[0] = x + w;    (*v)[1] = y + 0;    (*v) += stride;
@@ -151,40 +133,13 @@ static void make_trianglemesh2 (float *v[], uint32_t stride, float x, float y, f
 }
 
 
-static uint32_t gtext_gen
-(v4f32 pos[], v2f32 uv[], const char *text, struct gchar c[], uint32_t n, float aw, float ah, float x, float y, float z, float sx, float sy)
-{
-	uint32_t i = 0;
-	const uint8_t *p;
-	for (p = (const uint8_t *)text; *p; p++)
-	{
-		if (i+6 > n) {return n;}
-		// Calculate the vertex and texture coordinates
-		float x2 = x + c[*p].bl * sx;
-		float y2 = y + c[*p].bt * sy;
-		float w = c[*p].bw * sx;
-		float h = c[*p].bh * -sy;
-		float tx = c[*p].tx;
-		float ty = c[*p].ty;
-		float tw = c[*p].bw / aw;
-		float th = c[*p].bh / ah;
-		// Advance the cursor to the start of the next character
-		x += c[*p].ax * sx;
-		y += c[*p].ay * sy;
-		// Skip glyphs that have no pixels */
-		if (!w || !h) {continue;}
-		gtext_gen_pos (pos + i, x2, y2, z, w, h);
-		gtext_gen_uv (uv + i, tx, ty, tw, th);
-		i += 6;
-	}
-	return i;
-}
 
 
 
 
-static uint32_t gtext_gen1
-(float pos[], uint32_t n, uint32_t stride, const char *text, struct gchar c[], float x, float y, float sx, float sy)
+
+static uint32_t gft_gen_pos
+(float pos[], uint32_t n, uint32_t stride, const char *text, struct gft_char c[], float x, float y, float sx, float sy)
 {
 	uint32_t i = n;
 	uint8_t const *p;
@@ -200,14 +155,14 @@ static uint32_t gtext_gen1
 		y += c[*p].ay * sy;
 		// Skip glyphs that have no pixels */
 		if (!w || !h) {continue;}
-		make_trianglemesh2 (&pos, stride, x2, y2, w, h);
+		gft_trianglemesh2 (&pos, stride, x2, y2, w, h);
 	}
 	return n-i;
 }
 
 
-static uint32_t gtext_gen2
-(float uv[], uint32_t n, uint32_t stride, const char *text, struct gchar c[], float aw, float ah)
+static uint32_t gft_gen_uv
+(float uv[], uint32_t n, uint32_t stride, const char *text, struct gft_char c[], float aw, float ah)
 {
 	uint32_t i = n;
 	uint8_t const *p;
@@ -220,7 +175,7 @@ static uint32_t gtext_gen2
 		float th = c[*p].bh / ah;
 		// Skip glyphs that have no pixels */
 		if (!c[*p].bw || !c[*p].bh) {continue;}
-		make_trianglemesh2 (&uv, stride, tx, ty, tw, th);
+		gft_trianglemesh2 (&uv, stride, tx, ty, tw, th);
 	}
 	return n-i;
 }
@@ -228,40 +183,6 @@ static uint32_t gtext_gen2
 
 
 
-
-
-/**
- * Render text using the currently loaded font and currently set font size.
- * Rendering starts at coordinates (x, y), z is always 0.
- * The pixel coordinates that the FreeType2 library uses are scaled by (sx, sy).
- */
-static void render_text
-(
-const char *text,
-struct gchar c[],
-unsigned int aw, //Atlas width
-unsigned int ah, //Atlas height
-GLuint vbo_pos,
-GLuint vbo_uv,
-float x, //Coordinate x
-float y, //Coordinate y
-float z, //Coordinate z
-float sx,
-float sy
-)
-{
-
-	v4f32 pos[6 * 100];
-	v2f32 uv[6 * 100];
-	uint32_t i = 0;
-	i = gtext_gen (pos, uv, text, c, 6*100, aw, ah, x, y, z, sx, sy);
-	/* Draw all the character on the screen in one go */
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_pos);
-	glBufferData (GL_ARRAY_BUFFER, sizeof(v4f32)*i, pos, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_uv);
-	glBufferData (GL_ARRAY_BUFFER, sizeof(v2f32)*i, uv, GL_DYNAMIC_DRAW);
-	glDrawArrays (GL_TRIANGLES, 0, i);
-}
 
 
 
