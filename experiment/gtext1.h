@@ -11,8 +11,8 @@ struct gtext1_context
 	FT_Library ft;
 	FT_Face face;
 	char const * filename;
-	struct gchar c[128];
-	struct gatlas atlas;
+	struct gft_char c[128];
+	struct gft_atlas atlas;
 	GLuint vao;
 	GLuint vbo;
 	GLint program;
@@ -51,7 +51,7 @@ static void gtext1_setup (struct gtext1_context * ctx)
 	glBindTexture (GL_TEXTURE_2D, ctx->tex);
 	glUniform1i (ctx->uniform_tex, unit);
 	FT_Set_Pixel_Sizes (ctx->face, 0, 48);
-	gtext_init (ctx->face, ctx->c, &ctx->atlas);
+	gft_init (ctx->face, ctx->c, &ctx->atlas);
 	glGenBuffers (1, &ctx->vbo);
 	glGenVertexArrays (1, &ctx->vao);
 	glBindVertexArray (ctx->vao);
@@ -75,8 +75,8 @@ static void gtext1_draw (struct gtext1_context * ctx, float x, float y, float sx
 	float * v = ctx->v;
 	v += (ctx->char_last * stride * 6);
 	uint32_t n;
-	n = gtext_gen1 (v+0, ctx->maxchars, stride, text, ctx->c, x, y, sx, sy);
-	n = gtext_gen2 (v+2, ctx->maxchars, stride, text, ctx->c, ctx->atlas.w, ctx->atlas.h);
+	n = gft_gen_pos (v+0, ctx->maxchars, stride, text, ctx->c, x, y, sx, sy);
+	n = gft_gen_uv  (v+2, ctx->maxchars, stride, text, ctx->c, ctx->atlas.w, ctx->atlas.h);
 	ctx->char_last += n;
 }
 
