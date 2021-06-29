@@ -102,7 +102,19 @@ void csc_sdlglew_create_window (SDL_Window ** window, SDL_GLContext * context, c
 #define CSC_SDLGLEW_FULLSCREEN UINT32_C (0x00000002)
 #define CSC_SDLGLEW_FULLSCREEN UINT32_C (0x00000002)
 
-void csc_sdlglew_event_loop (SDL_Window * window, SDL_Event * event, uint32_t * flags, struct csc_gcam * gcam)
+static void csc_sdlglew_resize (SDL_Window * window, struct csc_gcam * gcam)
+{
+	int w;
+	int h;
+	SDL_GetWindowSize (window, &w, &h);
+	gcam->w = w;
+	gcam->h = h;
+	glViewport (0, 0, w, h);
+	XLOG (XLOG_INF, XLOG_SDL, " SDL_WINDOWEVENT_RESIZED: %i %i\n", w, h);
+}
+
+
+static void csc_sdlglew_event_loop (SDL_Window * window, SDL_Event * event, uint32_t * flags, struct csc_gcam * gcam)
 {
 	switch (event->type)
 	{
@@ -112,13 +124,7 @@ void csc_sdlglew_event_loop (SDL_Window * window, SDL_Event * event, uint32_t * 
 	case SDL_WINDOWEVENT:
 		if (event->window.event == SDL_WINDOWEVENT_RESIZED)
 		{
-			int w;
-			int h;
-			SDL_GetWindowSize (window, &w, &h);
-			gcam->w = w;
-			gcam->h = h;
-			glViewport (0, 0, w, h);
-			XLOG (XLOG_INF, XLOG_SDL, " SDL_WINDOWEVENT_RESIZED: %i %i\n", w, h);
+			csc_sdlglew_resize (window, gcam);
 		}
 		break;
 	case SDL_KEYDOWN:
@@ -138,6 +144,7 @@ void csc_sdlglew_event_loop (SDL_Window * window, SDL_Event * event, uint32_t * 
 			{
 				SDL_SetWindowFullscreen (window, SDL_WINDOW_OPENGL);
 			}
+			csc_sdlglew_resize (window, gcam);
 			break;
 
 		default:

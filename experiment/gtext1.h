@@ -88,6 +88,7 @@ static void gtext1_draw_format (struct gtext1_context * ctx, float x, float y, f
 	ASSERT_NOTNULL (ctx->strbuf);
 	va_list arglist;
 	va_start (arglist, format);
+	memset (ctx->strbuf, 0, ctx->maxchars);
 	vsnprintf (ctx->strbuf, ctx->maxchars, format, arglist);
 	//printf ("%s", buf);
 	gtext1_draw (ctx, x, y, sx, sy, ctx->strbuf);
@@ -109,5 +110,6 @@ static void gtext1_glflush (struct gtext1_context * ctx)
 	glBufferData (GL_ARRAY_BUFFER, size, ctx->v, GL_DYNAMIC_DRAW);
 	glDrawArrays (GL_TRIANGLES, 0, count);
 	ctx->char_last = 0;
+	memset (ctx->v, 0, size);//TODO: Why do we need this?
 }
 
