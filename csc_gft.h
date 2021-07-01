@@ -5,6 +5,7 @@
 
 #include "csc_xlog.h"
 #include "csc_math.h"
+#include "csc_v2f32.h"
 
 
 struct gft_char
@@ -56,7 +57,6 @@ static void gft_size (FT_Face face, unsigned int maxwidth, unsigned int * width,
 	}
 	w = MAX(w, roww);
 	h += rowh;
-	printf ("%i, %i\n", w, h);
 	*width = w;
 	*height = h;
 }
@@ -69,20 +69,9 @@ static int gft_init
 	unsigned int w = 0;
 	unsigned int h = 0;
 	gft_size (face, maxwidth, &w, &h);
+	XLOG (XLOG_INF, XLOG_GENERAL, "atlas requirement: %i, %i\n", w, h);
 	w = 512;
 	h = 512;
-
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, w, h, 0, GL_ALPHA, GL_UNSIGNED_BYTE, 0);
-	/* We require 1 byte alignment when uploading texture data */
-	//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	/* Clamping to edges is important to prevent artifacts when scaling */
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	/* Linear filtering usually looks best for text */
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	/* Paste all glyph bitmaps into the texture, remembering the offset */
 	int ox = 0;
@@ -109,7 +98,7 @@ static int gft_init
 		GLint zoffset = 0;
 		GLsizei depth = 1;
 		glTexSubImage3D (GL_TEXTURE_2D_ARRAY, level, ox, oy, zoffset, g->bitmap.width, g->bitmap.rows, depth,  GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
-		printf ("%c: %4i %4i %4i %4i\n", i, ox, oy, g->bitmap.width, g->bitmap.rows);
+		//printf ("%c: %4i %4i %4i %4i\n", i, ox, oy, g->bitmap.width, g->bitmap.rows);
 		c[i].ax = g->advance.x >> 6;
 		c[i].ay = g->advance.y >> 6;
 		c[i].bw = g->bitmap.width;
@@ -132,15 +121,6 @@ static int gft_init
 
 
 
-static void gft_trianglemesh2 (float v[], uint32_t stride, float x, float y, float w, float h)
-{
-	v[0] = x + 0; v[1] = y + h; v += stride;
-	v[0] = x + w; v[1] = y + 0; v += stride;
-	v[0] = x + 0; v[1] = y + 0; v += stride;
-	v[0] = x + w; v[1] = y + 0; v += stride;
-	v[0] = x + 0; v[1] = y + h; v += stride;
-	v[0] = x + w; v[1] = y + h; v += stride;
-}
 
 
 
@@ -165,7 +145,7 @@ static uint32_t gft_gen_pos
 		y += c[*p].ay * sy;
 		// Skip glyphs that have no pixels */
 		if (!w || !h) {continue;}
-		gft_trianglemesh2 (pos, stride, x2, y2, w, h);
+		v2f32_vertices6_set_rectangle (pos, stride, x2, y2, w, h);
 		pos += stride * 6; //gft_trianglemesh2 writes 6 vertices where each vertex have (stride)
 	}
 	return n-i;
@@ -186,7 +166,7 @@ static uint32_t gft_gen_uv
 		float th = c[*p].bh / ah;
 		// Skip glyphs that have no pixels */
 		if (!c[*p].bw || !c[*p].bh) {continue;}
-		gft_trianglemesh2 (uv, stride, tx, ty, tw, th);
+		v2f32_vertices6_set_rectangle (uv, stride, tx, ty, tw, th);
 		uv += stride * 6; //gft_trianglemesh2 writes 6 vertices where each vertex have (stride)
 	}
 	return n-i;
