@@ -5,6 +5,16 @@
 At its core is an independent rewrite of MSYS, based on modern Cygwin (POSIX compatibility layer) and MinGW-w64 with the aim of better interoperability with native Windows software. It provides a bash shell, Autotools, revision control systems and the like for building native Windows applications using MinGW-w64 toolchains.
 It features a package management system to provide easy installation of packages, Pacman. It brings many powerful features such as dependency resolution and simple complete system upgrades, as well as straight-forward package building.
 
+* qtcreator
+https://blog.agx.co/index.php/2017/11/09/how-to-build-static-qt-application-on-windows-even-with-qt-creator/
+If `Qt5Gui.dll` missing entry point when startin `qtcreator` reinstall msys2 and run then these:
+```bash
+pacman -Syu
+pacman -S base-devel git mercurial cvs wget p7zip
+pacman -S mingw-w64-x86_64-toolchain
+pacman -S mingw-w64-x86_64-qt5-static
+pacman -S mingw64/mingw-w64-x86_64-qt-creator
+```
 
 ### Libs
 * https://bellard.org/tcc/<br>
