@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include "csc_crossos.h"
-#include "csc_debug.h"
+#include "csc_assert.h"
 
 
 void foo (char * str)
