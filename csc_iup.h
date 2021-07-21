@@ -7,7 +7,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <stdio.h>
 #include <string.h>
 
-#include "csc_debug.h"
+#include "csc_assert.h"
 
 
 static void IupGetGlobal_MONITORSINFO (int * x, int * y, int * w, int * h)

@@ -7,7 +7,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
-#include "csc_debug.h"
+#include "csc_assert.h"
 #include "csc_basic.h"
 #include "csc_math.h"
 #include "csc_v3f32.h"

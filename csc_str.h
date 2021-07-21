@@ -9,7 +9,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <stdint.h>
 #include <stdlib.h>
 #include "csc_basic.h"
-#include "csc_debug.h"
+#include "csc_assert.h"
 
 #define CSC_STRNCMP_LITERAL(str1,str2) strncmp ((str1), (str2), sizeof ((str2))-1)
 

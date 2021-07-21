@@ -11,7 +11,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <inttypes.h>
 
 #include "csc_basic.h"
-#include "csc_debug.h"
+#include "csc_assert.h"
 #include "csc_type_str.h"
 #include "csc_base64set.h"
 

@@ -1,4 +1,4 @@
-#include "csc_debug.h"
+#include "csc_assert.h"
 #include "csc_pcstree.h"
 
 typedef void (*csc_pcstree_print_traverse_cb)(struct csc_pcstree const * node, void *ptr);

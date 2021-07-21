@@ -9,7 +9,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <string.h>
 #include <canlib.h>
 
-#include "csc_debug.h"
+#include "csc_assert.h"
 
 #define CSC_KVASERCAN_MSGFARGS(x) (x) [0], (x) [1], (x) [2], (x) [3], (x) [4], (x) [5], (x) [6], (x) [7]
 #define CSC_KVASERCAN_MSGFORMAT "%02x %02x %02x %02x %02x %02x %02x %02x"

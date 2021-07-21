@@ -9,7 +9,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <float.h>
 #include <limits.h>
 #include <math.h>
-#include "csc_debug.h"
+#include "csc_assert.h"
 #include "csc_basic.h"
 
 

@@ -7,7 +7,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <stdint.h> //offsetof
 
 #include "csc_basic.h"
-#include "csc_debug.h"
+#include "csc_assert.h"
 
 
 static uint64_t csc_base64set_fromchar (char a)

@@ -3,7 +3,7 @@ SPDX-License-Identifier: GPL-2.0
 SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@gmail.com>
 */
 #pragma once
-#include "csc_debug.h"
+#include "csc_assert.h"
 #include "csc_basic.h"
 #include <stdio.h> //fopen
 #include <string.h> //memset

@@ -7,7 +7,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <vulkan/vulkan.h>
 #include <string.h>
 #include <stdio.h>
-#include "csc_debug.h"
+#include "csc_assert.h"
 
 
 struct csc_vk_device

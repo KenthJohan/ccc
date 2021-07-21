@@ -1,4 +1,4 @@
-#include "csc_debug.h"
+#include "csc_assert.h"
 #include "csc_crossos.h"
 #include "csc_argv.h"
 #include "csc_basic.h"
