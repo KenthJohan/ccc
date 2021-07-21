@@ -217,5 +217,28 @@ void csc_gl_make_rectangle_uv (float uv[], uint32_t n, uint32_t stride)
 }
 
 
-
-
+#define ASSERT_GL csc_gl_catch_error(__FILE__, __LINE__)
+static void csc_gl_catch_error(char * filename, int line)
+{
+	GLenum errorCode;
+	char * error = NULL;
+	while ((errorCode = glGetError()) != GL_NO_ERROR)
+	{
+		switch (errorCode)
+		{
+		case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+		case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+		case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+		case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+		case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+		case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+		case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+		default: error = "Unknown OpenGL Error"; break;
+		}
+		printf ("%s:%i %s\n", filename, line, error);
+	}
+	if (error)
+	{
+		exit(0);
+	}
+}

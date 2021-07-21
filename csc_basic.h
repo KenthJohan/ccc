@@ -3,6 +3,7 @@ SPDX-License-Identifier: GPL-2.0
 SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@gmail.com>
 */
 #pragma once
+//#define __USE_MINGW_ANSI_STDIO 1
 #include <stddef.h> //offsetof
 #include <stdint.h> //offsetof
 

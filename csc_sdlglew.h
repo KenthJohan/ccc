@@ -23,15 +23,15 @@ static void GLAPIENTRY csc_sdlglew_gldebug_callback
 	{
 	case GL_DEBUG_SEVERITY_HIGH:
 		XLOG (XLOG_ERR, XLOG_OPENGL, "%s [%x]\n", message, severity);
-		abort();
+		//abort();
 		break;
 	case GL_DEBUG_SEVERITY_MEDIUM:
 		XLOG (XLOG_ERR, XLOG_OPENGL, "%s [%x]\n", message, severity);
-		abort();
+		//abort();
 		break;
 	case GL_DEBUG_SEVERITY_LOW:
 		XLOG (XLOG_ERR, XLOG_OPENGL, "%s [%x]\n", message, severity);
-		abort();
+		//abort();
 		break;
 	case GL_DEBUG_SEVERITY_NOTIFICATION:
 		XLOG (XLOG_INF, XLOG_OPENGL, "%s [%x]\n", message, severity);
