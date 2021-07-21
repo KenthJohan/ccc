@@ -12,7 +12,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 static void csc_pixmap_drawrect (uint32_t * image, int32_t iw, int32_t ih, int32_t rx, int32_t ry, int32_t rw, int32_t rh, uint32_t value)
 {
-	ASSERT_NOTNULL (image);
+	ASSERT_PARAM_NOTNULL (image);
 	rx += MIN (0, rw); //Handle negative width
 	ry += MIN (0, rh); //Handle negative height
 	rw = abs (rw); //Handle negative width
@@ -23,13 +23,13 @@ static void csc_pixmap_drawrect (uint32_t * image, int32_t iw, int32_t ih, int32
 	{
 		for (int32_t x = rx; x < rw; ++x)
 		{
-			ASSERT (x >= 0);
-			ASSERT (y >= 0);
-			ASSERT_LT (x, iw);
-			ASSERT_LT (y, ih);
+			ASSERT_GTEI (x, 0);
+			ASSERT_GTEI (y, 0);
+			ASSERT_LTI (x, iw);
+			ASSERT_LTI (y, ih);
 			int32_t i = x + y*ih;
-			ASSERT (i >= 0);
-			ASSERT (i < (iw*ih));
+			ASSERT_GTEI (i, 0);
+			ASSERT_LTI (i, iw*ih);
 			image[i] = value;
 		}
 

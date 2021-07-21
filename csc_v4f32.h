@@ -145,7 +145,7 @@ static void v4f32_dotv (v4f32 r[], uint32_t inc_r, v4f32 a[], uint32_t inc_a, v4
 
 static void v4f32_m4_macc_unsafe (v4f32 * y, m4f32 const * a, v4f32 * const b)
 {
-	ASSERT_PTR_NEQ (y, b);
+	ASSERT_NEQP (y, b);
 	y->x += (a->m11 * b->x) + (a->m12 * b->y) + (a->m13 * b->z) + (a->m14 * b->w);
 	y->y += (a->m21 * b->x) + (a->m22 * b->y) + (a->m23 * b->z) + (a->m24 * b->w);
 	y->z += (a->m31 * b->x) + (a->m32 * b->y) + (a->m33 * b->z) + (a->m34 * b->w);
@@ -167,7 +167,7 @@ static void v4f32_m4_macc (v4f32 * y, m4f32 const * a, v4f32 * const b)
 
 static void v4f32_m4_macct_unsafe (v4f32 * y, m4f32 const * a, v4f32 * const b)
 {
-	ASSERT_PTR_NEQ (y, b);
+	ASSERT_NEQP (y, b);
 	y->x += (a->m11 * b->x) + (a->m21 * b->y) + (a->m31 * b->z) + (a->m41 * b->w);
 	y->y += (a->m12 * b->x) + (a->m22 * b->y) + (a->m32 * b->z) + (a->m42 * b->w);
 	y->z += (a->m13 * b->x) + (a->m23 * b->y) + (a->m33 * b->z) + (a->m43 * b->w);
@@ -187,7 +187,7 @@ static void v4f32_m4_macct (v4f32 * y, m4f32 const * a, v4f32 * const b)
 
 static void v4f32_m4_mul_unsafe (v4f32 * y, m4f32 const * a, v4f32 * const b)
 {
-	ASSERT_PTR_NEQ (y, b);
+	ASSERT_NEQP (y, b);
 	y->x = (a->m11 * b->x) + (a->m12 * b->y) + (a->m13 * b->z) + (a->m14 * b->w);
 	y->y = (a->m21 * b->x) + (a->m22 * b->y) + (a->m23 * b->z) + (a->m24 * b->w);
 	y->z = (a->m31 * b->x) + (a->m32 * b->y) + (a->m33 * b->z) + (a->m34 * b->w);
