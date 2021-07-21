@@ -16,6 +16,10 @@ int main (int argc, char * argv [])
 	ASSERT (argv);
 	csc_crossos_enable_ansi_color();
 
+#if 1
+	ASSERTF (0, "Hello %s", "world");
+#endif
+
 #if 0
 	foo (NULL);
 #endif
@@ -58,7 +62,7 @@ int main (int argc, char * argv [])
 	ASSERT_POW2(a);
 #endif
 
-#if 1
+#if 0
 	errno = 4;
 	void * a = (void *)(intptr_t)0xABC5431;
 	unsigned x = 2;

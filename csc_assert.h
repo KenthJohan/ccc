@@ -15,18 +15,19 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 //http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2153.htm
 #define ASSERT_CARGS __COUNTER__, __FILE__, __LINE__, __func__
 
+#define ASSERT_STYLE_EXP        TFG(255,200,255) "%s"              TCOL_RST
 #define ASSERT_STYLE_VARNAME    TFG(123,200,255) "%s"              TCOL_RST
 #define ASSERT_STYLE_I          TFG(123,123,255) "%jd"             TCOL_RST
 #define ASSERT_STYLE_U          TFG(123,123,255) "%ju"             TCOL_RST
-#define ASSERT_STYLE_P          TFG(123,123,255) "%p"            TCOL_RST
+#define ASSERT_STYLE_P          TFG(123,123,255) "%p"              TCOL_RST
 #define ASSERT_STYLE_NULL       TFG(123,123,255) "NULL"            TCOL_RST
-#define ASSERT_STYLE_FALSE      TFG(123,123,255) "FALSE"            TCOL_RST
+#define ASSERT_STYLE_FALSE      TFG(123,123,255) "FALSE"           TCOL_RST
 #define ASSERT_STYLE_TRUE       TFG(123,123,255) "TRUE"            TCOL_RST
-#define ASSERT_STYLE_ASSERT     TFG(255,66,66)  "A%04x"           TCOL_RST
-#define ASSERT_STYLE_FILENAME   TFG(99,99,99)   "%s"              TCOL_RST
-#define ASSERT_STYLE_LINE       TFG(99,99,99)   "%i"              TCOL_RST
-#define ASSERT_STYLE_FNAME      TFG(99,120,99)  "%s"              TCOL_RST
-#define ASSERT_STYLE_ERRNO      TFG(190,90,90)  "%s (errno=%i)"   TCOL_RST
+#define ASSERT_STYLE_ASSERT     TFG(255,66 ,66)  "A%04x"           TCOL_RST
+#define ASSERT_STYLE_FILENAME   TFG(99 ,99 ,99)  "%s"              TCOL_RST
+#define ASSERT_STYLE_LINE       TFG(99 ,99 ,99)  "%i"              TCOL_RST
+#define ASSERT_STYLE_FNAME      TFG(99 ,120,99)  "%s"              TCOL_RST
+#define ASSERT_STYLE_ERRNO      TFG(190,90 ,90)  "%s (errno=%i)"   TCOL_RST
 
 #define ASSERT_STYLE_NOTNULL         "Failed assertion: (" ASSERT_STYLE_VARNAME " /= "  ASSERT_STYLE_NULL    ") evaluated as (" ASSERT_STYLE_P " /= " ASSERT_STYLE_NULL ")"
 #define ASSERT_STYLE_PARAM_NOTNULL   "Failed assertion: Paramater (" ASSERT_STYLE_VARNAME " /= "  ASSERT_STYLE_NULL    ") evaluated as (" ASSERT_STYLE_P " /= " ASSERT_STYLE_NULL ")"
@@ -76,11 +77,9 @@ __attribute__ ((format (printf, 6, 0)))
 static void assert_format_va
 (int id, char const * file, int line, char const * fn, char const * exp, char const * fmt, va_list va)
 {
-	fprintf (stderr, ASSERT_STYLE_ASSERT " " ASSERT_STYLE_FILENAME ":" ASSERT_STYLE_LINE " " ASSERT_STYLE_FNAME "()", id, file, line, fn);
-	//fprintf (stderr, TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT) "%s:%04i" TCOL_RST " in ", file, line);
-	//fprintf (stderr, ASSERT_TCOLID "%s() " TCOL_RST, fn);
+	fprintf (stderr, ASSERT_STYLE_ASSERT " " ASSERT_STYLE_FILENAME ":" ASSERT_STYLE_LINE " " ASSERT_STYLE_FNAME "() ", id, file, line, fn);
 	if (errno != 0) {fprintf (stderr, " " ASSERT_STYLE_ERRNO " ", strerror (errno), errno);}
-	if (exp){fprintf (stderr, TCOL (TCOL_NORMAL, TCOL_WHITE, TCOL_DEFAULT) "%s" TCOL_RST " ", exp);}
+	if (exp){fprintf (stderr, ": "ASSERT_STYLE_EXP " ", exp);}
 	if (fmt)
 	{
 		vfprintf (stderr, fmt, va);
