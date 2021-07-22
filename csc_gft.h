@@ -5,7 +5,7 @@
 
 #include "csc_xlog.h"
 #include "csc_math.h"
-#include "csc_v2f32.h"
+#include "csc_primf32.h"
 
 
 struct gft_char
@@ -146,9 +146,9 @@ static int gft_init
 static uint32_t gft_gen_pos
 (float pos[], uint32_t n, uint32_t stride, const char *text, struct gft_char c[], float x, float y, float sx, float sy)
 {
-	uint32_t i = n;
+	uint32_t i = 0;
 	uint8_t const *p;
-	for (p = (const uint8_t *)text; *p && (i > 0); p++, --i)
+	for (p = (const uint8_t *)text; *p && (n > 0); p++, --n)
 	{
 		// Calculate position coordinates
 		float x2 = x + c[*p].bl * sx;
@@ -160,19 +160,20 @@ static uint32_t gft_gen_pos
 		y += c[*p].ay * sy;
 		// Skip glyphs that have no pixels */
 		if (!w || !h) {continue;}
-		v2f32_vertices6_set_rectangle (pos, stride, x2, y2, w, h);
+		primf32_make_rectangle (pos, stride, x2, y2, w, h);
 		pos += stride * 6; //gft_trianglemesh2 writes 6 vertices where each vertex have (stride)
+		i += 6;
 	}
-	return n-i;
+	return i;
 }
 
 
 static uint32_t gft_gen_uv
 (float uv[], uint32_t n, uint32_t stride, const char *text, struct gft_char c[], float aw, float ah)
 {
-	uint32_t i = n;
+	uint32_t i = 0;
 	uint8_t const *p;
-	for (p = (const uint8_t *)text; *p && (i > 0); p++, --i)
+	for (p = (const uint8_t *)text; *p && (n > 0); p++, --n)
 	{
 		// Calculate texture coordinates
 		float tx = c[*p].tx;
@@ -181,10 +182,11 @@ static uint32_t gft_gen_uv
 		float th = c[*p].bh / ah;
 		// Skip glyphs that have no pixels
 		if (!c[*p].bw || !c[*p].bh) {continue;}
-		v2f32_vertices6_set_rectangle (uv, stride, tx, ty, tw, th);
+		primf32_make_rectangle (uv, stride, tx, ty, tw, th);
 		uv += stride * 6;
+		i += 6;
 	}
-	return n-i;
+	return i;
 }
 
 
