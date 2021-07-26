@@ -35,6 +35,17 @@ typedef union v2f32
 	};
 } v2f32;
 
+typedef union v2u32
+{
+	uint32_t e[2];
+	struct
+	{
+		uint32_t x;
+		uint32_t y;
+	};
+} v2u32;
+
+
 
 #define QF32_IDENTITY  {0.0f, 0.0f, 0.0f, 1.0f}
 typedef union qf32

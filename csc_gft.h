@@ -105,7 +105,7 @@ static int gft_init
 		uint32_t rgba[128*128];
 		for (uint32_t j = 0; j < g->bitmap.width * g->bitmap.rows; j++)
 		{
-			rgba[j] = (g->bitmap.buffer[j] << 0) | (g->bitmap.buffer[j] << 8) | (g->bitmap.buffer[j] << 16) | (0xFF << 24);
+			rgba[j] = (g->bitmap.buffer[j] << 0) | (g->bitmap.buffer[j] << 8) | (g->bitmap.buffer[j] << 16) | (g->bitmap.buffer[j] << 24);
 		}
 
 		GLint level = 0;
