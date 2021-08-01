@@ -81,8 +81,7 @@ void xlog(int counter, char const * file, int line, char const * func, enum xlog
 {
 	va_list args;
 	va_start (args, format);
-	char * w = TFG(100,100,100);
-	printf ("%s %s%s [%i] %s:%i "TFG(130, 110, 60)"%s() "TCOL_RST, xloglvl_tostr(level), xlogcategory_tostr(category), w, counter, file, line, func);
+	printf (TFG(100,100,100)"[%i]"TCOL_RST"%s %s "TFG(100,100,100)"%s:%i "TFG(130, 110, 60)"%s() "TCOL_RST, counter, xloglvl_tostr(level), xlogcategory_tostr(category), file, line, func);
 	vprintf (format, args);
 	putc ('\n', stdout);
 	va_end (args);

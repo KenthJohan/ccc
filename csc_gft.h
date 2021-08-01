@@ -110,8 +110,10 @@ static int gft_init
 
 		GLint level = 0;
 		GLint zoffset = 0;
+		GLsizei width = g->bitmap.width;
+		GLsizei height = g->bitmap.rows;
 		GLsizei depth = 1;
-		glTexSubImage3D (GL_TEXTURE_2D_ARRAY, level, ox, oy, zoffset, g->bitmap.width, g->bitmap.rows, depth, GL_RGBA, GL_UNSIGNED_BYTE, rgba);
+		glTexSubImage3D (GL_TEXTURE_2D_ARRAY, level, ox, oy, zoffset, width, height, depth, GL_RGBA, GL_UNSIGNED_BYTE, rgba);
 		c[i].ax = g->advance.x >> 6;
 		c[i].ay = g->advance.y >> 6;
 		c[i].bw = g->bitmap.width;
@@ -144,22 +146,51 @@ static int gft_init
 
 
 static uint32_t gft_gen_pos
-(float pos[], uint32_t n, uint32_t stride, const char *text, struct gft_char c[], float x, float y, float sx, float sy)
+(float pos[], uint32_t n, uint32_t stride, const char *text, struct gft_char c[], float const x, float const y, float sx, float sy, float line_distance)
 {
 	uint32_t i = 0;
 	uint8_t const *p;
+	float x0 = x;
+	float y0 = y;
 	for (p = (const uint8_t *)text; *p && (n > 0); p++, --n)
 	{
 		// Calculate position coordinates
-		float x2 = x + c[*p].bl * sx;
-		float y2 = y + c[*p].bt * sy;
+		float x2 = x0 + c[*p].bl * sx;
+		float y2 = y0 + c[*p].bt * sy;
 		float w = c[*p].bw * sx;
 		float h = c[*p].bh * -sy;
 		// Advance the cursor to the start of the next character
-		x += c[*p].ax * sx;
-		y += c[*p].ay * sy;
+
+		if (*p == '\n')
+		{
+			y0 += line_distance;
+			x0 = x;
+			continue;
+		}
+
+		x0 += c[*p].ax * sx;
+		y0 += c[*p].ay * sy;
 		// Skip glyphs that have no pixels */
-		if (!w || !h) {continue;}
+		/*
+		if (*p == ' ')
+		{
+			x0 += sx*2;
+			continue;
+		}
+		else if (*p == '\n')
+		{
+			x0 += sx;
+			continue;
+		}
+		else if (!w || !h)
+		{
+			continue;
+		}
+		else
+		{
+		}
+		*/
+		//if (!w || !h)continue;
 		primf32_make_rectangle (pos, stride, x2, y2, w, h);
 		pos += stride * 6; //gft_trianglemesh2 writes 6 vertices where each vertex have (stride)
 		i += 6;
@@ -181,7 +212,9 @@ static uint32_t gft_gen_uv
 		float tw = c[*p].bw / aw;
 		float th = c[*p].bh / ah;
 		// Skip glyphs that have no pixels
-		if (!c[*p].bw || !c[*p].bh) {continue;}
+		if (*p == '\n') {continue;}
+		//if (!c[*p].ax || !c[*p].bh) {continue;}
+		//if (!c[*p].bw || !c[*p].bh) {continue;}
 		primf32_make_rectangle (uv, stride, tx, ty, tw, th);
 		uv += stride * 6;
 		i += 6;
