@@ -44,7 +44,9 @@ static void GLAPIENTRY csc_sdlglew_gldebug_callback
 
 
 
-
+/*
+ *
+*/
 void csc_sdlglew_create_window (SDL_Window ** window, SDL_GLContext * context, const char *title, int x, int y, int w, int h, Uint32 flags)
 {
 	if (SDL_Init (SDL_INIT_VIDEO) != 0)
@@ -53,12 +55,14 @@ void csc_sdlglew_create_window (SDL_Window ** window, SDL_GLContext * context, c
 		exit (1);
 	}
 
+	//srand(int) becomes unpredictable after this
 	(*window) = SDL_CreateWindow (title, x, y, w, h, flags);
 	if ((*window) == NULL)
 	{
 		XLOG (XLOG_ERR, XLOG_SDL, " Could not create SDL_Window: %s", SDL_GetError());
 		exit (1);
 	}
+	srand(42);
 
 	(*context) = SDL_GL_CreateContext (*window);
 	if ((*context) == NULL)
