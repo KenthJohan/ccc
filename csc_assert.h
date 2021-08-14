@@ -8,6 +8,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <inttypes.h>
 #include "csc_tcol.h"
 
 
@@ -17,8 +18,8 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 #define ASSERT_STYLE_EXP        TFG(255,200,255) "%s"              TCOL_RST
 #define ASSERT_STYLE_VARNAME    TFG(123,200,255) "%s"              TCOL_RST
-#define ASSERT_STYLE_I          TFG(123,123,255) "%jd"             TCOL_RST
-#define ASSERT_STYLE_U          TFG(123,123,255) "%ju"             TCOL_RST
+#define ASSERT_STYLE_I          TFG(123,123,255) "%"PRIiMAX        TCOL_RST
+#define ASSERT_STYLE_U          TFG(123,123,255) "%"PRIuMAX        TCOL_RST
 #define ASSERT_STYLE_P          TFG(123,123,255) "%p"              TCOL_RST
 #define ASSERT_STYLE_NULL       TFG(123,123,255) "NULL"            TCOL_RST
 #define ASSERT_STYLE_FALSE      TFG(123,123,255) "FALSE"           TCOL_RST

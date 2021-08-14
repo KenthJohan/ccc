@@ -5,7 +5,11 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #pragma once
 
 
-//This will ensure that the ANSI I/O standards are preferred over Microsoft's.
+// This will ensure that the ANSI I/O standards are preferred over Microsoft's.
+//
+// qtcreator pro:
+// DEFINES += __USE_MINGW_ANSI_STDIO=1
+//
 #define __USE_MINGW_ANSI_STDIO 1
 
 
