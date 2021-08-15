@@ -239,3 +239,7 @@ mingw32-make install
 cp lib/libmosquitto.dll.a C:/msys64/mingw64/lib/libmosquitto.dll.a
 ```
 
+
+
+## Compiler flags
+* https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html `-fsanitize=address`
