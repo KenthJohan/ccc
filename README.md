@@ -46,7 +46,11 @@ LIBS += -lnng
 LIBS += -lws2_32 -lmswsock -ladvapi32 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
 ```
 * https://sourceforge.net/projects/iup/<br>
-IUP is a portable toolkit for building graphical user interfaces. It offers a configuration API in three basic languages: C, Lua and LED. IUP purpose is to allow a program to be executed in different systems without any modification.
+IUP is a portable toolkit for building graphical user interfaces. It offers a configuration API in three basic languages: C, Lua and LED. IUP purpose is to allow a program to be executed in different systems without any modification.<br>
+Windows deps: `-liup -lgdi32 -lcomdlg32 -lcomctl32 -luuid -loleaut32 -lole32`
+
+* https://github.com/SanderMertens/flecs<br>
+Flecs is a fast and lightweight Entity Component System with a focus on high performance game development and usability.
 * https://sigrok.org/wiki/Libserialport<br>
 libserialport (sometimes abbreviated as "sp") is a minimal, cross-platform shared library written in C that is intended to take care of the OS-specific details when writing software that uses serial ports. 
 
