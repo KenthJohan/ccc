@@ -47,7 +47,14 @@ LIBS += -lws2_32 -lmswsock -ladvapi32 -lkernel32 -luser32 -lgdi32 -lwinspool -ls
 ```
 * https://sourceforge.net/projects/iup/<br>
 IUP is a portable toolkit for building graphical user interfaces. It offers a configuration API in three basic languages: C, Lua and LED. IUP purpose is to allow a program to be executed in different systems without any modification.<br>
-Windows deps: `-liup -lgdi32 -lcomdlg32 -lcomctl32 -luuid -loleaut32 -lole32`
+Windows deps: `-liupcontrols -liupcd -liup -lcd -lim -lfreetype -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -luuid -lcomctl32`
+```
+pacman -S mingw-w64-x86_64-lua
+pacman -S mingw64/mingw-w64-x86_64-freetype
+```
+1. `im/` `mingw32-make NO_DEPEND=Yes`
+2. `cd/` `mingw32-make NO_DEPEND=Yes`
+3. `iup/` `mingw32-make`
 
 * https://github.com/SanderMertens/flecs<br>
 Flecs is a fast and lightweight Entity Component System with a focus on high performance game development and usability.
