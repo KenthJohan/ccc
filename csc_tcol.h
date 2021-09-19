@@ -45,6 +45,6 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 
 
-#define TFG(r,g,b) "\e[38;2;"XSTR(r)";"XSTR(g)";"XSTR(b)"m" //Select RGB foreground color
-#define TBG(r,g,b) "\e[48;2;"XSTR(r)";"XSTR(g)";"XSTR(b)"m" //Select RGB background color
+#define TFG(r,g,b) "\e[38;2;" XSTR(r) ";" XSTR(g) ";" XSTR(b) "m" //Select RGB foreground color
+#define TBG(r,g,b) "\e[48;2;" XSTR(r) ";" XSTR(g) ";" XSTR(b) "m" //Select RGB background color
 

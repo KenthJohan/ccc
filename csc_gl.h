@@ -17,7 +17,7 @@ char * csc_gl_infolog_malloc (GLuint shader)
 {
 	GLint length = 0;
 	glGetShaderiv (shader, GL_INFO_LOG_LENGTH, &length);
-	char * info = malloc (sizeof(char) * length);
+	char * info = (char *)malloc (sizeof(char) * length);
 	glGetShaderInfoLog (shader, length, NULL, info);
 	return info;
 }
@@ -218,10 +218,10 @@ void csc_gl_make_rectangle_uv (float uv[], uint32_t n, uint32_t stride)
 
 
 #define ASSERT_GL csc_gl_catch_error(__FILE__, __LINE__)
-static void csc_gl_catch_error(char * filename, int line)
+static void csc_gl_catch_error(char const * filename, int line)
 {
 	GLenum errorCode;
-	char * error = NULL;
+	char const * error = NULL;
 	while ((errorCode = glGetError()) != GL_NO_ERROR)
 	{
 		switch (errorCode)

@@ -18,8 +18,8 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 #define ASSERT_STYLE_EXP        TFG(255,200,255) "%s"              TCOL_RST
 #define ASSERT_STYLE_VARNAME    TFG(123,200,255) "%s"              TCOL_RST
-#define ASSERT_STYLE_I          TFG(123,123,255) "%"PRIiMAX        TCOL_RST
-#define ASSERT_STYLE_U          TFG(123,123,255) "%"PRIuMAX        TCOL_RST
+#define ASSERT_STYLE_I          TFG(123,123,255) "%" PRIiMAX       TCOL_RST
+#define ASSERT_STYLE_U          TFG(123,123,255) "%" PRIuMAX       TCOL_RST
 #define ASSERT_STYLE_P          TFG(123,123,255) "%p"              TCOL_RST
 #define ASSERT_STYLE_NULL       TFG(123,123,255) "NULL"            TCOL_RST
 #define ASSERT_STYLE_FALSE      TFG(123,123,255) "FALSE"           TCOL_RST
@@ -35,7 +35,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define ASSERT_STYLE_ISFALSE         "Failed assertion: (" ASSERT_STYLE_VARNAME " = "   ASSERT_STYLE_FALSE    ") evaluated as (" ASSERT_STYLE_P " = " ASSERT_STYLE_FALSE ")"
 #define ASSERT_STYLE_ISTRUE          "Failed assertion: (" ASSERT_STYLE_VARNAME " = "   ASSERT_STYLE_TRUE     ") evaluated as (" ASSERT_STYLE_P " = " ASSERT_STYLE_TRUE ")"
 #define ASSERT_STYLE_ISPOW2          "Failed assertion: (" ASSERT_STYLE_VARNAME " = "   ASSERT_STYLE_U ") is a positive integer power of two."
-#define ASSERT_STYLE_ISALIGN         "Failed assertion: (" ASSERT_STYLE_VARNAME " = "   ASSERT_STYLE_P") aligned to ("ASSERT_STYLE_VARNAME" = "ASSERT_STYLE_U"), "ASSERT_STYLE_U
+#define ASSERT_STYLE_ISALIGN         "Failed assertion: (" ASSERT_STYLE_VARNAME " = "   ASSERT_STYLE_P ") aligned to (" ASSERT_STYLE_VARNAME " = " ASSERT_STYLE_U"), " ASSERT_STYLE_U
 #define ASSERT_STYLE_LTI             "Failed assertion: (" ASSERT_STYLE_VARNAME " < "   ASSERT_STYLE_VARNAME ") evaluated as (" ASSERT_STYLE_I " < "  ASSERT_STYLE_I	")"
 #define ASSERT_STYLE_LTU             "Failed assertion: (" ASSERT_STYLE_VARNAME " < "   ASSERT_STYLE_VARNAME ") evaluated as (" ASSERT_STYLE_U " < "  ASSERT_STYLE_U	")"
 #define ASSERT_STYLE_LTP             "Failed assertion: (" ASSERT_STYLE_VARNAME " < "   ASSERT_STYLE_VARNAME ") evaluated as (" ASSERT_STYLE_P " < "  ASSERT_STYLE_P    ")"
@@ -92,7 +92,7 @@ static void assert_format_va
 {
 	fprintf (stderr, ASSERT_STYLE_ASSERT " " ASSERT_STYLE_FILENAME ":" ASSERT_STYLE_LINE " " ASSERT_STYLE_FNAME "() ", id, file, line, fn);
 	if (errno != 0) {fprintf (stderr, " " ASSERT_STYLE_ERRNO " ", strerror (errno), errno);}
-	if (exp){fprintf (stderr, ": "ASSERT_STYLE_EXP " ", exp);}
+	if (exp){fprintf (stderr, ": " ASSERT_STYLE_EXP " ", exp);}
 	if (fmt)
 	{
 		vfprintf (stderr, fmt, va);
