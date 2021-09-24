@@ -4,6 +4,12 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 */
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define _USE_MATH_DEFINES
+
 #include <stdio.h>
 #include <stdint.h>
 #include <float.h>
@@ -249,6 +255,9 @@ struct u32_line
 
 
 
+#ifdef __cplusplus
+}
+#endif
 
 
 
