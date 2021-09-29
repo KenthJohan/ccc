@@ -9,8 +9,15 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 #define CSC_V3F32_PRINT_RGB TCOLF("1")"%+5.3E"TCOLF("2")"%+5.3E"TCOLF("4")"%+5.3E"
 
-static void csc_v3f32_print_rgb (FILE * f, v3f32 * v)
+static void csc_v3f32_printf_rgb (FILE * f, v3f32 * v)
 {
 	char const * fmt = CSC_V3F32_PRINT_RGB"\n"TCOL_RST;
 	fprintf (f, fmt, v->x, v->y, v->z);
 }
+
+
+static void csc_v3f32_print_rgb (v3f32 * v)
+{
+	csc_v3f32_printf_rgb(stdout, v);
+}
+
