@@ -19,6 +19,11 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 
 
+static void csc_argv_setflags (uint64_t flags[2], char const * str)
+{
+
+}
+
 
 
 
@@ -98,7 +103,8 @@ static void csc_argv_convert_value (enum csc_type type, union csc_union * dst, c
 }
 
 
-static void csc_argv_parse (char const * argv[], char name_char, char const * name_str, enum csc_type type, void * dst, uint64_t setflag, uint64_t flags)
+static void csc_argv_parse
+(char const * argv[], char name_char, char const * name_str, enum csc_type type, void * dst, uint64_t setflag, uint64_t flags)
 {
 	ASSERT_PARAM_NOTNULL (argv);
 	ASSERT_PARAM_NOTNULL (name_str);
@@ -282,3 +288,6 @@ static void csc_argv_description1 (struct csc_argv_option const * option, FILE *
 	}
 	fputc ('\n', stdout);
 }
+
+
+

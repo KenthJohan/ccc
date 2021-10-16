@@ -13,8 +13,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 #define CSC_STRNCMP_LITERAL(str1,str2) strncmp ((str1), (str2), sizeof ((str2))-1)
 
-#define STR_SET_0Z "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-#define STR_SET_Z0 "ZYXWVUTSRQPONMLKJIHGFEDCBA9876543210"
+
 #define STR_INB(x, a, b, base) INRANGE ((x), (a), MIN ((base) + (a), (b)))
 #define STR_SIGNED (1 << 0)
 #define STR_UNSIGNED (1 << 1)

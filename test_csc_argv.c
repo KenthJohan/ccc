@@ -4,6 +4,7 @@
 #include "csc_basic.h"
 #include "csc_type_str.h"
 #include "csc_base64set.h"
+#include "csc_strf.h"
 
 
 #define FLAG_READ    0x01
@@ -12,7 +13,7 @@
 #define FLAG_EXEC2   0x08
 #define FLAG_DEFAULT 0x10
 
-
+#ifdef TEST
 static void test_float1()
 {
 	char const * a[] =
@@ -234,7 +235,26 @@ csc_argv_parseall (a, o);
 csc_argv_description0 (o, stdout);
 csc_argv_description1 (o, stdout);
 }
+#endif
 
+
+static void test_flags8()
+{
+	char const * a[] =
+	{
+	"-x",
+	"-r",
+	"-w",
+	NULL,
+	};
+	uint32_t perm = FLAG_DEFAULT;
+	uint64_t flags[2];
+	csc_argv_setflags (flags, "xrw");
+	//csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flags);
+	//csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flags);
+	//csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, flags);
+	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ));
+}
 
 int main (int argc, char const * argv [])
 {
@@ -242,7 +262,16 @@ int main (int argc, char const * argv [])
 	ASSERT (argc);
 	ASSERT (argv);
 
+	uint64_t f[2] = {0,0};
+	//f[0] |= UINT64_C(1) << ('a' & 63);
+	BITSET64_ADD(f, '1');
+	BITSET64_ADD(f, 'a');
+	//printf ("%lx", ((uint64_t)'a' >> UINT64_C(64)));
+	strf_printf ("%64u64_2\n%64u64_2\n", f[0], f[1]);
+	strf_printf ("%64u64_2\n", f[0]);
+	strf_printf ("%64u64_2\n", f[1]);
 
+	/*
 	test_float1();
 	test_float2();
 	test_float3();
@@ -258,6 +287,7 @@ int main (int argc, char const * argv [])
 	test_flags7();
 	test_flags8();
 	test_expanded();
+	*/
 
 	/*
 	char const * a [4] =

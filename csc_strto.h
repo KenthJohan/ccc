@@ -41,7 +41,7 @@ static inline intmax_t strto_imax (char const ** f, int base)
 
 
 
-static inline uintmax_t strto_umax (char ** f, int base)
+static inline uintmax_t strto_umax (char const ** f, int base)
 {
 	ASSERT_PARAM_NOTNULL (f);
 	uintmax_t a = 0;
@@ -103,7 +103,7 @@ static inline uintmax_t str_to_umax_ab_adabase (char const * a, char const * b)
 
 
 
-static inline uint32_t strto_u32 (char ** f, int base)
+static inline uint32_t strto_u32 (char const ** f, int base)
 {
 	ASSERT_PARAM_NOTNULL (f);
 	uintmax_t v = strto_umax (f, base);

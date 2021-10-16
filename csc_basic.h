@@ -26,10 +26,13 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 #define container_of(ptr, type, member) ((type *)(void *)((char *)(ptr) - offsetof(type, member)))
 #define container_of_const(ptr, type, member) ((type *)(void const *)((char const *)(ptr) - offsetof(type, member)))
-
 #define countof(array) (sizeof(array) / sizeof(array[0]))
 
-#define BITS_SUBSET(a,b) ((a) & (b))
+#define BITSET64_ADD(x,c) ((x)[(uint64_t)(c) >> 6] |= (UINT64_C(1) << ((c) & 63)))
+
+
+
+
 
 
 enum csc_status
@@ -46,14 +49,16 @@ enum csc_type
 	CSC_TYPE_LONG,
 	CSC_TYPE_FLOAT,
 	CSC_TYPE_DOUBLE,
-	CSC_TYPE_U8,
-	CSC_TYPE_U16,
-	CSC_TYPE_U32,
-	CSC_TYPE_U64,
-	CSC_TYPE_I8,
-	CSC_TYPE_I16,
-	CSC_TYPE_I32,
-	CSC_TYPE_I64,
+	CSC_TYPE_U,
+	CSC_TYPE_U8 = CSC_TYPE_U+8,
+	CSC_TYPE_U16 = CSC_TYPE_U+16,
+	CSC_TYPE_U32 = CSC_TYPE_U+32,
+	CSC_TYPE_U64 = CSC_TYPE_U+64,
+	CSC_TYPE_I,
+	CSC_TYPE_I8 = CSC_TYPE_I+8,
+	CSC_TYPE_I16 = CSC_TYPE_I+16,
+	CSC_TYPE_I32 = CSC_TYPE_I+32,
+	CSC_TYPE_I64 = CSC_TYPE_I+64,
 	CSC_TYPE_F32,
 	CSC_TYPE_F64,
 	CSC_TYPE_V4F32,
