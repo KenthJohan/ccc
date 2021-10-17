@@ -25,7 +25,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define ASSERT_STYLE_NULL       TFG(123,123,255) "NULL"            TCOL_RST
 #define ASSERT_STYLE_FALSE      TFG(123,123,255) "FALSE"           TCOL_RST
 #define ASSERT_STYLE_TRUE       TFG(123,123,255) "TRUE"            TCOL_RST
-#define ASSERT_STYLE_ASSERT     TFG(255,66 ,66)  "A%04x"           TCOL_RST
+#define ASSERT_STYLE_ASSERT     TFG(255,66 ,66)  "A%04X"           TCOL_RST
 #define ASSERT_STYLE_FILENAME   TFG(99 ,99 ,99)  "%s"              TCOL_RST
 #define ASSERT_STYLE_LINE       TFG(99 ,99 ,99)  "%i"              TCOL_RST
 #define ASSERT_STYLE_FNAME      TFG(99 ,120,99)  "%s"              TCOL_RST

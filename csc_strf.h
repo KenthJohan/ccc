@@ -28,14 +28,7 @@ void strf_fmtv (char * o, uint32_t n, char const * f, va_list va)
 	uint32_t size = 0;
 	uint32_t width = 0;
 	enum csc_type type = CSC_TYPE_NONE;
-	int base;
-	union
-	{
-		intmax_t i;
-		intmax_t u;
-		float f;
-		double d;
-	} value;
+	int base = 0;
 	while (1)
 	{
 		//Look for format specifier starting with '%'
@@ -105,24 +98,29 @@ void strf_fmtv (char * o, uint32_t n, char const * f, va_list va)
 		case CSC_TYPE_U8:
 		case CSC_TYPE_U16:
 		case CSC_TYPE_U32:
+			m = strfrom_umax (o, m, va_arg (va, uint32_t), base);
+			break;
 		case CSC_TYPE_U64:
-			m = strfrom_umax (o, va_arg (va, uint64_t), m, base, '0');
+			m = strfrom_umax (o, m, va_arg (va, uint64_t), base);
 			break;
 		case CSC_TYPE_I:
 		case CSC_TYPE_I8:
 		case CSC_TYPE_I16:
 		case CSC_TYPE_I32:
+			m = strfrom_imax (o, m, va_arg (va, int32_t), base, '+');
+			break;
 		case CSC_TYPE_I64:
-			m = strfrom_imax (o, va_arg (va, int64_t), m, base, '0');
+			m = strfrom_imax (o, m, va_arg (va, int64_t), base, '+');
 			break;
 		default:
 			ASSERT (0);
 			break;
 		}
-
+		memset (o, '#', m);
 		o += m;
 		n -= m;
 
+		/*
 		//Apply padding
 		if (width > m)
 		{
@@ -131,6 +129,7 @@ void strf_fmtv (char * o, uint32_t n, char const * f, va_list va)
 			o += width;
 			n -= width;
 		}
+		*/
 	}
 end:
 	return;
@@ -156,5 +155,35 @@ void strf_printf (char const * f, ...)
 	va_end (va);
 }
 
+
+
+static void test_csc_strf1 (char const * f, int32_t value, char const * expect)
+{
+	char buf[100+1] = {'\0'};
+	strf_fmt (buf, 10, f, value);
+	ASSERTF (strcmp (buf, expect) == 0, "%s %s", buf, expect);
+}
+
+
+static void test_csc_strf()
+{
+
+	test_csc_strf1 ("%i32_10", 10, "10");
+	test_csc_strf1 ("%i32_-10", 10, "190");
+	test_csc_strf1 ("%i32_2", 10, "01010");
+
+	{
+		char buf[10+1] = {'\0'};
+		strf_fmt (buf, 10, "%i32_10", -5);
+		puts (buf);
+		strf_fmt (buf, 10, "%i32_10", 10);
+		puts (buf);
+		strf_fmt (buf, 10, "%u32_32", -5);
+		puts (buf);
+		strf_fmt (buf, 10, "%u32_10", 5);
+		puts (buf);
+	}
+
+}
 
 

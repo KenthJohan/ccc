@@ -59,15 +59,6 @@ static inline uint32_t strfrom_imax
 		n --;
 		*o = (plus > 0) ? plus : '-';
 	}
-	/*
-	while (1)
-	{
-		if (n == 0) {break;}
-		o --;
-		n --;
-		*o = pad;
-	}
-	*/
 	return n;
 }
 
@@ -81,14 +72,14 @@ static inline uint32_t strfrom_imax
  * @param base
  * @param pad
  */
-static inline void strfrom_umax
-(char * o, uint32_t n, uintmax_t value, int base, char pad)
+static inline uint32_t strfrom_umax
+(char * o, uint32_t n, uintmax_t value, int base)
 {
 	ASSERT_PARAM_NOTNULL (o);
-	ASSERT (base != 0);
-	ASSERT (base < (int8_t)sizeof (STRFROM_LOOKUP_0Z));
+	ASSERT_NEQI (base, 0);
+	ASSERT_LTI (base, (int8_t)sizeof (STRFROM_LOOKUP_0Z));
 	int rem;
-	if (n == 0) {return;}
+	if (n == 0) {return n;}
 	o += n;
 	while (1)
 	{
@@ -105,27 +96,9 @@ static inline void strfrom_umax
 		*o = STRFROM_LOOKUP_0Z [rem];
 		if (value == 0) {break;}
 	}
-	while (1)
-	{
-		if (n == 0) {break;}
-		o --;
-		n --;
-		*o = pad;
-	}
-	return;
+	return n;
 }
 
-
-
-/*
-static inline uint32_t strfrom_imax2
-(char * o, uint32_t n, intmax_t value, int base, pad)
-{
-	char buf[64];
-	strfrom_imax (buf, 64, value, base, pad);
-
-}
-*/
 
 
 
