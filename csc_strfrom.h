@@ -25,7 +25,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
  * @param pad
  */
 static inline uint32_t strfrom_imax
-(char * o, uint32_t n, intmax_t value, int base, char plus)
+(char * o, uint32_t n, intmax_t value, int base, char sign)
 {
 	ASSERT_PARAM_NOTNULL (o);
 	ASSERT (base != 0);
@@ -36,7 +36,7 @@ static inline uint32_t strfrom_imax
 	if (value < 0)
 	{
 		value = -value;
-		plus = -plus;
+		sign = '-';
 	}
 	while (1)
 	{
@@ -53,11 +53,11 @@ static inline uint32_t strfrom_imax
 		*o = STRFROM_LOOKUP_0Z [rem];
 		if (value == 0) {break;}
 	}
-	if ((n > 0) && plus)
+	if ((n > 0) && sign)
 	{
 		o --;
 		n --;
-		*o = (plus > 0) ? plus : '-';
+		o[0] = sign;
 	}
 	return n;
 }
