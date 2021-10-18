@@ -86,7 +86,7 @@ static void v4f32_div (v4f32 * r, v4f32 const * a, float b)
 }
 
 
-float v4f32_dot (v4f32 const * a, v4f32 const * b)
+static float v4f32_dot (v4f32 const * a, v4f32 const * b)
 {
 	float sum = 0;
 	sum += a->x * b->x;

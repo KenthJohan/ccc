@@ -9,7 +9,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <string.h> //memset
 #include <stdlib.h> //malloc
 
-char * csc_malloc_file (char const * filename)
+static char * csc_malloc_file (char const * filename)
 {
 	ASSERTF (filename != NULL, "filename is NULL%s", "");
 	FILE * file = fopen (filename, "rb");
@@ -35,7 +35,7 @@ char * csc_malloc_file (char const * filename)
 }
 
 
-char * csc_malloc_file_ab (char const * a, char const * b)
+static char * csc_malloc_file_ab (char const * a, char const * b)
 {
 	char filename[100];
 	memset (filename, 0, 100);
@@ -67,7 +67,7 @@ char * csc_malloc_file_ab (char const * a, char const * b)
 }
 
 
-char * csc_malloc_file1 (char const * filename, long * length)
+static char * csc_malloc_file1 (char const * filename, long * length)
 {
 	ASSERTF (filename != NULL, "filename is NULL%s", "");
 	FILE * file = fopen (filename, "rb");

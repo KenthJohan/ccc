@@ -86,7 +86,7 @@ static void v3f32_cross (v3f32 * r, v3f32 const * a, v3f32 const * b)
 }
 
 
-float v3f32_dot (v3f32 const * a, v3f32 const * b)
+static float v3f32_dot (v3f32 const * a, v3f32 const * b)
 {
 	float sum = 0;
 	sum += a->x * b->x;
@@ -188,7 +188,7 @@ static void v3f32_m3_mul (v3f32 * y, m3f32 const * a, v3f32 * const b)
 
 
 //Copy all points inside the ball
-uint32_t v3f32_ball (v3f32 const x[], uint32_t n, v3f32 const * c, v3f32 y[], float r)
+static uint32_t v3f32_ball (v3f32 const x[], uint32_t n, v3f32 const * c, v3f32 y[], float r)
 {
 	uint32_t m = 0;
 	for(uint32_t i = 0; i < n; ++i)

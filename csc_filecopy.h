@@ -6,7 +6,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 #include <stdio.h>
 
-void csc_filecopy_tofolder (char const * filename, char const * destination_folder)
+static void csc_filecopy_tofolder (char const * filename, char const * destination_folder)
 {
 	char buf[100];
 	snprintf (buf, sizeof (buf), "cp %s %s/%s", filename, destination_folder, filename);

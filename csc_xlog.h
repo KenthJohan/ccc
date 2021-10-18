@@ -77,7 +77,7 @@ static char const * xlogcategory_tostr(enum xlogcategory category)
 
 #define XLOG(level, category, format, ...) xlog(__COUNTER__, __FILE__, __LINE__, __func__, level, category, (format), ## __VA_ARGS__)
 
-void xlog(int counter, char const * file, int line, char const * func, enum xloglvl level, enum xlogcategory category, char const * format, ...)
+static void xlog(int counter, char const * file, int line, char const * func, enum xloglvl level, enum xlogcategory category, char const * format, ...)
 {
 	va_list args;
 	va_start (args, format);
