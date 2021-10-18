@@ -3,17 +3,21 @@
 #include "csc_argv.h"
 #include "csc_basic.h"
 #include "csc_type_str.h"
-#include "csc_base64set.h"
 #include "csc_strf.h"
+#include "csc_bitset.h"
 
 
-#define FLAG_READ    0x01
-#define FLAG_WRITE   0x02
-#define FLAG_EXEC    0x04
-#define FLAG_EXEC2   0x08
-#define FLAG_DEFAULT 0x10
+#define FLAG_DEFAULT 0x0001
+#define FLAG_READ    0x0010
+#define FLAG_WRITE   0x0020
+#define FLAG_EXEC    0x0040
+#define FLAG_EXEC2   0x0080
+#define FLAG_A       0x0100
+#define FLAG_B       0x0200
+#define FLAG_C       0x0400
+#define FLAG_D       0x0800
 
-#ifdef TEST
+
 static void test_float1()
 {
 	char const * a[] =
@@ -22,7 +26,7 @@ static void test_float1()
 	NULL,
 	};
 	float value = 1.0f;
-	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0, 0);
+	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0);
 	ASSERT (value == 3.0);
 }
 
@@ -34,7 +38,7 @@ static void test_float2()
 	NULL,
 	};
 	float value = 1.0f;
-	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0, 0);
+	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0);
 	ASSERT (value == 3.0);
 }
 
@@ -47,7 +51,7 @@ static void test_float3()
 	NULL,
 	};
 	float value = 1.0f;
-	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0, 0);
+	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0);
 	ASSERT (value == 4.0);
 }
 
@@ -59,7 +63,7 @@ static void test_string1()
 	NULL,
 	};
 	char * value;
-	csc_argv_parse (a, 'a', "name", CSC_TYPE_STRING, &value, 0, 0);
+	csc_argv_parse (a, 'a', "name", CSC_TYPE_STRING, &value, 0);
 	ASSERT (strcmp("Bob", value) == 0);
 }
 
@@ -72,7 +76,7 @@ static void test_string2()
 	NULL,
 	};
 	char * value;
-	csc_argv_parse (a, 'a', "name", CSC_TYPE_STRING, &value, 0, 0);
+	csc_argv_parse (a, 'a', "name", CSC_TYPE_STRING, &value, 0);
 	ASSERT (strcmp("Bob", value) == 0);
 }
 
@@ -84,9 +88,41 @@ static void test_string3()
 	NULL,
 	};
 	char * value;
-	csc_argv_parse (a, 'a', "name", CSC_TYPE_STRING, &value, 0, 0);
+	csc_argv_parse (a, 'a', "name", CSC_TYPE_STRING, &value, 0);
 	ASSERT (strcmp("Bob", value) == 0);
 }
+
+
+
+
+
+static void test_expanded()
+{
+	char const * a[] ={"-xX","--read","-h","-a","192.168.0.1:4000",NULL};
+	char * address = NULL;
+	int threads = 0;
+	uint32_t perm = 0;
+	struct csc_argv_option o[] =
+{
+	{CSC_ARGV_DEFINE_GROUP("Options")},
+	{'a', "address", CSC_TYPE_STRING, &address, 0, "The address"},
+	{'j', "threads", CSC_TYPE_INT, &threads, 0, "Number of threads"},
+	{CSC_ARGV_DEFINE_GROUP("Permissions")},
+	{'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, "Read"},
+	{'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, "Write"},
+	{'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, "Exec"},
+	{'X', "exec2", CSC_TYPE_U32, &perm, FLAG_EXEC2, "Exec2"},
+	{CSC_ARGV_END}
+};
+	csc_argv_parseall (a, o);
+	csc_argv_description0 (o, stdout);
+	csc_argv_description1 (o, stdout);
+}
+
+
+
+
+
 
 static void test_flags1()
 {
@@ -96,9 +132,8 @@ static void test_flags1()
 	NULL,
 	};
 	uint32_t perm = FLAG_DEFAULT;
-	uint64_t flagmask = csc_base64set_fromstr ("rw");
-	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
-	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE);
 	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ));
 }
 
@@ -110,9 +145,8 @@ static void test_flags2()
 	NULL,
 	};
 	uint32_t perm = FLAG_DEFAULT;
-	uint64_t flagmask = csc_base64set_fromstr("rw");
-	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
-	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE);
 	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE));
 }
 
@@ -124,9 +158,8 @@ static void test_flags3()
 	NULL,
 	};
 	uint32_t perm = FLAG_DEFAULT;
-	uint64_t flagmask = csc_base64set_fromstr("rw");
-	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
-	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE);
 	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE));
 }
 
@@ -139,9 +172,8 @@ static void test_flags4()
 	NULL,
 	};
 	uint32_t perm = FLAG_DEFAULT;
-	uint64_t flagmask = csc_base64set_fromstr("rw");
-	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
-	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE);
 	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE));
 }
 
@@ -154,10 +186,9 @@ static void test_flags5()
 	NULL,
 	};
 	uint32_t perm = FLAG_DEFAULT;
-	uint64_t flagmask = csc_base64set_fromstr("rwx");
-	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
-	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
-	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, flagmask);
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE);
+	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC);
 	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE|FLAG_EXEC));
 }
 
@@ -169,10 +200,9 @@ static void test_flags6()
 	NULL,
 	};
 	uint32_t perm = FLAG_DEFAULT;
-	uint64_t flagmask = csc_base64set_fromstr("rwx");
-	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
-	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
-	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, flagmask);
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE);
+	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC);
 	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE|FLAG_EXEC));
 }
 
@@ -186,10 +216,9 @@ static void test_flags7()
 	NULL,
 	};
 	uint32_t perm = FLAG_DEFAULT;
-	uint64_t flagmask = csc_base64set_fromstr("rwx");
-	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
-	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
-	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, flagmask);
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE);
+	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC);
 	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ|FLAG_WRITE|FLAG_EXEC));
 }
 
@@ -197,64 +226,38 @@ static void test_flags8()
 {
 	char const * a[] =
 	{
-	"-x",
-	"-r",
-	"-w",
+	"-rx",
+	"-xrb",
+	"-wwc",
+	"-D",
+	"4",
 	NULL,
 	};
+	float value = 1.0f;
 	uint32_t perm = FLAG_DEFAULT;
-	uint64_t flagmask = csc_base64set_fromstr("r");
-	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
-	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
-	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, flagmask);
-	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ));
+	csc_argv_parse (a, 'a', "a", CSC_TYPE_U32, &perm, FLAG_A);
+	csc_argv_parse (a, 'b', "b", CSC_TYPE_U32, &perm, 0);
+	csc_argv_parse (a, 'c', "c", CSC_TYPE_U32, &perm, FLAG_C);
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE);
+	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC|FLAG_A);
+	csc_argv_parse (a, 'D', "Duration", CSC_TYPE_FLOAT, &value, 0);
+	csc_argv_parse (a, 'D', "Duration", CSC_TYPE_U32, &perm, FLAG_D|FLAG_B);
+	ASSERT (perm & FLAG_DEFAULT);
+	ASSERT (perm & FLAG_EXEC);
+	ASSERT (perm & FLAG_READ);
+	ASSERT (perm & FLAG_WRITE);
+	ASSERT (perm & FLAG_A);
+	ASSERT (perm & FLAG_B);
+	ASSERT (perm & FLAG_C);
+	ASSERT (perm & FLAG_D);
+	ASSERT (perm == (FLAG_DEFAULT|FLAG_EXEC|FLAG_READ|FLAG_WRITE|FLAG_A|FLAG_B|FLAG_C|FLAG_D));
+	ASSERT (value == 4.0);
 }
 
 
 
-static void test_expanded()
-{
-	char const * a[] ={"-xX","--read","-h","-a","192.168.0.1:4000",NULL};
-	char * address = NULL;
-	int threads = 0;
-	uint32_t perm = 0;
-	struct csc_argv_option o[] =
-	{
-	{CSC_ARGV_DEFINE_GROUP("Options")},
-	{'a', "address", CSC_TYPE_STRING, &address, 0, "The address"},
-	{'j', "threads", CSC_TYPE_INT, &threads, 0, "Number of threads"},
-	{CSC_ARGV_DEFINE_GROUP("Permissions")},
-	{'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, "Read"},
-	{'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, "Write"},
-	{'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, "Exec"},
-	{'X', "exec2", CSC_TYPE_U32, &perm, FLAG_EXEC2, "Exec2"},
-	{CSC_ARGV_END}
-};
-//
-csc_argv_parseall (a, o);
-csc_argv_description0 (o, stdout);
-csc_argv_description1 (o, stdout);
-}
-#endif
 
-
-static void test_flags8()
-{
-	char const * a[] =
-	{
-	"-x",
-	"-r",
-	"-w",
-	NULL,
-	};
-	uint32_t perm = FLAG_DEFAULT;
-	uint64_t flags[2];
-	csc_argv_setflags (flags, "xrw");
-	//csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flags);
-	//csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flags);
-	//csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC, flags);
-	ASSERT (perm == (FLAG_DEFAULT|FLAG_READ));
-}
 
 int main (int argc, char const * argv [])
 {
@@ -262,16 +265,7 @@ int main (int argc, char const * argv [])
 	ASSERT (argc);
 	ASSERT (argv);
 
-	uint64_t f[2] = {0,0};
-	//f[0] |= UINT64_C(1) << ('a' & 63);
-	BITSET64_ADD(f, '1');
-	BITSET64_ADD(f, 'a');
-	//printf ("%lx", ((uint64_t)'a' >> UINT64_C(64)));
-	strf_printf ("%64u64_2\n%64u64_2\n", f[0], f[1]);
-	strf_printf ("%64u64_2\n", f[0]);
-	strf_printf ("%64u64_2\n", f[1]);
 
-	/*
 	test_float1();
 	test_float2();
 	test_float3();
@@ -287,22 +281,21 @@ int main (int argc, char const * argv [])
 	test_flags7();
 	test_flags8();
 	test_expanded();
-	*/
 
 	/*
 	char const * a [4] =
 	{
 	"--duration=3",
+	"-xrw",
 	NULL,
 	};
 	float value = 1.0f;
 	uint32_t perm = 0;
-	uint64_t flagmask = csc_argv_alphanumbits_fromstr("rw");
-	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0, 0);
-	ASSERT (value == 3.0);
-	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ, flagmask);
-	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE, flagmask);
+	csc_argv_parse (a, 'd', "duration", CSC_TYPE_FLOAT, &value, 0);
+	csc_argv_parse (a, 'r', "read", CSC_TYPE_U32, &perm, FLAG_READ);
+	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE);
 	*/
+
 
 
 

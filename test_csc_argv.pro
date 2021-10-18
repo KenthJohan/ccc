@@ -13,6 +13,6 @@ QMAKE_CFLAGS = -Wno-unused-function
 HEADERS += csc_argv.h
 HEADERS += csc_crossos.h
 HEADERS += csc_basic.h
-HEADERS += csc_base64set.h
+HEADERS += csc_bitset.h
 HEADERS += csc_type_str.h
 SOURCES += test_csc_argv.c

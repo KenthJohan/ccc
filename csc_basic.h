@@ -28,7 +28,6 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define container_of_const(ptr, type, member) ((type *)(void const *)((char const *)(ptr) - offsetof(type, member)))
 #define countof(array) (sizeof(array) / sizeof(array[0]))
 
-#define BITSET64_ADD(x,c) ((x)[(uint64_t)(c) >> 6] |= (UINT64_C(1) << ((c) & 63)))
 
 
 
@@ -181,7 +180,6 @@ int csc_hamming_weight_u64 (uint32_t x)
 {
 	return __builtin_popcountll (x);
 }
-
 
 
 

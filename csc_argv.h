@@ -13,18 +13,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include "csc_basic.h"
 #include "csc_assert.h"
 #include "csc_type_str.h"
-#include "csc_base64set.h"
-
-
-
-
-
-static void csc_argv_setflags (uint64_t flags[2], char const * str)
-{
-
-}
-
-
+#include "csc_bitset.h"
 
 
 
@@ -104,7 +93,7 @@ static void csc_argv_convert_value (enum csc_type type, union csc_union * dst, c
 
 
 static void csc_argv_parse
-(char const * argv[], char name_char, char const * name_str, enum csc_type type, void * dst, uint64_t setflag, uint64_t flags)
+(char const * argv[], char name_char, char const * name_str, enum csc_type type, void * dst, uint64_t setflag)
 {
 	ASSERT_PARAM_NOTNULL (argv);
 	ASSERT_PARAM_NOTNULL (name_str);
@@ -142,12 +131,12 @@ again:
 	//Handles short names for flags: e.g: {"-x", "-rw", -rWarren}:
 	else if (setflag)
 	{
-		//Make sure every character in the argument is part of a flag:
-		uint64_t a = csc_base64set_fromstr (s+1);
-		if ((a & flags) == 0) {goto again;}
-		//Check if this flag matches a character in the argument:
-		uint64_t b = csc_base64set_fromchar (name_char);
-		if ((b & a) == 0) {goto again;}
+		uint64_t a[2] = {0};
+		for (char const * p = s; p[0] != '\0'; p++)
+		{
+			BITSET64_ADD(a, p[0]);
+		}
+		if (BITSET64_GET(a, name_char) == 0) {goto again;}
 		csc_argv_convert_flag (type, (union csc_union*)dst, setflag);
 		return;
 	}
@@ -202,6 +191,7 @@ static void csc_argv_parseall (char const * argv[], struct csc_argv_option * opt
 	ASSERT_PARAM_NOTNULL (options);
 
 	//Find all characters that is used for flags:
+	/*
 	uint64_t flagmask = 0;
 	for (struct csc_argv_option * o = options; o->t != CSC_TYPE_NONE; ++o)
 	{
@@ -210,13 +200,14 @@ static void csc_argv_parseall (char const * argv[], struct csc_argv_option * opt
 			flagmask |= csc_base64set_fromchar (o->c);
 		}
 	}
+	*/
 
 	//Go through all options:
 	for (struct csc_argv_option * o = options; o->t != CSC_TYPE_NONE; ++o)
 	{
 		if (o->t != (enum csc_type)CSC_ARGV_GROUP)
 		{
-			csc_argv_parse (argv, o->c, o->s, o->t, o->v, o->f, flagmask);
+			csc_argv_parse (argv, o->c, o->s, o->t, o->v, o->f);
 		}
 	}
 }
