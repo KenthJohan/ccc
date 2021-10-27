@@ -134,6 +134,15 @@ static float v3f32_norm (v3f32 const * a)
 	return sqrtf (v3f32_norm2 (a));
 }
 
+static void v3f32_normalize (v3f32 * a)
+{
+	float l = v3f32_norm (a);
+	ASSERT (l != 0.0f);
+	a->x /= l;
+	a->y /= l;
+	a->z /= l;
+}
+
 
 
 
@@ -223,5 +232,16 @@ static void v3f32_meanacc (v3f32 * y, v3f32 const x[], uint32_t n)
 	y->x *= s;
 	y->y *= s;
 	y->z *= s;
+}
+
+
+
+
+
+static void v3f32_lerp2 (v3f32 * y, v3f32 const * a, v3f32 * const b, float t)
+{
+	y->x = (1 - t) * a->x + t * b->x;
+	y->y = (1 - t) * a->y + t * b->y;
+	y->z = (1 - t) * a->z + t * b->z;
 }
 
