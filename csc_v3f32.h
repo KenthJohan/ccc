@@ -96,6 +96,20 @@ static float v3f32_dot (v3f32 const * a, v3f32 const * b)
 }
 
 
+static float v3f32_dotv (float r[], v3f32 const a[], v3f32 const b[], int inca, int incb, int count)
+{
+	float sum = 0;
+	for (int i = 0; i < count; ++i)
+	{
+		r[i] = (a->x * b->x) + (a->y * b->y) + (a->z * b->z);
+		a += inca;
+		b += incb;
+	}
+	return sum;
+}
+
+
+
 static void v3f32_crossacc (v3f32 * r, v3f32 const * a, v3f32 const * b)
 {
 	r->x += a->y * b->z - a->z * b->y;
