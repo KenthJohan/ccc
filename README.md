@@ -240,7 +240,7 @@ enable_testing()
 
 ```bash
 git clone https://github.com/eclipse/mosquitto
-cd nng && mkdir build && cd build
+cd mosquitto && mkdir build && cd build
 cmake -G"MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX="C:\msys64\mingw64"
 pacman -R cmake
 pacman -S mingw-w64-x86_64-cmake
