@@ -61,12 +61,22 @@ static void v3f32_subv (v3f32 r[], v3f32 const a[], v3f32 const b[], uint32_t in
 	}
 }
 
-
 static void v3f32_add (v3f32 * r, v3f32 const * a, v3f32 const * b)
 {
 	r->x = a->x + b->x;
 	r->y = a->y + b->y;
 	r->z = a->z + b->z;
+}
+
+static void v3f32_addv (v3f32 r[], v3f32 const a[], v3f32 const b[], uint32_t incr, uint32_t inca, uint32_t incb, uint32_t n)
+{
+	for (uint32_t i = 0; i < n; ++i)
+	{
+		v3f32_add (r, a, b);
+		r += incr;
+		a += inca;
+		b += incb;
+	}
 }
 
 
