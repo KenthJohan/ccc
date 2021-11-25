@@ -53,6 +53,20 @@ static void m3f32_rotate_z (m3f32 * r, float angle)
 
 
 
+static void m3f32_add_mul (m3f32 * r, m3f32 const * a, m3f32 const * b, float alpha, float beta)
+{
+	r->m[0] = a->m[0] * alpha + b->m[0] * beta;
+	r->m[1] = a->m[1] * alpha + b->m[1] * beta;
+	r->m[2] = a->m[2] * alpha + b->m[2] * beta;
+	r->m[3] = a->m[3] * alpha + b->m[3] * beta;
+	r->m[4] = a->m[4] * alpha + b->m[4] * beta;
+	r->m[5] = a->m[5] * alpha + b->m[5] * beta;
+	r->m[6] = a->m[6] * alpha + b->m[6] * beta;
+	r->m[7] = a->m[7] * alpha + b->m[7] * beta;
+	r->m[8] = a->m[8] * alpha + b->m[8] * beta;
+	r->m[9] = a->m[9] * alpha + b->m[9] * beta;
+}
+
 
 
 

@@ -8,6 +8,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 extern "C" {
 #endif
 
+
 #define _USE_MATH_DEFINES
 
 #include <stdio.h>
@@ -19,6 +20,18 @@ extern "C" {
 #include "csc_basic.h"
 
 
+
+
+// Stupid:
+#ifndef FLT_MAX
+#define FLT_MAX __FLT_MAX__
+#endif
+#ifndef FLT_MIN
+#define FLT_MIN __FLT_MIN__
+#endif
+#ifndef DBL_EPSILON
+#define DBL_EPSILON __DBL_EPSILON__
+#endif
 
 
 //typedef float m4f32[16];
