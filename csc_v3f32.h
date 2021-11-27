@@ -42,6 +42,13 @@ static void v3f32_mul (v3f32 * r, v3f32 const * a, float b)
 	r->z = a->z * b;
 }
 
+static void v3f32_mul_hadamard (v3f32 * r, v3f32 const * a, v3f32 const * b)
+{
+	r->x = a->x * b->x;
+	r->y = a->y * b->y;
+	r->z = a->z * b->z;
+}
+
 
 static void v3f32_sub (v3f32 * r, v3f32 const * a, v3f32 const * b)
 {
