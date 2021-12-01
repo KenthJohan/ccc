@@ -1,10 +1,9 @@
+#include "csc_basic.h"
 #include "csc_assert.h"
 #include "csc_crossos.h"
 #include "csc_argv.h"
-#include "csc_basic.h"
 #include "csc_type_str.h"
 #include "csc_strf.h"
-#include "csc_bitset.h"
 
 
 #define FLAG_DEFAULT 0x0001

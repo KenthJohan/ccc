@@ -28,7 +28,9 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define container_of_const(ptr, type, member) ((type *)(void const *)((char const *)(ptr) - offsetof(type, member)))
 #define countof(array) (sizeof(array) / sizeof(array[0]))
 
-
+#define BITSET64_ADD(x,c) ((x)[(uint64_t)(c) >> 6] |= (UINT64_C(1) << ((c) & 63)))
+#define BITSET64_REMOVE(x,c) ((x)[(uint64_t)(c) >> 6] &= ~(UINT64_C(1) << ((c) & 63)))
+#define BITSET64_GET(x,c) (((x)[(uint64_t)(c) >> 6] >> ((c)&63)) & 1)
 
 
 
@@ -109,77 +111,6 @@ typedef uint16_t utf16; //utf character
 typedef uint32_t utf32; //utf character
 */
 
-
-//If a maps to x, then b maps from x
-static inline void
-csc_inverse_121 (uint32_t a [], uint32_t b [], uint32_t n)
-{
-	for (uint32_t i = 0; i < n; ++i)
-	{
-		b [a [i]] = i;
-	}
-}
-
-
-//Calculate the size-mask or max-size:
-//TODO: This might be too convulated to get the size mask:
-static inline uint64_t
-csc_sizemask64 (unsigned size)
-{
-	uint64_t mask;
-	if (size == 64)
-	{
-		mask = UINT64_MAX;
-	}
-	else
-	{
-		mask = ((UINT64_C (1) << (uint64_t)size) - UINT64_C (1));
-	}
-	return mask;
-}
-
-
-
-//https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
-// compute the next highest power of 2 of 32-bit v
-static unsigned int csc_round_up_pow2(unsigned int v)
-{
-	v--;
-	v |= v >> 1;
-	v |= v >> 2;
-	v |= v >> 4;
-	v |= v >> 8;
-	v |= v >> 16;
-	v++;
-	return v;
-}
-
-
-
-
-static void csc_mask_unravel_u64 (uint64_t mask, uint64_t set[64])
-{
-	set[0] = mask & 0x0000000000000001;
-	set[1] = mask & 0x0000000000000002;
-	set[2] = mask & 0x0000000000000004;
-	set[3] = mask & 0x0000000000000008;
-	set[4] = mask & 0x0000000000000010;
-	set[5] = mask & 0x0000000000000020;
-	//TODO: etc...
-}
-
-
-//https://en.wikipedia.org/wiki/Hamming_weight
-static int csc_hamming_weight_u32 (uint32_t x)
-{
-	return __builtin_popcount (x);
-}
-
-//https://en.wikipedia.org/wiki/Hamming_weight
-static int csc_hamming_weight_u64 (uint32_t x)
-{
-	return __builtin_popcountll (x);
-}
 
 
 

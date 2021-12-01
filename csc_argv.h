@@ -13,7 +13,6 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include "csc_basic.h"
 #include "csc_assert.h"
 #include "csc_type_str.h"
-#include "csc_bitset.h"
 
 
 

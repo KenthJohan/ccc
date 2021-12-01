@@ -2,6 +2,12 @@
 SPDX-License-Identifier: GPL-2.0
 SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@gmail.com>
 */
+
+//https://github.com/zephyrproject-rtos/zephyr/blob/main/subsys/testsuite/ztest/include/ztest_assert.h
+//https://github.com/libuv/libuv/blob/6564ccc90073296769ac17319bba3f3357005603/test/task.h
+//https://gcc.gnu.org/onlinedocs/gcc/Variadic-Macros.html
+//http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2153.htm
+
 #pragma once
 #include <stdio.h>
 #include <stdarg.h>
@@ -9,107 +15,66 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <string.h>
 #include <errno.h>
 #include <inttypes.h>
-#include "csc_tcol.h"
+
+#define ASSERT_COLOR "\e[38;2;220;60;60m"
+#define ASSERT_COLOR1 "\e[38;2;80;190;80m"
+#define ASSERT_COLOR2 "\e[38;2;190;80;80m"
+#define ASSERT_COLOR_FILENAME "\e[38;2;130;130;130m"
+#define ASSERT_COLOR_FUNCNAME "\e[38;2;100;100;140m"
+#define ASSERT_COLOR_EXP "\e[38;2;150;150;200m"
+
+#define ASSERT_COMPARE(a, o, b, t, p) \
+	do{if(!((t)(a) o (t)(b))){assert_format(__COUNTER__, __FILE__, __LINE__, __func__, NULL, \
+	"(" ASSERT_COLOR1 "%s\e[0m %s " ASSERT_COLOR2 "%s\e[0m) eval (" \
+	ASSERT_COLOR1 "%" p "\e[0m " #o ASSERT_COLOR2" %" p "\e[0m)", #a, #o, #b, (t)(a), (t)(b) \
+	);}} while(0)
 
 
-//https://gcc.gnu.org/onlinedocs/gcc/Variadic-Macros.html
-//http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2153.htm
-#define ASSERT_CARGS __COUNTER__, __FILE__, __LINE__, __func__
+// Generic assertion
+#define ASSERT(A)               do{if(!(A)){assert_format(__COUNTER__, __FILE__, __LINE__, __func__, #A, (NULL)             );}}while(0)
+#define ASSERTF(A, F, ...)      do{if(!(A)){assert_format(__COUNTER__, __FILE__, __LINE__, __func__, #A, (F), ## __VA_ARGS__);}}while(0)
 
-#define ASSERT_STYLE_EXP        TFG(255,200,255) "%s"              TCOL_RST
-#define ASSERT_STYLE_VARNAME    TFG(123,200,255) "%s"              TCOL_RST
-#define ASSERT_STYLE_I          TFG(123,123,255) "%" PRIiMAX       TCOL_RST
-#define ASSERT_STYLE_U          TFG(123,123,255) "%" PRIuMAX       TCOL_RST
-#define ASSERT_STYLE_P          TFG(123,123,255) "%p"              TCOL_RST
-#define ASSERT_STYLE_F          TFG(123,123,255) "%f"              TCOL_RST
-#define ASSERT_STYLE_NULL       TFG(123,123,255) "NULL"            TCOL_RST
-#define ASSERT_STYLE_FALSE      TFG(123,123,255) "FALSE"           TCOL_RST
-#define ASSERT_STYLE_TRUE       TFG(123,123,255) "TRUE"            TCOL_RST
-#define ASSERT_STYLE_ASSERT     TFG(255,66 ,66)  "A%04X"           TCOL_RST
-#define ASSERT_STYLE_FILENAME   TFG(99 ,99 ,99)  "%s"              TCOL_RST
-#define ASSERT_STYLE_LINE       TFG(99 ,99 ,99)  "%i"              TCOL_RST
-#define ASSERT_STYLE_FNAME      TFG(99 ,120,99)  "%s"              TCOL_RST
-#define ASSERT_STYLE_ERRNO      TFG(190,90 ,90)  "%s (errno=%i)"   TCOL_RST
+// Comparison assertion
+// Can be used for any unsigned
+#define ASSERT_EQ_U(a,b) ASSERT_COMPARE(a, ==, b, uintmax_t, PRIuMAX)
+#define ASSERT_NE_U(a,b) ASSERT_COMPARE(a, !=, b, uintmax_t, PRIuMAX)
+#define ASSERT_GT_U(a,b) ASSERT_COMPARE(a, > , b, uintmax_t, PRIuMAX)
+#define ASSERT_GE_U(a,b) ASSERT_COMPARE(a, >=, b, uintmax_t, PRIuMAX)
+#define ASSERT_LT_U(a,b) ASSERT_COMPARE(a, < , b, uintmax_t, PRIuMAX)
+#define ASSERT_LE_U(a,b) ASSERT_COMPARE(a, <=, b, uintmax_t, PRIuMAX)
 
-#define ASSERT_STYLE_NOTNULL         "Failed assertion: (" ASSERT_STYLE_VARNAME " /= "  ASSERT_STYLE_NULL    ") evaluated as (" ASSERT_STYLE_P " /= " ASSERT_STYLE_NULL ")"
-#define ASSERT_STYLE_PARAM_NOTNULL   "Failed assertion: Paramater (" ASSERT_STYLE_VARNAME " /= "  ASSERT_STYLE_NULL    ") evaluated as (" ASSERT_STYLE_P " /= " ASSERT_STYLE_NULL ")"
-#define ASSERT_STYLE_ISFALSE         "Failed assertion: (" ASSERT_STYLE_VARNAME " = "   ASSERT_STYLE_FALSE    ") evaluated as (" ASSERT_STYLE_P " = " ASSERT_STYLE_FALSE ")"
-#define ASSERT_STYLE_ISTRUE          "Failed assertion: (" ASSERT_STYLE_VARNAME " = "   ASSERT_STYLE_TRUE     ") evaluated as (" ASSERT_STYLE_P " = " ASSERT_STYLE_TRUE ")"
-#define ASSERT_STYLE_ISPOW2          "Failed assertion: (" ASSERT_STYLE_VARNAME " = "   ASSERT_STYLE_U ") is a positive integer power of two."
-#define ASSERT_STYLE_ISALIGN         "Failed assertion: (" ASSERT_STYLE_VARNAME " = "   ASSERT_STYLE_P ") aligned to (" ASSERT_STYLE_VARNAME " = " ASSERT_STYLE_U"), " ASSERT_STYLE_U
+// Comparison assertion
+// Can be used for any signed
+#define ASSERT_EQ_I(a,b) ASSERT_COMPARE(a, ==, b, intmax_t, PRIiMAX)
+#define ASSERT_NE_I(a,b) ASSERT_COMPARE(a, !=, b, intmax_t, PRIiMAX)
+#define ASSERT_GT_I(a,b) ASSERT_COMPARE(a, > , b, intmax_t, PRIiMAX)
+#define ASSERT_GE_I(a,b) ASSERT_COMPARE(a, >=, b, intmax_t, PRIiMAX)
+#define ASSERT_LT_I(a,b) ASSERT_COMPARE(a, < , b, intmax_t, PRIiMAX)
+#define ASSERT_LE_I(a,b) ASSERT_COMPARE(a, <=, b, intmax_t, PRIiMAX)
 
-
-#define ASSERT_STYLE_PARAM2(o,param) "Failed assertion: (" ASSERT_STYLE_VARNAME o ASSERT_STYLE_VARNAME ") evaluated as (" param o param ")"
-
-#define ASSERT_STYLE_LTI             ASSERT_STYLE_PARAM2("<", ASSERT_STYLE_I)
-#define ASSERT_STYLE_LTU             ASSERT_STYLE_PARAM2("<", ASSERT_STYLE_U)
-#define ASSERT_STYLE_LTP             ASSERT_STYLE_PARAM2("<", ASSERT_STYLE_P)
-#define ASSERT_STYLE_LTF             ASSERT_STYLE_PARAM2("<", ASSERT_STYLE_F)
-#define ASSERT_STYLE_LTEI            ASSERT_STYLE_PARAM2("<=", ASSERT_STYLE_I)
-#define ASSERT_STYLE_LTEU            ASSERT_STYLE_PARAM2("<=", ASSERT_STYLE_U)
-#define ASSERT_STYLE_LTEP            ASSERT_STYLE_PARAM2("<=", ASSERT_STYLE_P)
-#define ASSERT_STYLE_LTEF            ASSERT_STYLE_PARAM2("<=", ASSERT_STYLE_F)
-#define ASSERT_STYLE_GTI             ASSERT_STYLE_PARAM2(">", ASSERT_STYLE_I)
-#define ASSERT_STYLE_GTU             ASSERT_STYLE_PARAM2(">", ASSERT_STYLE_U)
-#define ASSERT_STYLE_GTP             ASSERT_STYLE_PARAM2(">", ASSERT_STYLE_P)
-#define ASSERT_STYLE_GTF             ASSERT_STYLE_PARAM2(">", ASSERT_STYLE_F)
-#define ASSERT_STYLE_GTEI            ASSERT_STYLE_PARAM2(">=", ASSERT_STYLE_I)
-#define ASSERT_STYLE_GTEU            ASSERT_STYLE_PARAM2(">=", ASSERT_STYLE_U)
-#define ASSERT_STYLE_GTEP            ASSERT_STYLE_PARAM2(">=", ASSERT_STYLE_P)
-#define ASSERT_STYLE_GTEF            ASSERT_STYLE_PARAM2(">=", ASSERT_STYLE_F)
-#define ASSERT_STYLE_EQI             ASSERT_STYLE_PARAM2("=", ASSERT_STYLE_I)
-#define ASSERT_STYLE_EQU             ASSERT_STYLE_PARAM2("=", ASSERT_STYLE_U)
-#define ASSERT_STYLE_EQP             ASSERT_STYLE_PARAM2("=", ASSERT_STYLE_P)
-#define ASSERT_STYLE_EQF             ASSERT_STYLE_PARAM2("=", ASSERT_STYLE_F)
-#define ASSERT_STYLE_NEQI            ASSERT_STYLE_PARAM2("!=", ASSERT_STYLE_I)
-#define ASSERT_STYLE_NEQU            ASSERT_STYLE_PARAM2("!=", ASSERT_STYLE_U)
-#define ASSERT_STYLE_NEQP            ASSERT_STYLE_PARAM2("!=", ASSERT_STYLE_P)
-#define ASSERT_STYLE_NEQF            ASSERT_STYLE_PARAM2("!=", ASSERT_STYLE_F)
-
-#define ASSERT(A)               do{if(!(A)){assert_format(ASSERT_CARGS, #A, (NULL)             );}}while(0)
-#define ASSERTF(A, F, ...)      do{if(!(A)){assert_format(ASSERT_CARGS, #A, (F), ## __VA_ARGS__);}}while(0)
-#define ASSERT_NOTNULL(A)       do{if(!(A))       {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_NOTNULL,        #A, (A));}}while(0)
-#define ASSERT_PARAM_NOTNULL(A) do{if(!(A))       {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_PARAM_NOTNULL,  #A, (A));}}while(0)
-#define ASSERT_LTI(A,B)         do{if((A)>=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_LTI,            #A, #B,  (intmax_t)(A),  (intmax_t)(B));}}while(0)
-#define ASSERT_LTU(A,B)         do{if((A)>=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_LTU,            #A, #B, (uintmax_t)(A), (uintmax_t)(B));}}while(0)
-#define ASSERT_LTP(A,B)         do{if((A)>=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_LTP,            #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_LTF(A,B)         do{if((A)>=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_LTF,            #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_LTEI(A,B)        do{if((A)>(B))    {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_LTEI,           #A, #B,  (intmax_t)(A),  (intmax_t)(B));}}while(0)
-#define ASSERT_LTEU(A,B)        do{if((A)>(B))    {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_LTEU,           #A, #B, (uintmax_t)(A), (uintmax_t)(B));}}while(0)
-#define ASSERT_LTEP(A,B)        do{if((A)>(B))    {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_LTEP,           #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_LTEF(A,B)        do{if((A)>(B))    {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_LTEF,           #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_GTI(A,B)         do{if((A)<=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_GTI,            #A, #B,  (intmax_t)(A),  (intmax_t)(B));}}while(0)
-#define ASSERT_GTU(A,B)         do{if((A)<=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_GTU,            #A, #B, (uintmax_t)(A), (uintmax_t)(B));}}while(0)
-#define ASSERT_GTP(A,B)         do{if((A)<=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_GTP,            #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_GTF(A,B)         do{if((A)<=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_GTF,            #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_GTEI(A,B)        do{if((A)<(B))    {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_GTEI,           #A, #B,  (intmax_t)(A),  (intmax_t)(B));}}while(0)
-#define ASSERT_GTEU(A,B)        do{if((A)<(B))    {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_GTEU,           #A, #B, (uintmax_t)(A), (uintmax_t)(B));}}while(0)
-#define ASSERT_GTEP(A,B)        do{if((A)<(B))    {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_GTEP,           #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_GTEF(A,B)        do{if((A)<(B))    {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_GTEF,           #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_EQI(A,B)         do{if((A)!=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_EQI,            #A, #B,  (intmax_t)(A),  (intmax_t)(B));}}while(0)
-#define ASSERT_EQU(A,B)         do{if((A)!=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_EQU,            #A, #B, (uintmax_t)(A), (uintmax_t)(B));}}while(0)
-#define ASSERT_EQP(A,B)         do{if((A)!=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_EQP,            #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_EQF(A,B)         do{if((A)!=(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_EQF,            #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_NEQI(A,B)        do{if((A)==(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_NEQI,           #A, #B,  (intmax_t)(A),  (intmax_t)(B));}}while(0)
-#define ASSERT_NEQU(A,B)        do{if((A)==(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_NEQU,           #A, #B, (uintmax_t)(A), (uintmax_t)(B));}}while(0)
-#define ASSERT_NEQP(A,B)        do{if((A)==(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_NEQP,           #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_NEQF(A,B)        do{if((A)==(B))   {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_NEQF,           #A, #B,            (A),            (B));}}while(0)
-#define ASSERT_FALSE(A)         do{if((A))        {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_ISFALSE,        #A, (A));}}while(0)
-#define ASSERT_TRUE(A)          do{if((A)!=0)     {assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_ISTRUE,         #A, (A));}}while(0)
-#define ASSERT_POW2(A)          do{if((A)&((A)-1)){assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_ISPOW2,         #A, (A));}}while(0)
-#define ASSERT_ALIGN(x,a)       do{if(((uintptr_t)(void const*)(x) % (a)) != 0){assert_format(ASSERT_CARGS, NULL, ASSERT_STYLE_ISALIGN, #a, (a), #x, (x), (uintptr_t)(void const*)(x) % (a));}}while(0)
+// Comparison assertion
+// Can be used for only float or double
+#define ASSERT_EQ_F(a,b) ASSERT_COMPARE(a, ==, b, double, "f")
+#define ASSERT_NE_F(a,b) ASSERT_COMPARE(a, !=, b, double, "f")
+#define ASSERT_GT_F(a,b) ASSERT_COMPARE(a, > , b, double, "f")
+#define ASSERT_GE_F(a,b) ASSERT_COMPARE(a, >=, b, double, "f")
+#define ASSERT_LT_F(a,b) ASSERT_COMPARE(a, < , b, double, "f")
+#define ASSERT_LE_F(a,b) ASSERT_COMPARE(a, <=, b, double, "f")
 
 
-
-
-__attribute__ ((unused))
-__attribute__ ((format (printf, 6, 0)))
 static void assert_format_va
 (int id, char const * file, int line, char const * fn, char const * exp, char const * fmt, va_list va)
 {
-	fprintf (stderr, ASSERT_STYLE_ASSERT " " ASSERT_STYLE_FILENAME ":" ASSERT_STYLE_LINE " " ASSERT_STYLE_FNAME "() ", id, file, line, fn);
-	if (errno != 0) {fprintf (stderr, " " ASSERT_STYLE_ERRNO " ", strerror (errno), errno);}
-	if (exp){fprintf (stderr, ": " ASSERT_STYLE_EXP " ", exp);}
+	fprintf (stderr, ASSERT_COLOR "A%i " ASSERT_COLOR_FILENAME "%s:%i\e[0m " ASSERT_COLOR_FUNCNAME "%s()\e[0m: ", id, file, line, fn);
+
+	if (errno != 0)
+	{
+		fprintf (stderr, "errno(%i): " ASSERT_COLOR "%s\e[0m. ", errno, strerror (errno));
+	}
+	if (exp)
+	{
+		fprintf (stderr, "exp: "ASSERT_COLOR_EXP "%s\e[0m. ", exp);
+	}
 	if (fmt)
 	{
 		vfprintf (stderr, fmt, va);
@@ -120,23 +85,21 @@ static void assert_format_va
 
 
 __attribute__ ((noreturn))
-__attribute__ ((format (printf, 6, 0)))
+__attribute__ ((format (printf, 6, 7)))
 static void assert_format 
 (int id,char const * file,int line,char const * fn,char const * exp,char const * fmt,...)
 {
-/*
-#ifdef _WIN32
-	file = strrchr(file, '\\') + 1;
-#else
-	file = strrchr(file, '/') + 1;
-#endif
-*/
 	va_list va;
 	va_start (va, fmt);
 	assert_format_va (id, file, line, fn, exp, fmt, va);
 	va_end (va);
 	exit (1);
 }
+
+
+
+
+
 
 
 

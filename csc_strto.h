@@ -16,7 +16,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 
 static inline intmax_t strto_imax (char const ** f, int base)
 {
-	ASSERT_PARAM_NOTNULL (f);
+	ASSERT (f);
 	intmax_t a = 0;
 	int c;
 	int neg = 0;
@@ -43,7 +43,7 @@ static inline intmax_t strto_imax (char const ** f, int base)
 
 static inline uintmax_t strto_umax (char const ** f, int base)
 {
-	ASSERT_PARAM_NOTNULL (f);
+	ASSERT (f);
 	uintmax_t a = 0;
 	int c;
 	while (1)
@@ -105,7 +105,7 @@ static inline uintmax_t str_to_umax_ab_adabase (char const * a, char const * b)
 
 static inline uint32_t strto_u32 (char const ** f, int base)
 {
-	ASSERT_PARAM_NOTNULL (f);
+	ASSERT (f);
 	uintmax_t v = strto_umax (f, base);
 	return (uint32_t) v;
 }
@@ -114,7 +114,7 @@ static inline uint32_t strto_u32 (char const ** f, int base)
 
 static inline int32_t strto_i32 (char const ** f, int base)
 {
-	ASSERT_PARAM_NOTNULL (f);
+	ASSERT (f);
 	intmax_t v = strto_imax (f, base);
 	return (int8_t) v;
 }

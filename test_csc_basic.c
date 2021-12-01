@@ -1,16 +1,12 @@
+#include "csc_basic.h"
 #include "csc_assert.h"
 #include "csc_crossos.h"
-#include "csc_basic.h"
-#include "csc_bitset.h"
 #include "csc_strf.h"
 
 
-int main (int argc, char const * argv [])
-{
-	csc_crossos_enable_ansi_color();
-	ASSERT (argc);
-	ASSERT (argv);
 
+static void test_BITSET64()
+{
 	uint64_t f[2] = {0,0};
 	BITSET64_ADD(f, '0');
 	BITSET64_ADD(f, '1');
@@ -22,9 +18,6 @@ int main (int argc, char const * argv [])
 	ASSERT (f[1] == 0b0000000000000000000000000000001000000000000000000000000000000000);
 	ASSERT(BITSET64_GET(f, '0') == 0);
 	ASSERT(BITSET64_GET(f, '1') == 1);
-	//strf_printf ("%w064u64_2\n", f[1]);
-
-
 	f[0] = 0;
 	f[1] = 0;
 	BITSET64_ADD(f, '0');
@@ -53,8 +46,17 @@ int main (int argc, char const * argv [])
 	ASSERT(BITSET64_GET(f, 'Z') == 0);
 	ASSERT (f[0] == 0);
 	ASSERT (f[1] == 0);
+	//strf_printf ("%w064u64_2\n", f[1]);
+}
 
 
+int main (int argc, char const * argv [])
+{
+	csc_crossos_enable_ansi_color();
+	ASSERT (argc);
+	ASSERT (argv);
+
+	test_BITSET64();
 
 	return EXIT_SUCCESS;
 }

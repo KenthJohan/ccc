@@ -27,9 +27,9 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 static inline uint32_t strfrom_imax
 (char * o, uint32_t n, intmax_t value, int base, char sign)
 {
-	ASSERT_PARAM_NOTNULL (o);
-	ASSERT (base != 0);
-	ASSERT (base < (int8_t)sizeof (STRFROM_LOOKUP_0Z));
+	ASSERT (o);
+	ASSERT_NE_I (base, 0);
+	ASSERT_LE_I (base, (int8_t)sizeof (STRFROM_LOOKUP_0Z));
 	int rem;
 	if (n == 0) {return n;}
 	o += n;
@@ -75,9 +75,9 @@ static inline uint32_t strfrom_imax
 static inline uint32_t strfrom_umax
 (char * o, uint32_t n, uintmax_t value, int base)
 {
-	ASSERT_PARAM_NOTNULL (o);
-	ASSERT_NEQI (base, 0);
-	ASSERT_LTI (base, (int8_t)sizeof (STRFROM_LOOKUP_0Z));
+	ASSERT (o);
+	ASSERT_NE_I (base, 0);
+	ASSERT_LT_I (base, (int8_t)sizeof (STRFROM_LOOKUP_0Z));
 	int rem;
 	if (n == 0) {return n;}
 	o += n;
