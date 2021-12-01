@@ -13,6 +13,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include "csc_basic.h"
 #include "csc_assert.h"
 #include "csc_type_str.h"
+#include "csc_u64.h"
 
 
 
@@ -144,11 +145,8 @@ again:
 	else if (setflag)
 	{
 		uint64_t a[2] = {0};
-		for (char const * p = s; p[0] != '\0'; p++)
-		{
-			BITSET64_ADD(a, p[0]);
-		}
-		if (BITSET64_GET(a, name_char) == 0) {goto again;}
+		vu64_bitset_from_string (a, s);
+		if (VU64_BITSET_GET(a, name_char) == 0) {goto again;}
 		csc_argv_convert_flag (type, (union csc_union*)dst, setflag);
 	}
 	//Handles short names for values: e.g: {"-aHello", "-a", "Hello"}:

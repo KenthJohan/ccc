@@ -7,6 +7,12 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #include <stdint.h>
 
 
+#define U32_U8_LE(a, b, c, d) ((uint32_t)((a) | (b) << 8 | (c) << 16 | (d) << 24))
+#define U32_U8_BE(d, c, b, a) ((uint32_t)((a) | (b) << 8 | (c) << 16 | (d) << 24))
+#define U32_V4U8_LE(s) U32_U8_LE(s[0],s[1],s[2],s[3])
+#define U32_V4U8_BE(s) U32_U8_BE(s[0],s[1],s[2],s[3])
+
+
 
 //If a maps to x, then b maps from x
 static inline void
@@ -19,22 +25,7 @@ vu32_map (uint32_t a [], uint32_t b [], uint32_t n)
 }
 
 
-//Calculate the size-mask or max-size:
-//TODO: This might be too convulated to get the size mask:
-static inline uint64_t
-u64_sizemask (unsigned size)
-{
-	uint64_t mask;
-	if (size == 64)
-	{
-		mask = UINT64_MAX;
-	}
-	else
-	{
-		mask = ((UINT64_C (1) << (uint64_t)size) - UINT64_C (1));
-	}
-	return mask;
-}
+
 
 
 
@@ -60,9 +51,4 @@ static int u32_hamming_weight (uint32_t x)
 	return __builtin_popcount (x);
 }
 
-//https://en.wikipedia.org/wiki/Hamming_weight
-static int u64_hamming_weight (uint64_t x)
-{
-	return __builtin_popcountll (x);
-}
 

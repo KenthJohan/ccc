@@ -34,6 +34,8 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define ASSERT(A)               do{if(!(A)){assert_format(__COUNTER__, __FILE__, __LINE__, __func__, #A, (NULL)             );}}while(0)
 #define ASSERTF(A, F, ...)      do{if(!(A)){assert_format(__COUNTER__, __FILE__, __LINE__, __func__, #A, (F), ## __VA_ARGS__);}}while(0)
 
+#define ASSERT_PARAM_NOTNULL(A) ASSERT(A)
+
 // Comparison assertion
 // Can be used for any unsigned
 #define ASSERT_EQ_U(a,b) ASSERT_COMPARE(a, ==, b, uintmax_t, PRIuMAX)

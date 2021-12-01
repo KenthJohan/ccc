@@ -15,10 +15,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define SWAP(t, a, b) do{t c = (b); (b) = (a); (a) = (c);} while (0)
 #define SWAPX(a, b)	((a)^=(b),(b)^=(a),(a)^=(b))
 #define INRANGE(x, a, b) ((a) <= (x) && (x) <= (b))
-#define U8_U32_LE(a, b, c, d) ((uint32_t)((a) | (b) << 8 | (c) << 16 | (d) << 24))
-#define U8_U32_BE(d, c, b, a) ((uint32_t)((a) | (b) << 8 | (c) << 16 | (d) << 24))
-#define STR4_U32_LE(s) U8_U32_LE(s[0],s[1],s[2],s[3])
-#define STR4_U32_BE(s) U8_U32_BE(s[0],s[1],s[2],s[3])
+
 //#define STRINGIFY0(x) #x
 //#define STRINGIFY(x)  STRINGIFY0(x)
 #define XSTR(a) STR(a)
@@ -28,9 +25,7 @@ SPDX-FileCopyrightText: 2021 Johan Söderlind Åström <johan.soderlind.astrom@g
 #define container_of_const(ptr, type, member) ((type *)(void const *)((char const *)(ptr) - offsetof(type, member)))
 #define countof(array) (sizeof(array) / sizeof(array[0]))
 
-#define BITSET64_ADD(x,c) ((x)[(uint64_t)(c) >> 6] |= (UINT64_C(1) << ((c) & 63)))
-#define BITSET64_REMOVE(x,c) ((x)[(uint64_t)(c) >> 6] &= ~(UINT64_C(1) << ((c) & 63)))
-#define BITSET64_GET(x,c) (((x)[(uint64_t)(c) >> 6] >> ((c)&63)) & 1)
+
 
 
 
