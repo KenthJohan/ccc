@@ -228,9 +228,9 @@ static void test_flags8()
 	{
 	"-rx",
 	"-xrb",
-	"-wwc",
-	"-D",
-	"4",
+	"-cw",
+	"-Dwwww",
+	"-D4",
 	NULL,
 	};
 	float value = 1.0f;
@@ -242,7 +242,8 @@ static void test_flags8()
 	csc_argv_parse (a, 'w', "write", CSC_TYPE_U32, &perm, FLAG_WRITE);
 	csc_argv_parse (a, 'x', "exec", CSC_TYPE_U32, &perm, FLAG_EXEC|FLAG_A);
 	csc_argv_parse (a, 'D', "Duration", CSC_TYPE_FLOAT, &value, 0);
-	csc_argv_parse (a, 'D', "Duration", CSC_TYPE_U32, &perm, FLAG_D|FLAG_B);
+	csc_argv_parse (a, 'D', "Duration", CSC_TYPE_U32, &perm, FLAG_D);
+	csc_argv_parse (a, '4', "4", CSC_TYPE_U32, &perm, FLAG_B);
 	ASSERT (perm & FLAG_DEFAULT);
 	ASSERT (perm & FLAG_EXEC);
 	ASSERT (perm & FLAG_READ);

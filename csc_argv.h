@@ -45,50 +45,64 @@ static void csc_argv_convert_value (enum csc_type type, union csc_union * dst, c
 	ASSERT_PARAM_NOTNULL (dst);
 	ASSERT_PARAM_NOTNULL (src);
 	char * endptr = NULL;
+	union csc_union v;
 	switch (type)
 	{
 	case CSC_TYPE_STRING:
 		dst->val_string = src;
 		break;
 	case CSC_TYPE_FLOAT:
-		dst->val_float = strtod (src, &endptr);
+		v.val_float = strtod (src, &endptr);
+		if (src != endptr) {dst->val_float = v.val_float;}
 		break;
 	case CSC_TYPE_DOUBLE:
-		dst->val_double = strtod (src, &endptr);
+		v.val_double = strtod (src, &endptr);
+		if (src != endptr) {dst->val_double = v.val_float;}
 		break;
 	case CSC_TYPE_U8:
-		dst->val_u8 = strtoumax (src, &endptr, 0);
+		v.val_u8 = strtoumax (src, &endptr, 0);
+		if (src != endptr) {dst->val_u8 = v.val_float;}
 		break;
 	case CSC_TYPE_U16:
-		dst->val_u16 = strtoumax (src, &endptr, 0);
+		v.val_u16 = strtoumax (src, &endptr, 0);
+		if (src != endptr) {dst->val_u16 = v.val_float;}
 		break;
 	case CSC_TYPE_U32:
-		dst->val_u32 = strtoumax (src, &endptr, 0);
+		v.val_u32 = strtoumax (src, &endptr, 0);
+		if (src != endptr) {dst->val_u32 = v.val_float;}
 		break;
 	case CSC_TYPE_U64:
-		dst->val_u64 = strtoumax (src, &endptr, 0);
+		v.val_u64 = strtoumax (src, &endptr, 0);
+		if (src != endptr) {dst->val_u64 = v.val_float;}
 		break;
 	case CSC_TYPE_INT:
-		dst->val_int = strtoimax (src, &endptr, 0);
+		v.val_int = strtoimax (src, &endptr, 0);
+		if (src != endptr) {dst->val_int = v.val_float;}
 		break;
 	case CSC_TYPE_LONG:
-		dst->val_long = strtoimax (src, &endptr, 0);
+		v.val_long = strtoimax (src, &endptr, 0);
+		if (src != endptr) {dst->val_long = v.val_float;}
 		break;
 	case CSC_TYPE_I8:
-		dst->val_i8 = strtoimax (src, &endptr, 0);
+		v.val_i8 = strtoimax (src, &endptr, 0);
+		if (src != endptr) {dst->val_i8 = v.val_float;}
 		break;
 	case CSC_TYPE_I16:
-		dst->val_i16 = strtoimax (src, &endptr, 0);
+		v.val_i16 = strtoimax (src, &endptr, 0);
+		if (src != endptr) {dst->val_i16 = v.val_float;}
 		break;
 	case CSC_TYPE_I32:
-		dst->val_i32 = strtoimax (src, &endptr, 0);
+		v.val_i32 = strtoimax (src, &endptr, 0);
+		if (src != endptr) {dst->val_i32 = v.val_float;}
 		break;
 	case CSC_TYPE_I64:
-		dst->val_i64 = strtoimax (src, &endptr, 0);
+		v.val_i64 = strtoimax (src, &endptr, 0);
+		if (src != endptr) {dst->val_i64 = v.val_float;}
 		break;
 	default:
 		break;
 	}
+
 }
 
 
@@ -125,7 +139,6 @@ again:
 		else if (s[-1] == '\0' && setflag)
 		{
 			csc_argv_convert_flag (type, (union csc_union*)dst, setflag);
-			return;
 		}
 	}
 	//Handles short names for flags: e.g: {"-x", "-rw", -rWarren}:
@@ -138,7 +151,6 @@ again:
 		}
 		if (BITSET64_GET(a, name_char) == 0) {goto again;}
 		csc_argv_convert_flag (type, (union csc_union*)dst, setflag);
-		return;
 	}
 	//Handles short names for values: e.g: {"-aHello", "-a", "Hello"}:
 	else if (s[1] == name_char)
@@ -149,7 +161,6 @@ again:
 		else if (argv[1]) {s = argv[1];}
 		else {goto again;}
 		csc_argv_convert_value (type, (union csc_union*)dst, s);
-		return;
 	}
 	goto again;
 }
